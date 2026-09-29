@@ -3,12 +3,7 @@ import streamlit as st
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import ENGLISH_T1
 from lumina.curriculum.grounding import build_grounded_pdf, curriculum_prompt
-from lumina.curriculum.english_unit1 import UNIT1_LESSONS
-from lumina.curriculum.english_unit2 import UNIT2_LESSONS
-from lumina.curriculum.english_unit3 import UNIT3_LESSONS
-from lumina.curriculum.english_unit4 import UNIT4_LESSONS
-from lumina.curriculum.english_unit5 import UNIT5_LESSONS
-from lumina.curriculum.english_unit6 import UNIT6_LESSONS
+from lumina.curriculum.english_curriculum import get_english_lessons
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.learning.progress_view import render_learning_brain_summary
 from lumina.session_state import (
@@ -60,38 +55,23 @@ def _render_school_track(ai: GeminiService) -> None:
         prefix = "→" if unit.title == unit_title else "•"
         st.write(f"{prefix} {unit.title}")
 
-    if unit_title == "Personal Identity":
-        _render_verified_unit("Unit 1 · Personal Identity", UNIT1_LESSONS, "english_u1_lesson")
-    elif unit_title == "Communication with Family and Friends":
+    lessons = get_english_lessons(unit_title)
+    if lessons:
+        unit_number = {
+            "Personal Identity": 1,
+            "Communication with Family and Friends": 2,
+            "Artificial Intelligence": 3,
+            "Screen Time": 4,
+            "Design Thinking": 5,
+            "Why Do We Like Stories?": 6,
+        }[unit_title]
         _render_verified_unit(
-            "Unit 2 · Communication with Family and Friends",
-            UNIT2_LESSONS,
-            "english_u2_lesson",
+            f"Unit {unit_number} · {unit_title}",
+            lessons,
+            f"english_u{unit_number}_lesson",
         )
-    elif unit_title == "Artificial Intelligence":
-        _render_verified_unit(
-            "Unit 3 · Artificial Intelligence",
-            UNIT3_LESSONS,
-            "english_u3_lesson",
-        )
-    elif unit_title == "Screen Time":
-        _render_verified_unit(
-            "Unit 4 · Screen Time",
-            UNIT4_LESSONS,
-            "english_u4_lesson",
-        )
-    elif unit_title == "Design Thinking":
-        _render_verified_unit(
-            "Unit 5 · Design Thinking",
-            UNIT5_LESSONS,
-            "english_u5_lesson",
-        )
-    elif unit_title == "Why Do We Like Stories?":
-        _render_verified_unit(
-            "Unit 6 · Why Do We Like Stories?",
-            UNIT6_LESSONS,
-            "english_u6_lesson",
-        )
+    elif unit_title in {"Review 1", "Review 2"}:
+        st.info("Structured review mode is being connected next from the verified review pages.")
 
     st.markdown("---")
     st.caption("Advanced source session")

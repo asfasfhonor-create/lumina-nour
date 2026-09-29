@@ -45,9 +45,12 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
         if st.button("اختبر اتصال الحفظ السحابي", key="parent_test_persistence"):
             try:
                 if store.health_check():
-                    st.success("اتصال قاعدة البيانات يعمل الآن.")
+                    st.session_state.persistence_verified = True
+                    st.success("اتصال قاعدة البيانات والجداول المطلوبة يعملان الآن.")
+                    st.rerun()
                 else:
-                    st.warning("اختبار الاتصال لم ينجح.")
+                    st.session_state.persistence_verified = False
+                    st.warning("الاتصال موجود لكن مخطط قاعدة البيانات غير مكتمل أو غير جاهز.")
             except PersistenceError as exc:
                 st.session_state.persistence_verified = False
                 st.error(str(exc))
@@ -61,6 +64,8 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
         ai_available=ai_available,
         app_pin_configured=app_pin_configured,
         parent_pin_configured=bool(parent_pin),
+        storage_status=status,
+        storage_verified=bool(st.session_state.get("persistence_verified", False)),
     )
     for item in readiness:
         icon = "✅" if item.ready else "⚠️"

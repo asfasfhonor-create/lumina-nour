@@ -15,10 +15,10 @@ Configure only in Streamlit secrets. Never commit real values.
 
 ## Database activation
 
-1. Create a **dedicated LUMINA Supabase project**. Do not reuse PROJECT LEDGER databases.
-2. Apply `supabase/lumina_schema.sql` as a migration.
-3. Run Supabase security advisors.
-4. Add `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, and `NOUR_LEARNER_KEY` to Streamlit secrets.
+1. Create a **dedicated LUMINA Neon project**. Do not reuse PROJECT LEDGER databases.
+2. Apply `postgres/neon_schema.sql` in the Neon SQL editor.
+3. Copy the Neon server-side connection string with SSL enabled.
+4. Add `DATABASE_URL` and `NOUR_LEARNER_KEY` to Streamlit secrets.
 5. Launch the app and verify that attempts, mistakes, reviews, XP, streak, badges, and English profile survive a fresh browser session.
 
 ## Curriculum checks

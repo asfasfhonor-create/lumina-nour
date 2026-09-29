@@ -67,3 +67,33 @@ create table if not exists lumina_profile_state (
     state jsonb not null default '{}'::jsonb,
     updated_at timestamptz not null default now()
 );
+
+
+-- Permanent trusted-source catalog.
+-- Large PDF/image bytes live in a durable object/file provider; Neon stores
+-- metadata and provenance only.
+create table if not exists lumina_trusted_sources (
+    source_id text primary key,
+    learner_key text not null,
+    filename text not null,
+    display_name text not null,
+    subject text not null,
+    term_label text not null,
+    unit_label text,
+    mime_type text not null,
+    sha256 text not null,
+    size_bytes bigint not null check (size_bytes > 0),
+    storage_provider text not null,
+    storage_key text not null,
+    trust_status text not null default 'trusted'
+        check (trust_status in ('trusted', 'archived')),
+    active boolean not null default true,
+    notes text,
+    metadata jsonb not null default '{}'::jsonb,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+    unique (learner_key, sha256)
+);
+
+create index if not exists lumina_trusted_sources_lookup_idx
+    on lumina_trusted_sources (learner_key, subject, active, updated_at);

@@ -80,9 +80,20 @@ def _render_learning_worlds() -> None:
             st.markdown(
                 f'<div class="subject"><h4>{module.icon} {module.title}</h4>'
                 f'<span class="muted">{module.description}</span><br>'
-                '<small>🚧 جاري بناء التجربة من منهج نور الحالي</small></div>',
+                '<small>Structured learning world</small></div>',
                 unsafe_allow_html=True,
             )
+            if module.id == "english":
+                if st.button("ادخلي English Adventure", key=f"open_world_{module.id}"):
+                    st.session_state.active_world = module.id
+                    st.rerun()
+            else:
+                st.button(
+                    "قريبًا",
+                    key=f"open_world_{module.id}",
+                    disabled=True,
+                    help="هنفتح العالم ده بعد ربطه بمحرك المنهج والتعلم.",
+                )
 
     ai_module = get_module("ai")
     if ai_module:

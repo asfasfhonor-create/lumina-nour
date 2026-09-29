@@ -15,15 +15,15 @@ def require_app_access(app_pin: str | None) -> bool:
     if st.session_state.get("app_unlocked", False):
         return True
 
-    st.markdown("## 🔐 Nour's World")
-    st.caption("ادخلي الـPIN لفتح عالم نور.")
-    entered = st.text_input("PIN", type="password", key="nour_app_pin_input")
+    st.markdown("## 🔐 عالم نور")
+    st.caption("اكتبي رمز الدخول لفتح عالم نور.")
+    entered = st.text_input("رمز الدخول", type="password", key="nour_app_pin_input")
 
     if st.button("فتح LUMINA", key="nour_app_unlock"):
         if hmac.compare_digest(str(entered), str(app_pin)):
             st.session_state.app_unlocked = True
             st.rerun()
         else:
-            st.error("PIN غير صحيح.")
+            st.error("رمز الدخول غير صحيح.")
 
     return False

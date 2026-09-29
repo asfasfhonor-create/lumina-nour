@@ -8,6 +8,8 @@ from lumina.worlds.ict import render_ict_world
 from lumina.worlds.arabic import render_arabic_world
 from lumina.worlds.social import render_social_world
 from lumina.worlds.religion import render_religion_world
+from lumina.worlds.ai_lab import render_ai_world
+from lumina.review_center import render_review_center
 from lumina.parent_dashboard import render_parent_dashboard
 
 
@@ -19,6 +21,7 @@ WORLD_RENDERERS = {
     "arabic": render_arabic_world,
     "social": render_social_world,
     "religion": render_religion_world,
+    "ai": render_ai_world,
 }
 
 
@@ -34,6 +37,10 @@ def render_active_world(ai: GeminiService, parent_pin: str | None = None) -> boo
 
     if module_id == "parent":
         render_parent_dashboard(parent_pin)
+        return True
+
+    if module_id == "review":
+        render_review_center()
         return True
 
     renderer = WORLD_RENDERERS.get(module_id)

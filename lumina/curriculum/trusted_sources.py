@@ -24,6 +24,26 @@ ARCHIVED = "archived"
 NEON_OBJECT_STORAGE = "neon_object_storage"
 TRUSTED_SOURCE_BUCKET = "lumina-trusted-sources"
 
+SOURCE_ROLE_OFFICIAL = "official"
+SOURCE_ROLE_SUPPLEMENTARY = "supplementary"
+SOURCE_ROLE_SUPPLIED = "supplied"
+
+SOURCE_ROLE_LABELS = {
+    SOURCE_ROLE_OFFICIAL: "رسمي · وزارة التربية والتعليم",
+    SOURCE_ROLE_SUPPLEMENTARY: "مساعد · كتاب خارجي / مذكرة",
+    SOURCE_ROLE_SUPPLIED: "مقدَّم من وليّ الأمر",
+}
+
+SOURCE_ROLE_PRIORITY = {
+    SOURCE_ROLE_OFFICIAL: 100,
+    SOURCE_ROLE_SUPPLIED: 70,
+    SOURCE_ROLE_SUPPLEMENTARY: 50,
+}
+
+
+def source_role_priority(role: str) -> int:
+    return SOURCE_ROLE_PRIORITY.get(role, 0)
+
 
 def content_sha256(data: bytes) -> str:
     """Return a stable lowercase SHA-256 digest for uploaded bytes."""
@@ -85,6 +105,20 @@ class TrustedSourceRecord:
     notes: str | None = None
     metadata: Mapping[str, str] = field(default_factory=dict)
 
+    @property
+    def source_role(self) -> str:
+        return str(self.metadata.get("source_role", SOURCE_ROLE_SUPPLIED))
+
+    @property
+    def priority(self) -> int:
+        raw = self.metadata.get("priority")
+        if raw is not None:
+            try:
+                return int(raw)
+            except (TypeError, ValueError):
+                pass
+        return source_role_priority(self.source_role)
+
     def __post_init__(self) -> None:
         if self.trust_status not in {TRUSTED, ARCHIVED}:
             raise ValueError("Permanent sources must be trusted or archived.")
@@ -115,9 +149,26 @@ def build_trusted_record(
     unit_label: str | None = None,
     notes: str | None = None,
     metadata: Mapping[str, str] | None = None,
+    source_role: str = SOURCE_ROLE_SUPPLIED,
+    publisher: str | None = None,
+    edition_label: str | None = None,
 ) -> TrustedSourceRecord:
     """Create metadata only after durable binary storage has succeeded."""
+    if source_role not in SOURCE_ROLE_PRIORITY:
+        raise ValueError("Unsupported source role.")
     digest = upload.digest
+    source_metadata = dict(metadata or {})
+    source_metadata.update(
+        {
+            "source_role": source_role,
+            "priority": str(source_role_priority(source_role)),
+        }
+    )
+    if publisher:
+        source_metadata["publisher"] = publisher.strip()
+    if edition_label:
+        source_metadata["edition_label"] = edition_label.strip()
+
     return TrustedSourceRecord(
         source_id=f"src_{digest[:24]}",
         learner_key=learner_key,
@@ -132,5 +183,5 @@ def build_trusted_record(
         storage_provider=storage_provider.strip(),
         storage_key=storage_key.strip(),
         notes=notes.strip() if notes else None,
-        metadata=dict(metadata or {}),
+        metadata=source_metadata,
     )

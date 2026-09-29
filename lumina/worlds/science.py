@@ -5,6 +5,7 @@ from lumina.curriculum.catalog import SCIENCE_T1
 from lumina.curriculum.science_unit1 import SCIENCE_UNIT1_LESSONS
 from lumina.curriculum.science_unit2 import SCIENCE_UNIT2_LESSONS
 from lumina.curriculum.science_unit3 import SCIENCE_UNIT3_LESSONS
+from lumina.curriculum.science_unit4 import SCIENCE_UNIT4_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
 
 
@@ -43,6 +44,13 @@ def render_science_world(ai: GeminiService) -> None:
             "Unit 3 · The Universe and the Solar System",
             SCIENCE_UNIT3_LESSONS,
             "science_u3_lesson",
+            module_id="science",
+        )
+    elif unit_title == "Reproduction and Species Continuity":
+        render_verified_unit(
+            "Unit 4 · Reproduction and Species Continuity",
+            SCIENCE_UNIT4_LESSONS,
+            "science_u4_lesson",
             module_id="science",
         )
     else:

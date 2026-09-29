@@ -25,6 +25,7 @@ jobs:
           python - <<'PY'
           import lumina.ai_service
           import lumina.worlds.english
+          import lumina.worlds.science
           import lumina.parent_dashboard
           import lumina.persistence.session_store
           print("Import smoke test OK")
@@ -165,4 +166,21 @@ jobs:
           assert len(REVIEW1.checks) == 3
           assert len(REVIEW2.checks) == 3
           print("Complete English curriculum mapping OK")
+          PY
+
+      - name: Validate Science Unit 1 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.science_unit1 import SCIENCE_UNIT1_LESSONS
+
+          assert len(SCIENCE_UNIT1_LESSONS) == 3
+          assert [lesson.title for lesson in SCIENCE_UNIT1_LESSONS] == [
+              "Motion in One Direction",
+              "Graphic Representation of Motion in a Straight Line",
+              "Physical Quantities: Scalars and Vectors",
+          ]
+          for lesson in SCIENCE_UNIT1_LESSONS:
+              assert lesson.checks
+              assert lesson.source_pages
+          print("Science Unit 1 lesson contracts OK")
           PY

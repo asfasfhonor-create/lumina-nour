@@ -26,6 +26,7 @@ def initialize_session_state() -> None:
         "profile_hydrated": False,
         "persistence_disabled_for_session": False,
         "persistence_warning": None,
+        "persistence_verified": False,
     }
     for key, value in defaults.items():
         if key not in st.session_state:

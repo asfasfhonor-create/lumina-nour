@@ -65,6 +65,7 @@ def _render_school_track(ai: GeminiService) -> None:
             lessons,
             f"english_u{unit_number}_lesson",
             module_id="english",
+            ai=ai,
         )
     elif unit_title in {"Review 1", "Review 2"}:
         review = get_review(unit_title)

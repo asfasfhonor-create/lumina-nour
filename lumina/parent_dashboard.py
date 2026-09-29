@@ -20,8 +20,7 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
 
     if not parent_pin:
         st.info(
-            "Parent Dashboard is protected by design. Configure PARENT_PIN in Streamlit secrets "
-            "before enabling this area."
+            "لوحة وليّ الأمر مقفولة حاليًا. فعّل رمز وليّ الأمر من إعدادات التطبيق قبل استخدامها."
         )
         return
 
@@ -32,7 +31,7 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
                 st.session_state.parent_unlocked = True
                 st.rerun()
             else:
-                st.error("PIN غير صحيح.")
+                st.error("الرمز غير صحيح.")
         return
 
     if st.button("قفل لوحة وليّ الأمر", key="parent_lock"):
@@ -152,8 +151,8 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
     st.markdown("### مستوى Real English")
     if profile:
         st.write(
-            f"Starting band: **{profile.get('broad_band', '—')}** · "
-            f"baseline {profile.get('baseline_correct', 0)}/{profile.get('baseline_total', 0)}"
+            f"المستوى المبدئي: **{profile.get('broad_band', '—')}** · "
+            f"اختبار البداية {profile.get('baseline_correct', 0)}/{profile.get('baseline_total', 0)}"
         )
         if profile.get("support_note"):
             st.caption(profile["support_note"])
@@ -161,7 +160,7 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
         st.caption("لسه ما اتعملش اختبار تحديد المستوى لـ Real English.")
 
     st.markdown("### تغطية المصادر المعتمدة")
-    st.caption("LUMINA لا يفترض Term غير موجود في المصادر الموثوقة.")
+    st.caption("LUMINA ما بيفترضش ترم أو جزء دراسي غير موجود في المصادر المعتمدة.")
     for subject_id, coverage in SOURCE_COVERAGE.items():
         st.write(
             f"**{SUBJECT_LABELS.get(subject_id, subject_id)}** — "
@@ -193,12 +192,12 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
 
         total_started += started
         with st.expander(
-            f"{SUBJECT_LABELS.get(subject_id, subject_id)} · {started}/{len(subject_lessons)} started",
+            f"{SUBJECT_LABELS.get(subject_id, subject_id)} · بدأ {started}/{len(subject_lessons)}",
             expanded=False,
         ):
             st.write(
-                f"Needs review: **{needs_review}** · Mastered: **{mastered}** · "
-                f"Mapped lessons: **{len(subject_lessons)}**"
+                f"محتاج مراجعة: **{needs_review}** · متقن: **{mastered}** · "
+                f"الدروس المرتبطة: **{len(subject_lessons)}**"
             )
             for unit_title, lessons in units.items():
                 unit_states = [
@@ -212,8 +211,8 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
                 unit_review = sum(state == "needs_review" for state in unit_states)
                 unit_mastered = sum(state == "mastered" for state in unit_states)
                 st.caption(
-                    f"{unit_title}: started {unit_started}/{len(lessons)} · "
-                    f"review {unit_review} · mastered {unit_mastered}"
+                    f"{unit_title}: بدأ {unit_started}/{len(lessons)} · "
+                    f"مراجعة {unit_review} · متقن {unit_mastered}"
                 )
 
     if mistakes:
@@ -229,10 +228,10 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
             with st.container(border=True):
                 st.write(
                     f"**{subject}** · {mistake.get('lesson_title', lesson_id)} — "
-                    f"{mistake.get('mistake_type', 'learning mistake')}"
+                    f"{mistake.get('mistake_type', 'خطأ تعلّم')}"
                 )
                 if mistake.get("source_pages"):
-                    st.caption(f"Source: {mistake['source_pages']}")
+                    st.caption(f"المصدر: {mistake['source_pages']}")
                 if st.button(
                     "افتحي نقطة الضعف",
                     key=f"parent_open_weak_{lesson_id}",
@@ -243,8 +242,8 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
                     st.rerun()
 
     st.caption(
-        f"Mapped curriculum lessons across all subjects: {total_mapped} · "
-        f"started: {total_started} · progress is based on evidence, not button clicks."
+        f"إجمالي الدروس المرتبطة: {total_mapped} · "
+        f"بدأ منها: {total_started} · التقدّم يعتمد على دليل تعلّم حقيقي، مش مجرد الضغط على الأزرار."
     )
 
     _render_trusted_sources()
@@ -365,8 +364,7 @@ def _render_trusted_sources() -> None:
 def _render_backup_tools(store) -> None:
     st.markdown("### النسخة الاحتياطية والاستعادة")
     st.caption(
-        "Portable safety copy. When Neon is active, the database remains the primary source of truth. "
-        "The backup contains learning progress, never database passwords or API keys."
+        "نسخة أمان قابلة للتنزيل تحتوي على تقدّم التعلّم فقط، ولا تحتوي على كلمات مرور أو مفاتيح سرية."
     )
 
     st.download_button(

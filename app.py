@@ -2,6 +2,7 @@ import streamlit as st
 from google import genai
 from google.genai import types
 from PIL import Image
+from lumina.module_registry import get_school_subjects, get_module
 
 st.set_page_config(page_title="LUMINA | Nour's World", page_icon="✨", layout="centered", initial_sidebar_state="collapsed")
 
@@ -73,21 +74,24 @@ else:
 
 st.markdown('<div class="section-title">📚 اختاري عالمك</div>', unsafe_allow_html=True)
 cols = st.columns(2)
-subjects = [
-    ("🇬🇧 English Adventure", "محادثة، كلمات، قراءة وكتابة."),
-    ("🔬 Science Lab", "اكتشفي الفكرة بالتجربة والتشبيه."),
-    ("➗ Math Quest", "حلّي وفكّري خطوة بخطوة."),
-    ("📖 Arabic World", "لغة وقراءة وتعبير بطريقة ممتعة."),
-    ("🌍 Social Studies", "تاريخ وجغرافيا كقصة وتحقيق."),
-    ("🕌 Religion Journey", "فهم وربط وتطبيق من المنهج."),
-    ("💻 ICT Lab", "تكنولوجيا ومهارات رقمية بالتجربة."),
-]
-for i, (title, desc) in enumerate(subjects):
+subjects = get_school_subjects()
+for i, module in enumerate(subjects):
     with cols[i % 2]:
-        st.markdown(f'<div class="subject"><h4>{title}</h4><span class="muted">{desc}</span><br><small>🚧 جاري بناء التجربة من منهج نور الحالي</small></div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="subject"><h4>{module.icon} {module.title}</h4>'
+            f'<span class="muted">{module.description}</span><br>'
+            '<small>🚧 جاري بناء التجربة من منهج نور الحالي</small></div>',
+            unsafe_allow_html=True,
+        )
 
-st.markdown('<div class="section-title">🤖 AI Explorer</div>', unsafe_allow_html=True)
-st.markdown('<div class="mission"><b>قريبًا: AI Detective + Prompt Challenges + Creative Builder</b><br><span class="muted">مش الهدف ناخد الإجابة من الـ AI؛ الهدف نتعلم نسأله صح، نراجعه، نكتشف أخطاءه ونصنع به حاجات جديدة.</span></div>', unsafe_allow_html=True)
+ai_module = get_module("ai")
+if ai_module:
+    st.markdown(f'<div class="section-title">{ai_module.icon} {ai_module.title}</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="mission"><b>قريبًا: AI Detective + Prompt Challenges + Creative Builder</b><br>'
+        '<span class="muted">مش الهدف ناخد الإجابة من الـ AI؛ الهدف نتعلم نسأله صح، نراجعه، نكتشف أخطاءه ونصنع به حاجات جديدة.</span></div>',
+        unsafe_allow_html=True,
+    )
 
 st.markdown('<div class="section-title">⚡ Quick Access · أدواتك الحالية</div>', unsafe_allow_html=True)
 api_key = st.secrets.get("GEMINI_API_KEY", None)

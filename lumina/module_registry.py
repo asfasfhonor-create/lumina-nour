@@ -24,14 +24,14 @@ CORE_MODULES: Tuple[LearningModule, ...] = (
     LearningModule(
         id="english",
         title="English Adventure",
-        description="School English + real language growth.",
+        description="منهج المدرسة + English حقيقي للحياة.",
         category="language",
         icon="🇬🇧",
         mastery_dimensions=("vocabulary", "grammar", "reading", "writing", "listening", "speaking", "pronunciation"),
     ),
     LearningModule(
         id="science",
-        title="Science Lab",
+        title="معمل العلوم",
         description="اكتشفي الفكرة بالتجربة والتشبيه.",
         category="school_subject",
         icon="🔬",
@@ -39,7 +39,7 @@ CORE_MODULES: Tuple[LearningModule, ...] = (
     ),
     LearningModule(
         id="math",
-        title="Math Quest",
+        title="تحدّي الرياضيات",
         description="حلّي وفكّري خطوة بخطوة.",
         category="school_subject",
         icon="➗",
@@ -47,7 +47,7 @@ CORE_MODULES: Tuple[LearningModule, ...] = (
     ),
     LearningModule(
         id="arabic",
-        title="Arabic World",
+        title="عالم العربي",
         description="لغة وقراءة وتعبير بطريقة ممتعة.",
         category="school_subject",
         icon="📖",
@@ -55,7 +55,7 @@ CORE_MODULES: Tuple[LearningModule, ...] = (
     ),
     LearningModule(
         id="social",
-        title="Social Detective",
+        title="مغامرة الدراسات",
         description="تاريخ وجغرافيا كقصة وتحقيق.",
         category="school_subject",
         icon="🌍",
@@ -63,7 +63,7 @@ CORE_MODULES: Tuple[LearningModule, ...] = (
     ),
     LearningModule(
         id="religion",
-        title="Religion Journey",
+        title="رحلة الدين",
         description="فهم وربط وتطبيق من المنهج.",
         category="school_subject",
         icon="🕌",
@@ -71,7 +71,7 @@ CORE_MODULES: Tuple[LearningModule, ...] = (
     ),
     LearningModule(
         id="ict",
-        title="ICT Lab",
+        title="معمل الكمبيوتر",
         description="تكنولوجيا ومهارات رقمية بالتجربة.",
         category="school_subject",
         icon="💻",
@@ -79,7 +79,7 @@ CORE_MODULES: Tuple[LearningModule, ...] = (
     ),
     LearningModule(
         id="ai",
-        title="AI Lab",
+        title="عالم الذكاء الاصطناعي",
         description="اسألي، جرّبي، راجعي، وابني حاجة جديدة.",
         category="ai",
         icon="🤖",

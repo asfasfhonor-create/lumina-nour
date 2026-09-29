@@ -741,3 +741,20 @@ jobs:
 
           print("Adaptive learning priority OK")
           PY
+
+      - name: Validate safe AI provider failures
+        run: |
+          python - <<'PY'
+          from lumina.ai_service import AIServiceError, GeminiService
+
+          service = GeminiService(None)
+          assert service.available is False
+          try:
+              service.generate("hello")
+          except AIServiceError as exc:
+              assert "API Key" in str(exc)
+          else:
+              raise AssertionError("Missing key must raise AIServiceError")
+
+          print("Safe AI provider failures OK")
+          PY

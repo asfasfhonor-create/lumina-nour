@@ -14,6 +14,7 @@ def initialize_session_state() -> None:
         "lesson_hints": {},
         "mistake_notebook": [],
         "review_queue": [],
+        "parent_unlocked": False,
     }
     for key, value in defaults.items():
         if key not in st.session_state:

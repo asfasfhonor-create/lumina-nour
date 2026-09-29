@@ -5,6 +5,7 @@ from lumina.config import APP_ICON, APP_INITIAL_SIDEBAR_STATE, APP_LAYOUT, APP_T
 from lumina.home import render_home_foundation
 from lumina.session_state import initialize_session_state
 from lumina.quick_access import render_quick_access
+from lumina.persistence.profile_state import hydrate_profile_state
 from lumina.theme import apply_theme
 from lumina.world_router import render_active_world
 
@@ -23,6 +24,8 @@ initialize_session_state()
 app_pin = st.secrets.get("NOUR_APP_PIN", None)
 if not require_app_access(app_pin):
     st.stop()
+
+hydrate_profile_state()
 
 api_key = st.secrets.get("GEMINI_API_KEY", None)
 if not api_key:

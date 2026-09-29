@@ -5,6 +5,7 @@ import streamlit as st
 from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS, all_mapped_lessons
 from lumina.curriculum.coverage import SOURCE_COVERAGE
 from lumina.learning.progress import derive_mastery, mastery_label
+from lumina.learning.english_profile import recommended_focus
 from lumina.persistence.session_store import get_learning_store, persistence_status
 from lumina.persistence.base import PersistenceError
 from lumina.persistence.backup import export_learning_backup, restore_learning_backup
@@ -224,6 +225,8 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
                 correct_count = int(values.get("correct", 0))
                 total_count = int(values.get("total", 0))
                 st.write(f"• **{skill}** — {correct_count}/{total_count}")
+            focus_label, focus_reason = recommended_focus(profile)
+            st.info(f"التركيز المقترح حاليًا: **{focus_label}** — {focus_reason}")
             st.caption(
                 "دي صورة مبدئية فقط، وهتتطور مع أدلة من القراءة والكتابة والمحادثة والتدريبات الفعلية."
             )

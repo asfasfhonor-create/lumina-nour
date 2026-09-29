@@ -1285,7 +1285,7 @@ jobs:
           assert "nour-photo-glow" in theme
           assert "width:190px" in theme
           assert "filter:none" in theme
-          assert "assets/nour_avatar.jpg" in home
+          assert "nour_avatar_parts" in home
           assert "object-fit:cover" in theme
           assert '[data-testid="stToolbar"]' in theme
           assert 'toolbarMode = "viewer"' in config
@@ -1300,4 +1300,26 @@ jobs:
               assert forbidden not in learner_text, forbidden
 
           print("Learner-facing visual and copy guard OK")
+          PY
+
+      - name: Validate approved Nour portrait asset
+        run: |
+          python - <<'PY'
+          import base64
+          import io
+          from pathlib import Path
+          from PIL import Image
+
+          parts = sorted(Path("assets/nour_avatar_parts").glob("*.txt"))
+          assert len(parts) == 2, parts
+          payload = "".join(part.read_text(encoding="utf-8").strip() for part in parts)
+          raw = base64.b64decode(payload, validate=True)
+          image = Image.open(io.BytesIO(raw))
+          image.verify()
+
+          image = Image.open(io.BytesIO(raw))
+          assert image.format == "JPEG"
+          assert image.size == (260, 325)
+          assert len(raw) > 15000
+          print("Approved Nour portrait asset OK:", image.size)
           PY

@@ -14,8 +14,14 @@ class ReadinessItem:
     detail: str
 
 
-def build_release_readiness(*, ai_available: bool, app_pin_configured: bool, parent_pin_configured: bool) -> tuple[ReadinessItem, ...]:
-    storage = persistence_status()
+def build_release_readiness(
+    *,
+    ai_available: bool,
+    app_pin_configured: bool,
+    parent_pin_configured: bool,
+    storage_status: dict | None = None,
+) -> tuple[ReadinessItem, ...]:
+    storage = storage_status if storage_status is not None else persistence_status()
     mapped_count = len(all_mapped_lessons())
 
     return (

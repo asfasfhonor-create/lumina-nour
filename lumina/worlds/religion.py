@@ -29,11 +29,11 @@ def render_religion_world(ai: GeminiService) -> None:
     )
 
     if unit_title == "قيم الإسلام في بناء الفرد والمجتمع":
-        render_verified_unit("الوحدة الأولى · قيم الإسلام في بناء الفرد والمجتمع", RELIGION_U1_LESSONS, "religion_u1_lesson", module_id="religion")
+        render_verified_unit("الوحدة الأولى · قيم الإسلام في بناء الفرد والمجتمع", RELIGION_U1_LESSONS, "religion_u1_lesson", module_id="religion", ai=ai)
     elif unit_title == "الإسلام دين وحياة":
-        render_verified_unit("الوحدة الثانية · الإسلام دين وحياة", RELIGION_U2_LESSONS, "religion_u2_lesson", module_id="religion")
+        render_verified_unit("الوحدة الثانية · الإسلام دين وحياة", RELIGION_U2_LESSONS, "religion_u2_lesson", module_id="religion", ai=ai)
     elif unit_title == "تحمل المسئولية في الإسلام":
-        render_verified_unit("الوحدة الثالثة · تحمل المسئولية في الإسلام", RELIGION_U3_LESSONS, "religion_u3_lesson", module_id="religion")
+        render_verified_unit("الوحدة الثالثة · تحمل المسئولية في الإسلام", RELIGION_U3_LESSONS, "religion_u3_lesson", module_id="religion", ai=ai)
     render_temporary_source_session(
         ai,
         source,

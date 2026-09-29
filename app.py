@@ -1,9 +1,8 @@
 import streamlit as st
-from google.genai import types
-from PIL import Image
 from lumina.ai_service import GeminiService
 from lumina.home import render_home_foundation
 from lumina.session_state import initialize_session_state
+from lumina.quick_access import render_quick_access
 
 st.set_page_config(page_title="LUMINA | Nour's World", page_icon="✨", layout="centered", initial_sidebar_state="collapsed")
 
@@ -35,117 +34,13 @@ div[data-testid="stTabs"] button { font-weight:800; }
 initialize_session_state()
 render_home_foundation()
 
-st.markdown('<div class="section-title">⚡ Quick Access · أدواتك الحالية</div>', unsafe_allow_html=True)
 api_key = st.secrets.get("GEMINI_API_KEY", None)
 if not api_key:
     api_key = st.sidebar.text_input("Gemini API Key", type="password")
     if not api_key:
         st.info("الأدوات الذكية تحتاج Gemini API Key. Nour's World نفسها تعمل بدون المفتاح.")
+
 ai = GeminiService(api_key)
-
-def need_ai():
-    if not ai.available:
-        st.warning("فعّلي Gemini API Key أولاً لتشغيل الأداة.")
-        return False
-    return True
-
-tabs = st.tabs(["📄 PDF", "💬 AI Buddy", "📸 مسألة", "🇬🇧 English", "🗝️ Escape", "💻 Python", "🎯 أهدافي"])
-
-with tabs[0]:
-    st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-    st.subheader("رفيقة المنهج والـ PDF")
-    uploaded_pdf = st.file_uploader("ارفعي كتابًا أو مذكرة PDF", type=["pdf"], key="pdf")
-    if uploaded_pdf:
-        pdf_bytes = uploaded_pdf.read()
-        st.success(f"تم استقبال الملف: {uploaded_pdf.name} 💖")
-        pdf_part = types.Part.from_bytes(data=pdf_bytes, mime_type="application/pdf")
-        option = st.radio("عايزة نعمل إيه؟", ["سؤال من الملف", "اختبار تدريبي", "ملخص ذكي"], horizontal=True)
-        if option == "سؤال من الملف":
-            q = st.text_input("سؤالك", key="pdf_q")
-            if st.button("جاوبني من الملف", key="pdf_answer") and q and need_ai():
-                with st.spinner("بقرأ الملف..."):
-                    text = ai.generate([pdf_part, f"أنت مدرس لنور في الصف الثالث الإعدادي بمدرسة لغات في مصر. أجب من الملف فقط، وبمصطلحات المنهج الأصلية، واشرح بالعربية عند الحاجة. لا تخمن معلومة غير موجودة. السؤال: {q}"])
-                    st.markdown(text)
-        elif option == "اختبار تدريبي" and st.button("اعمل اختبار", key="pdf_exam") and need_ai():
-            text = ai.generate([pdf_part, "أنشئ 5 أسئلة تدريبية مناسبة للصف الثالث الإعدادي من هذا الملف وتقيس الفهم والتطبيق قدر الإمكان. ضع نموذج الإجابة في نهاية منفصلة."])
-            st.markdown(text)
-        elif option == "ملخص ذكي" and st.button("لخّص", key="pdf_summary") and need_ai():
-            text = ai.generate([pdf_part, "لخص أهم المفاهيم والتعريفات والقوانين في هذا الملف لطالبة ثالثة إعدادي، مع الحفاظ على مصطلحات المنهج وعدم إضافة معلومات غير موجودة."])
-            st.markdown(text)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with tabs[1]:
-    buddy = st.selectbox("مين يذاكر معاكي؟", ["أستاذ ألبرت 🔬", "المحقق التاريخي 📜", "صديقتك الملهمة 🌸"])
-    prompts = {
-        "أستاذ ألبرت 🔬": "اشرح علوم ثالثة إعدادي لنور بأسلوب بسيط وتجريبي. ابدأ بالفهم، اسألها سؤالًا صغيرًا، واستخدم تلميحات قبل الإجابة النهائية.",
-        "المحقق التاريخي 📜": "اشرح دراسات ثالثة إعدادي لنور كتحقيق وقصة. شجع الاستنتاج والربط ولا تخترع تفاصيل منهجية.",
-        "صديقتك الملهمة 🌸": "ساعد نور على تنظيم مذاكرتها وشجعها بلطف ومن دون مبالغة أو ضغط.",
-    }
-    for m in st.session_state.chat_history:
-        with st.chat_message(m["role"]):
-            st.markdown(m["content"])
-    msg = st.chat_input("اكتبي سؤالك يا نور...")
-    if msg and need_ai():
-        st.session_state.chat_history.append({"role": "user", "content": msg})
-        text = ai.generate(msg, system_instruction=prompts[buddy])
-        st.session_state.chat_history.append({"role": "assistant", "content": text})
-        st.rerun()
-
-with tabs[2]:
-    cam = st.file_uploader("ارفعي صورة المسألة", type=["jpg", "jpeg", "png"], key="problem")
-    if cam:
-        img = Image.open(cam)
-        st.image(img, use_container_width=True)
-        if st.button("ابدئي معايا من أول Hint", key="solve") and need_ai():
-            text = ai.generate([img, "أنت Homework Coach لنور في ثالثة إعدادي. لا تعط الحل النهائي مباشرة. حدد المطلوب، اسألها كيف تبدأ، ثم أعط Hint أول واضح وطريقة التفكير المناسبة فقط."])
-            st.markdown(text)
-
-with tabs[3]:
-    st.subheader("English Adventure")
-    level = st.select_slider("درجة المساعدة", options=["مساعدة كبيرة", "متوسطة", "تحدي"], value="مساعدة كبيرة")
-    eng = st.text_area("Write 1–3 sentences in English", key="eng")
-    if st.button("ساعدني أتحسن", key="eng_go") and eng and need_ai():
-        p = f"""Nour is an Egyptian third-prep language-school student improving practical English.
-Assistance level: {level}.
-Her text: {eng}
-Respond briefly and warmly:
-1) preserve what she meant;
-2) show a natural corrected version;
-3) explain only the most useful mistake in short Arabic;
-4) teach one useful word or expression in context;
-5) give one tiny follow-up challenge.
-Do not overwhelm her and do not treat every difference as an error."""
-        text = ai.generate(p)
-        st.markdown(text)
-
-with tabs[4]:
-    sub = st.selectbox("المادة", ["علوم 3 إعدادي", "دراسات 3 إعدادي", "رياضيات 3 إعدادي"], key="escape_sub")
-    if st.button("ابدئي المغامرة", key="escape_new") and need_ai():
-        text = ai.generate(f"اصنع لغز غرفة هروب قصيرًا لنور من {sub}. لا تكشف الإجابة. اجعل الحل كلمة أو رقمًا واحدًا، وفضّل سؤال فهم أو تطبيق بدل الحفظ المباشر.")
-        st.session_state.esc_puzzle = text
-    if st.session_state.get("esc_puzzle"):
-        st.info(st.session_state.esc_puzzle)
-        ans = st.text_input("شفرة الخروج", key="escape_answer")
-        if st.button("افتحي الباب", key="escape_check") and ans and need_ai():
-            text = ai.generate(f"اللغز: {st.session_state.esc_puzzle}\nإجابة نور: {ans}\nتحقق من الإجابة. إن كانت خطأ أعط تلميحًا فقط ولا تكشف الحل، وإن كانت صحيحة احتفل باختصار واشرح لماذا هي صحيحة في جملة.")
-            st.markdown(text)
-
-with tabs[5]:
-    code = st.text_area("Python", 'name = "Nour"\nscore = 100\nprint(f"Great job {name}! {score}%")', key="code")
-    if st.button("اشرح واديني تحدي صغير", key="code_explain") and need_ai():
-        text = ai.generate(f"اشرح هذا الكود لنور كمبتدئة، سطرًا سطرًا وباختصار، اطلب منها توقع الناتج قبل كشفه، ثم أعطها تعديلًا صغيرًا تكتبه بنفسها:\n{code}")
-        st.markdown(text)
-
-with tabs[6]:
-    task = st.text_input("هدف صغير لليوم", key="task")
-    if st.button("أضيفيه", key="task_add") and task:
-        st.session_state.tasks_list.append(task)
-        st.rerun()
-    for i, item in enumerate(st.session_state.tasks_list):
-        st.checkbox(item, key=f"task_{i}")
-    if st.button("🎉 رسالة تشجيع لليوم", key="motivate") and need_ai():
-        st.balloons()
-        text = ai.generate("اكتب رسالة قصيرة ودافئة لنور، طالبة ثالثة إعدادي، تشجعها على خطوة صغيرة عملية اليوم بدون مبالغة أو ضغط.")
-        st.success(text)
+render_quick_access(ai)
 
 st.caption("LUMINA · built for Nour ✨ | Development branch · التقدم الحالي تجريبي حتى تفعيل الحفظ الدائم")

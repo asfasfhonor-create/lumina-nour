@@ -29,11 +29,11 @@ def render_arabic_world(ai: GeminiService) -> None:
     )
 
     if unit_title == "قيم تحمي شبابنا":
-        render_verified_unit("الوحدة الأولى · قيم تحمي شبابنا", ARABIC_U1_LESSONS, "arabic_u1_lesson", module_id="arabic")
+        render_verified_unit("الوحدة الأولى · قيم تحمي شبابنا", ARABIC_U1_LESSONS, "arabic_u1_lesson", module_id="arabic", ai=ai)
     elif unit_title == "نحو تفكير سليم":
-        render_verified_unit("الوحدة الثانية · نحو تفكير سليم", ARABIC_U2_LESSONS, "arabic_u2_lesson", module_id="arabic")
+        render_verified_unit("الوحدة الثانية · نحو تفكير سليم", ARABIC_U2_LESSONS, "arabic_u2_lesson", module_id="arabic", ai=ai)
     elif unit_title == "أنا والمستقبل":
-        render_verified_unit("الوحدة الثالثة · أنا والمستقبل", ARABIC_U3_LESSONS, "arabic_u3_lesson", module_id="arabic")
+        render_verified_unit("الوحدة الثالثة · أنا والمستقبل", ARABIC_U3_LESSONS, "arabic_u3_lesson", module_id="arabic", ai=ai)
     else:
         st.info("الجزء التمهيدي موجود في المصدر وسيظل متاحًا كمادة موثقة منفصلة عن الوحدات الثلاث.")
 

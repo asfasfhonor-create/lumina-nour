@@ -469,3 +469,14 @@ jobs:
 
           print(f"Validated {len(lesson_ids)} lessons and {len(check_ids)} checks")
           PY
+
+      - name: Validate adaptive weekly plan imports
+        run: |
+          python - <<'PY'
+          from lumina.learning.weekly_plan import WeeklyPlanItem, build_weekly_plan
+          import lumina.weekly_plan
+
+          assert WeeklyPlanItem.__name__ == "WeeklyPlanItem"
+          assert callable(build_weekly_plan)
+          print("Weekly plan contracts OK")
+          PY

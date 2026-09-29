@@ -821,3 +821,44 @@ jobs:
           assert status["durable"] is False
           print("Persistence status helper OK")
           PY
+
+      - name: Validate adaptive exam selection
+        run: |
+          python - <<'PY'
+          from lumina.exam_mode import _pick_checks
+          from lumina.curriculum.mapped_curriculum import all_mapped_lessons
+
+          lessons = [lesson for lesson in all_mapped_lessons("english") if lesson.checks][:3]
+          assert len(lessons) >= 2
+          weak = lessons[1]
+
+          class Store:
+              def get_attempts(self, lesson_id=None):
+                  rows = [{
+                      "lesson_id": weak.id,
+                      "check_id": weak.checks[0].id,
+                      "evidence_id": weak.checks[0].id,
+                      "correct": False,
+                  }]
+                  if lesson_id is None:
+                      return rows
+                  return [row for row in rows if row["lesson_id"] == lesson_id]
+
+              def get_mistakes(self, lesson_id=None, unresolved_only=False):
+                  rows = [{
+                      "lesson_id": weak.id,
+                      "check_id": weak.checks[0].id,
+                      "resolved": False,
+                  }]
+                  if lesson_id is not None:
+                      rows = [row for row in rows if row["lesson_id"] == lesson_id]
+                  if unresolved_only:
+                      rows = [row for row in rows if not row.get("resolved", False)]
+                  return rows
+
+          picked = _pick_checks(lessons, Store(), limit=2)
+          assert picked
+          assert picked[0][0].id == weak.id, picked[0][0].id
+          assert len({lesson.id for lesson, _ in picked}) == len(picked)
+          print("Adaptive exam selection OK")
+          PY

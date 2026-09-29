@@ -31,7 +31,7 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
 
     store = get_learning_store()
     attempts = store.get_attempts()
-    mistakes = store.store.get_mistakes(unresolved_only=True)
+    mistakes = store.get_mistakes(unresolved_only=True)
     reviews = store.get_reviews("due")
 
     c1, c2, c3 = st.columns(3)

@@ -40,7 +40,7 @@ def render_curriculum_search(ai: GeminiService) -> None:
     st.markdown(f"### {lesson.title}")
     for point in lesson.evidence_summary:
         st.write(f"• {point}")
-    st.caption(f"المصدر: {lesson.source_pages} · {lesson.source_id}")
+    st.caption(f"المصدر: {lesson.source_pages}")
 
     if st.button(
         "افتحي الدرس كامل",

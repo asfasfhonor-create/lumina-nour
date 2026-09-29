@@ -1,5 +1,6 @@
 import streamlit as st
 from lumina.ai_service import AIServiceError, GeminiService
+from lumina.access_control import require_app_access
 from lumina.config import APP_ICON, APP_INITIAL_SIDEBAR_STATE, APP_LAYOUT, APP_TITLE
 from lumina.home import render_home_foundation
 from lumina.session_state import initialize_session_state
@@ -18,6 +19,10 @@ apply_theme()
 
 
 initialize_session_state()
+
+app_pin = st.secrets.get("NOUR_APP_PIN", None)
+if not require_app_access(app_pin):
+    st.stop()
 
 api_key = st.secrets.get("GEMINI_API_KEY", None)
 if not api_key:

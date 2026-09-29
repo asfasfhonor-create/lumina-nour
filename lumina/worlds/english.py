@@ -4,7 +4,17 @@ from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import ENGLISH_T1
 from lumina.curriculum.grounding import build_grounded_pdf, curriculum_prompt
 from lumina.curriculum.english_unit1 import UNIT1_LESSONS
-from lumina.session_state import get_learning_attempts, record_learning_attempt
+from lumina.learning.progress import derive_mastery, mastery_label
+from lumina.session_state import (
+    complete_review,
+    get_learning_attempts,
+    get_mistakes,
+    get_reviews,
+    queue_review,
+    record_learning_attempt,
+    record_mistake,
+    resolve_mistake,
+)
 
 
 def render_english_world(ai: GeminiService) -> None:
@@ -223,29 +233,69 @@ def _render_verified_lesson(lesson) -> None:
     if st.button("Check my thinking", key=f"lesson_check_button_{lesson.id}_{check.id}") and answer:
         selected_index = list(check.options).index(answer)
         correct = selected_index == check.correct_index
-        record_learning_attempt(
-            {
-                "lesson_id": lesson.id,
-                "check_id": check.id,
-                "answer": answer,
-                "correct": correct,
-                "source_pages": lesson.source_pages,
-            }
-        )
+        attempt = {
+            "module_id": "english",
+            "unit_id": lesson.unit_id,
+            "lesson_id": lesson.id,
+            "check_id": check.id,
+            "evidence_id": check.id,
+            "answer": answer,
+            "correct": correct,
+            "source_pages": lesson.source_pages,
+        }
+        record_learning_attempt(attempt)
+
         if correct:
+            resolve_mistake(lesson.id, check.id)
+            complete_review(lesson.id, check.id)
             st.success("Good thinking — this matches the lesson.")
             st.info(
-                "This is learning evidence, not full mastery yet. "
-                "LUMINA will require more than one successful check before marking a concept mastered."
+                "This is learning evidence, not automatic mastery. "
+                "LUMINA requires varied evidence before a lesson can become Mastered."
             )
         else:
+            record_mistake(
+                {
+                    "module_id": "english",
+                    "unit_id": lesson.unit_id,
+                    "lesson_id": lesson.id,
+                    "lesson_title": lesson.title,
+                    "check_id": check.id,
+                    "question": check.prompt,
+                    "answer": answer,
+                    "mistake_type": "concept_understanding",
+                    "hint": check.hint,
+                    "source_pages": lesson.source_pages,
+                    "resolved": False,
+                }
+            )
+            queue_review(
+                {
+                    "module_id": "english",
+                    "lesson_id": lesson.id,
+                    "lesson_title": lesson.title,
+                    "check_id": check.id,
+                    "status": "due",
+                    "reason": "incorrect_understanding_check",
+                    "source_pages": lesson.source_pages,
+                }
+            )
             st.warning("Not yet. Use the hint, then try again.")
             st.info(f"Hint: {check.hint}")
 
     attempts = get_learning_attempts(lesson.id)
-    if attempts:
-        correct_count = sum(1 for attempt in attempts if attempt.get("correct"))
-        st.caption(
-            f"Session evidence: {correct_count} successful check(s) "
-            f"from {len(attempts)} attempt(s)."
-        )
+    mistakes = get_mistakes(lesson.id)
+    mastery = derive_mastery(attempts, mistakes)
+    st.caption(
+        f"Mastery: {mastery_label(mastery.state)} · "
+        f"{mastery.correct_attempts}/{mastery.attempts} successful attempt(s) · "
+        f"{mastery.unresolved_mistakes} unresolved mistake(s)"
+    )
+
+    due_reviews = [
+        review
+        for review in get_reviews("due")
+        if review.get("lesson_id") == lesson.id
+    ]
+    if due_reviews:
+        st.warning("Review due: this lesson has something worth revisiting before moving on.")

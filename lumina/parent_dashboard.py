@@ -219,6 +219,31 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
     else:
         st.caption("لسه ما اتعملش اختبار تحديد المستوى لـ Real English.")
 
+    st.markdown("### تقدّم مهارات AI")
+    ai_profile = st.session_state.get("ai_profile") or {}
+    ai_skills = ai_profile.get("skills") or {}
+    ai_skill_labels = {
+        "prompting": "كتابة Prompt",
+        "comparison": "مقارنة إجابات AI",
+        "verification": "التحقق",
+        "evidence": "تقييم جودة الدليل",
+        "uncertainty": "التعامل مع عدم اليقين",
+    }
+    if ai_skills:
+        for skill_id, label in ai_skill_labels.items():
+            values = ai_skills.get(skill_id)
+            if not values:
+                continue
+            attempts_count = int(values.get("attempts", 0))
+            correct_count = int(values.get("correct", 0))
+            st.write(f"• **{label}** — نجاح {correct_count}/{attempts_count}")
+        st.caption(
+            f"مهارات ظهر فيها دليل نجاح: "
+            f"{ai_profile.get('completed_skills', 0)}/{len(ai_skill_labels)}"
+        )
+    else:
+        st.caption("لسه مفيش نشاط AI Literacy مسجل لنور.")
+
     st.markdown("### تغطية المصادر المعتمدة")
     st.caption("LUMINA ما بيفترضش ترم أو جزء دراسي غير موجود في المصادر المعتمدة.")
     for subject_id, coverage in SOURCE_COVERAGE.items():

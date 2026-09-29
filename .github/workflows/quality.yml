@@ -1283,8 +1283,9 @@ jobs:
 
           assert "nour-photo-wrap" in home
           assert "nour-photo-glow" in theme
-          assert "width:118px" in theme
+          assert "width:190px" in theme
           assert "filter:none" in theme
+          assert "assets/nour_avatar.jpg" in home
           assert "object-fit:cover" in theme
           assert '[data-testid="stToolbar"]' in theme
           assert 'toolbarMode = "viewer"' in config

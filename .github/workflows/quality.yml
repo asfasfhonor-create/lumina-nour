@@ -937,3 +937,15 @@ jobs:
           assert "not verified" in storage.detail
           print("Unverified storage correctly blocks release readiness")
           PY
+
+      - name: Validate verified storage readiness wiring
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          parent = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert 'storage_status=status' in parent
+          assert 'storage_verified=bool(st.session_state.get("persistence_verified", False))' in parent
+          assert 'st.session_state.persistence_verified = True' in parent
+          print("Verified storage readiness wiring OK")
+          PY

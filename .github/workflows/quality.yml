@@ -796,3 +796,15 @@ jobs:
               raise SystemExit("Potential committed secrets found:\n" + "\n".join(findings))
           print("Committed secret scan OK")
           PY
+
+      - name: Validate parent weak-point navigation
+        run: |
+          python - <<'PY'
+          import lumina.parent_dashboard
+          from lumina.curriculum.search import lesson_by_id
+
+          lesson = lesson_by_id("english_u1_l1")
+          assert lesson is not None
+          assert callable(lumina.parent_dashboard.render_parent_dashboard)
+          print("Parent weak-point navigation imports OK")
+          PY

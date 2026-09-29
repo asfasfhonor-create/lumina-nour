@@ -1658,3 +1658,14 @@ jobs:
           assert label == "محادثة واقعية"
           print("Adaptive Real English focus recommendation OK")
           PY
+
+      - name: Validate parent AI not-started states
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert "لسه مفيش دليل تعلم مسجل" in source
+          assert "أول ما نور تبدأ تحديات AI" in source
+          print("Parent AI not-started states OK")
+          PY

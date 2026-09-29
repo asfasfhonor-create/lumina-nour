@@ -30,52 +30,71 @@ div[data-testid="stTabs"] button { font-weight:800; }
 </style>
 """, unsafe_allow_html=True)
 
-if "xp" not in st.session_state: st.session_state.xp = 120
-if "streak" not in st.session_state: st.session_state.streak = 3
-if "daily_done" not in st.session_state: st.session_state.daily_done = False
+if "xp" not in st.session_state:
+    st.session_state.xp = 120
+if "streak" not in st.session_state:
+    st.session_state.streak = 3
+if "daily_done" not in st.session_state:
+    st.session_state.daily_done = False
+
+level_number = max(1, st.session_state.xp // 100 + 1)
 
 st.markdown("""
 <div class="hero">
   <div class="brand">LUMINA · NOUR'S WORLD</div>
   <div class="hello">أهلاً يا نور ✨ جاهزة لمهمة صغيرة النهارده؟</div>
-  <div class="muted">مساحتك للمذاكرة، التجربة، والإنجليزي — خطوة صغيرة كل يوم.</div>
+  <div class="muted">مساحتك للمذاكرة، الاكتشاف، الإنجليزي والـ AI — خطوة ممتعة كل يوم.</div>
 </div>
 """, unsafe_allow_html=True)
 
-c1,c2,c3 = st.columns(3)
-with c1: st.markdown(f'<div class="stat">⭐ <b>{st.session_state.xp} XP</b><span class="muted">نقاطك</span></div>', unsafe_allow_html=True)
-with c2: st.markdown(f'<div class="stat">🔥 <b>{st.session_state.streak} أيام</b><span class="muted">Streak</span></div>', unsafe_allow_html=True)
-with c3: st.markdown('<div class="stat">🌱 <b>Level 2</b><span class="muted">Explorer</span></div>', unsafe_allow_html=True)
+c1, c2, c3 = st.columns(3)
+with c1:
+    st.markdown(f'<div class="stat">⭐ <b>{st.session_state.xp} XP</b><span class="muted">نقاطك</span></div>', unsafe_allow_html=True)
+with c2:
+    st.markdown(f'<div class="stat">🔥 <b>{st.session_state.streak} أيام</b><span class="muted">Streak · تجريبي</span></div>', unsafe_allow_html=True)
+with c3:
+    st.markdown(f'<div class="stat">🌱 <b>Level {level_number}</b><span class="muted">Explorer</span></div>', unsafe_allow_html=True)
 
 st.markdown('<div class="section-title">🎯 مهمة اليوم</div>', unsafe_allow_html=True)
-st.markdown('<div class="mission"><b>English Mini Mission</b><br><span class="muted">اكتبي 3 جمل قصيرة عن يومك بالإنجليزي. مش مهم تكون مثالية — المهم نجرب.</span></div>', unsafe_allow_html=True)
+st.markdown('<div class="mission"><b>English Mini Mission</b><br><span class="muted">اكتبي 3 جمل قصيرة عن يومك بالإنجليزي. هنراجعها معًا قبل تسجيل الـ XP.</span></div>', unsafe_allow_html=True)
+daily_text = st.text_area("مهمة اليوم", placeholder="Write 3 short sentences...", key="daily_text", label_visibility="collapsed")
 if not st.session_state.daily_done:
-    if st.button("أنجزت المهمة +20 XP", key="daily_xp"):
-        st.session_state.xp += 20
-        st.session_state.daily_done = True
-        st.balloons()
-        st.rerun()
+    if st.button("راجعي المهمة وسجلي +20 XP", key="daily_xp"):
+        sentences = [s.strip() for s in daily_text.replace("!", ".").replace("?", ".").split(".") if s.strip()]
+        if len(sentences) < 3:
+            st.warning("اكتبي 3 جمل على الأقل الأول — المهم المحاولة 🌱")
+        else:
+            st.session_state.xp += 20
+            st.session_state.daily_done = True
+            st.balloons()
+            st.rerun()
 else:
-    st.success("مهمة اليوم اتسجلت 🎉 +20 XP")
+    st.success("مهمة اليوم اتسجلت 🎉 +20 XP — الحفظ الدائم هنفعله مع قاعدة البيانات.")
 
 st.markdown('<div class="section-title">📚 اختاري عالمك</div>', unsafe_allow_html=True)
 cols = st.columns(2)
 subjects = [
-    ("🔬 Science Lab", "افهمي الفكرة بالتجربة والتشبيه."),
-    ("➗ Math Quest", "مسائل خطوة بخطوة من غير حفظ أعمى."),
+    ("🇬🇧 English Adventure", "محادثة، كلمات، قراءة وكتابة."),
+    ("🔬 Science Lab", "اكتشفي الفكرة بالتجربة والتشبيه."),
+    ("➗ Math Quest", "حلّي وفكّري خطوة بخطوة."),
+    ("📖 Arabic World", "لغة وقراءة وتعبير بطريقة ممتعة."),
     ("🌍 Social Studies", "تاريخ وجغرافيا كقصة وتحقيق."),
-    ("🇬🇧 English Adventure", "محادثة، كلمات، وتصحيح بسيط."),
+    ("🕌 Religion Journey", "فهم وربط وتطبيق من المنهج."),
+    ("💻 ICT Lab", "تكنولوجيا ومهارات رقمية بالتجربة."),
 ]
-for i,(title,desc) in enumerate(subjects):
-    with cols[i%2]:
-        st.markdown(f'<div class="subject"><h4>{title}</h4><span class="muted">{desc}</span><br><small>🚧 Subject Hub — المرحلة القادمة</small></div>', unsafe_allow_html=True)
+for i, (title, desc) in enumerate(subjects):
+    with cols[i % 2]:
+        st.markdown(f'<div class="subject"><h4>{title}</h4><span class="muted">{desc}</span><br><small>🚧 جاري بناء التجربة من منهج نور الحالي</small></div>', unsafe_allow_html=True)
 
-st.markdown('<div class="section-title">⚡ أدواتك الحالية</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">🤖 AI Explorer</div>', unsafe_allow_html=True)
+st.markdown('<div class="mission"><b>قريبًا: AI Detective + Prompt Challenges + Creative Builder</b><br><span class="muted">مش الهدف ناخد الإجابة من الـ AI؛ الهدف نتعلم نسأله صح، نراجعه، نكتشف أخطاءه ونصنع به حاجات جديدة.</span></div>', unsafe_allow_html=True)
+
+st.markdown('<div class="section-title">⚡ Quick Access · أدواتك الحالية</div>', unsafe_allow_html=True)
 api_key = st.secrets.get("GEMINI_API_KEY", None)
 if not api_key:
     api_key = st.sidebar.text_input("Gemini API Key", type="password")
     if not api_key:
-        st.info("الأدوات الذكية تحتاج Gemini API Key. الواجهة الرئيسية تعمل بدون المفتاح.")
+        st.info("الأدوات الذكية تحتاج Gemini API Key. Nour's World نفسها تعمل بدون المفتاح.")
 client = genai.Client(api_key=api_key) if api_key else None
 
 def need_ai():
@@ -91,78 +110,128 @@ with tabs[0]:
     st.subheader("رفيقة المنهج والـ PDF")
     uploaded_pdf = st.file_uploader("ارفعي كتابًا أو مذكرة PDF", type=["pdf"], key="pdf")
     if uploaded_pdf:
-        pdf_part = types.Part.from_bytes(data=uploaded_pdf.read(), mime_type="application/pdf")
+        pdf_bytes = uploaded_pdf.read()
+        st.success(f"تم استقبال الملف: {uploaded_pdf.name} 💖")
+        pdf_part = types.Part.from_bytes(data=pdf_bytes, mime_type="application/pdf")
         option = st.radio("عايزة نعمل إيه؟", ["سؤال من الملف", "اختبار تدريبي", "ملخص ذكي"], horizontal=True)
         if option == "سؤال من الملف":
             q = st.text_input("سؤالك", key="pdf_q")
             if st.button("جاوبني من الملف", key="pdf_answer") and q and need_ai():
                 with st.spinner("بقرأ الملف..."):
-                    res=client.models.generate_content(model="gemini-2.5-flash",contents=[pdf_part,f"أنت مدرس لنور في الصف الثالث الإعدادي بمدرسة لغات في مصر. أجب من الملف فقط، وبمصطلحات المنهج الأصلية، واشرح بالعربية عند الحاجة. السؤال: {q}"])
+                    res = client.models.generate_content(
+                        model="gemini-2.5-flash",
+                        contents=[pdf_part, f"أنت مدرس لنور في الصف الثالث الإعدادي بمدرسة لغات في مصر. أجب من الملف فقط، وبمصطلحات المنهج الأصلية، واشرح بالعربية عند الحاجة. لا تخمن معلومة غير موجودة. السؤال: {q}"],
+                    )
                     st.markdown(res.text)
         elif option == "اختبار تدريبي" and st.button("اعمل اختبار", key="pdf_exam") and need_ai():
-            res=client.models.generate_content(model="gemini-2.5-flash",contents=[pdf_part,"أنشئ 5 أسئلة تدريبية مناسبة للصف الثالث الإعدادي من هذا الملف، ثم ضع نموذج الإجابة بعد الأسئلة."])
+            res = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=[pdf_part, "أنشئ 5 أسئلة تدريبية مناسبة للصف الثالث الإعدادي من هذا الملف وتقيس الفهم والتطبيق قدر الإمكان. ضع نموذج الإجابة في نهاية منفصلة."],
+            )
             st.markdown(res.text)
         elif option == "ملخص ذكي" and st.button("لخّص", key="pdf_summary") and need_ai():
-            res=client.models.generate_content(model="gemini-2.5-flash",contents=[pdf_part,"لخص أهم المفاهيم والتعريفات والقوانين في هذا الملف لطالبة ثالثة إعدادي، مع الحفاظ على مصطلحات المنهج."])
+            res = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=[pdf_part, "لخص أهم المفاهيم والتعريفات والقوانين في هذا الملف لطالبة ثالثة إعدادي، مع الحفاظ على مصطلحات المنهج وعدم إضافة معلومات غير موجودة."],
+            )
             st.markdown(res.text)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 with tabs[1]:
-    buddy=st.selectbox("مين يذاكر معاكي؟",["أستاذ ألبرت 🔬","المحقق التاريخي 📜","صديقتك الملهمة 🌸"])
-    prompts={"أستاذ ألبرت 🔬":"اشرح علوم ثالثة إعدادي لنور بأسلوب بسيط وتجريبي، ولا تجعلها تحفظ قبل أن تفهم.","المحقق التاريخي 📜":"اشرح دراسات ثالثة إعدادي لنور كتحقيق وقصة مع الالتزام بالمنهج.","صديقتك الملهمة 🌸":"ساعد نور على تنظيم مذاكرتها وشجعها بلطف ومن دون مبالغة."}
-    if "chat_history" not in st.session_state: st.session_state.chat_history=[]
+    buddy = st.selectbox("مين يذاكر معاكي؟", ["أستاذ ألبرت 🔬", "المحقق التاريخي 📜", "صديقتك الملهمة 🌸"])
+    prompts = {
+        "أستاذ ألبرت 🔬": "اشرح علوم ثالثة إعدادي لنور بأسلوب بسيط وتجريبي. ابدأ بالفهم، اسألها سؤالًا صغيرًا، واستخدم تلميحات قبل الإجابة النهائية.",
+        "المحقق التاريخي 📜": "اشرح دراسات ثالثة إعدادي لنور كتحقيق وقصة. شجع الاستنتاج والربط ولا تخترع تفاصيل منهجية.",
+        "صديقتك الملهمة 🌸": "ساعد نور على تنظيم مذاكرتها وشجعها بلطف ومن دون مبالغة أو ضغط.",
+    }
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
     for m in st.session_state.chat_history:
-        with st.chat_message(m["role"]): st.markdown(m["content"])
-    msg=st.chat_input("اكتبي سؤالك يا نور...")
+        with st.chat_message(m["role"]):
+            st.markdown(m["content"])
+    msg = st.chat_input("اكتبي سؤالك يا نور...")
     if msg and need_ai():
-        st.session_state.chat_history.append({"role":"user","content":msg})
-        r=client.models.generate_content(model="gemini-2.5-flash",contents=msg,config=types.GenerateContentConfig(system_instruction=prompts[buddy]))
-        st.session_state.chat_history.append({"role":"assistant","content":r.text})
+        st.session_state.chat_history.append({"role": "user", "content": msg})
+        r = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=msg,
+            config=types.GenerateContentConfig(system_instruction=prompts[buddy]),
+        )
+        st.session_state.chat_history.append({"role": "assistant", "content": r.text})
         st.rerun()
 
 with tabs[2]:
-    cam=st.file_uploader("ارفعي صورة المسألة",type=["jpg","jpeg","png"],key="problem")
+    cam = st.file_uploader("ارفعي صورة المسألة", type=["jpg", "jpeg", "png"], key="problem")
     if cam:
-        img=Image.open(cam)
-        st.image(img,use_container_width=True)
-        if st.button("فهمني الحل",key="solve") and need_ai():
-            r=client.models.generate_content(model="gemini-2.5-flash",contents=[img,"اشرح لنور، طالبة ثالثة إعدادي، طريقة التفكير والحل خطوة بخطوة. لا تكتفِ بالإجابة النهائية."])
+        img = Image.open(cam)
+        st.image(img, use_container_width=True)
+        if st.button("ابدئي معايا من أول Hint", key="solve") and need_ai():
+            r = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=[img, "أنت Homework Coach لنور في ثالثة إعدادي. لا تعط الحل النهائي مباشرة. حدد المطلوب، اسألها كيف تبدأ، ثم أعط Hint أول واضح وطريقة التفكير المناسبة فقط."],
+            )
             st.markdown(r.text)
 
 with tabs[3]:
     st.subheader("English Adventure")
-    level=st.select_slider("درجة المساعدة",options=["مساعدة كبيرة","متوسطة","تحدي"],value="مساعدة كبيرة")
-    eng=st.text_area("Write 1–3 sentences in English",key="eng")
-    if st.button("ساعدني أتحسن",key="eng_go") and eng and need_ai():
-        p=f"Nour is an Egyptian third-prep language-school student whose English needs improvement. Assistance level: {level}. Correct this gently: {eng}. Show: 1) her sentence, 2) corrected version, 3) one short Arabic explanation, 4) one tiny follow-up challenge. Do not overwhelm her."
-        r=client.models.generate_content(model="gemini-2.5-flash",contents=p)
+    level = st.select_slider("درجة المساعدة", options=["مساعدة كبيرة", "متوسطة", "تحدي"], value="مساعدة كبيرة")
+    eng = st.text_area("Write 1–3 sentences in English", key="eng")
+    if st.button("ساعدني أتحسن", key="eng_go") and eng and need_ai():
+        p = f"""Nour is an Egyptian third-prep language-school student improving practical English.
+Assistance level: {level}.
+Her text: {eng}
+Respond briefly and warmly:
+1) preserve what she meant;
+2) show a natural corrected version;
+3) explain only the most useful mistake in short Arabic;
+4) teach one useful word or expression in context;
+5) give one tiny follow-up challenge.
+Do not overwhelm her and do not treat every difference as an error."""
+        r = client.models.generate_content(model="gemini-2.5-flash", contents=p)
         st.markdown(r.text)
 
 with tabs[4]:
-    sub=st.selectbox("المادة",["علوم 3 إعدادي","دراسات 3 إعدادي","رياضيات 3 إعدادي"],key="escape_sub")
-    if st.button("ابدئي المغامرة",key="escape_new") and need_ai():
-        r=client.models.generate_content(model="gemini-2.5-flash",contents=f"اصنع لغز غرفة هروب قصيرًا لنور من {sub}. لا تكشف الإجابة. اجعل الحل كلمة أو رقمًا واحدًا.")
-        st.session_state.esc_puzzle=r.text
+    sub = st.selectbox("المادة", ["علوم 3 إعدادي", "دراسات 3 إعدادي", "رياضيات 3 إعدادي"], key="escape_sub")
+    if st.button("ابدئي المغامرة", key="escape_new") and need_ai():
+        r = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=f"اصنع لغز غرفة هروب قصيرًا لنور من {sub}. لا تكشف الإجابة. اجعل الحل كلمة أو رقمًا واحدًا، وفضّل سؤال فهم أو تطبيق بدل الحفظ المباشر.",
+        )
+        st.session_state.esc_puzzle = r.text
     if st.session_state.get("esc_puzzle"):
         st.info(st.session_state.esc_puzzle)
-        ans=st.text_input("شفرة الخروج",key="escape_answer")
-        if st.button("افتحي الباب",key="escape_check") and ans and need_ai():
-            r=client.models.generate_content(model="gemini-2.5-flash",contents=f"اللغز: {st.session_state.esc_puzzle}\nإجابة نور: {ans}\nتحقق من الإجابة. إن كانت خطأ أعط تلميحًا فقط، وإن كانت صحيحة احتفل باختصار.")
+        ans = st.text_input("شفرة الخروج", key="escape_answer")
+        if st.button("افتحي الباب", key="escape_check") and ans and need_ai():
+            r = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=f"اللغز: {st.session_state.esc_puzzle}\nإجابة نور: {ans}\nتحقق من الإجابة. إن كانت خطأ أعط تلميحًا فقط ولا تكشف الحل، وإن كانت صحيحة احتفل باختصار واشرح لماذا هي صحيحة في جملة.",
+            )
             st.markdown(r.text)
 
 with tabs[5]:
-    code=st.text_area("Python",'name = "Nour"\nscore = 100\nprint(f"Great job {name}! {score}%")',key="code")
-    if st.button("اشرح الكود",key="code_explain") and need_ai():
-        r=client.models.generate_content(model="gemini-2.5-flash",contents=f"اشرح هذا الكود لنور كمبتدئة، سطرًا سطرًا، ثم أعطها تعديلًا صغيرًا تجرب كتابته بنفسها:\n{code}")
+    code = st.text_area("Python", 'name = "Nour"\nscore = 100\nprint(f"Great job {name}! {score}%")', key="code")
+    if st.button("اشرح واديني تحدي صغير", key="code_explain") and need_ai():
+        r = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=f"اشرح هذا الكود لنور كمبتدئة، سطرًا سطرًا وباختصار، اطلب منها توقع الناتج قبل كشفه، ثم أعطها تعديلًا صغيرًا تكتبه بنفسها:\n{code}",
+        )
         st.markdown(r.text)
 
 with tabs[6]:
-    if "tasks_list" not in st.session_state: st.session_state.tasks_list=[]
-    task=st.text_input("هدف صغير لليوم",key="task")
-    if st.button("أضيفيه",key="task_add") and task:
+    if "tasks_list" not in st.session_state:
+        st.session_state.tasks_list = []
+    task = st.text_input("هدف صغير لليوم", key="task")
+    if st.button("أضيفيه", key="task_add") and task:
         st.session_state.tasks_list.append(task)
         st.rerun()
-    for i,item in enumerate(st.session_state.tasks_list):
-        st.checkbox(item,key=f"task_{i}")
+    for i, item in enumerate(st.session_state.tasks_list):
+        st.checkbox(item, key=f"task_{i}")
+    if st.button("🎉 رسالة تشجيع لليوم", key="motivate") and need_ai():
+        st.balloons()
+        insp = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents="اكتب رسالة قصيرة ودافئة لنور، طالبة ثالثة إعدادي، تشجعها على خطوة صغيرة عملية اليوم بدون مبالغة أو ضغط.",
+        )
+        st.success(insp.text)
 
-st.caption("LUMINA · built for Nour ✨ | النسخة التجريبية الجديدة على فرع التطوير")
+st.caption("LUMINA · built for Nour ✨ | Development branch · التقدم الحالي تجريبي حتى تفعيل الحفظ الدائم")

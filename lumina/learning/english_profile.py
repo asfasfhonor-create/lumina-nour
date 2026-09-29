@@ -135,3 +135,54 @@ def support_instruction(profile: dict | None) -> str:
         "Use very clear short English and brief Arabic support for meaning. "
         "Ask for one small learner response at a time and avoid overload."
     )
+
+
+
+def recommended_focus(profile: dict | None) -> tuple[str, str]:
+    """Suggest a gentle next Real English activity from the weakest observed baseline skill."""
+    profile = profile or {}
+    scores = profile.get("skill_scores") or {}
+    if not scores:
+        return (
+            "تحديد نقطة البداية",
+            "نبدأ بصورة بسيطة عن المهارات علشان التدريب يبقى مناسب.",
+        )
+
+    ranked = []
+    for skill, values in scores.items():
+        total = int(values.get("total", 0))
+        correct = int(values.get("correct", 0))
+        ratio = (correct / total) if total else 0.0
+        ranked.append((ratio, skill))
+    ranked.sort(key=lambda item: (item[0], item[1]))
+    weakest = ranked[0][1]
+
+    mapping = {
+        "Reading": (
+            "قراءة وفهم",
+            "نقوّي فهم المعنى والاستنتاج من سياق قصير.",
+        ),
+        "Vocabulary": (
+            "كلمات في سياق",
+            "نزود كلمات مفيدة من مواقف حقيقية بدل قوائم الحفظ.",
+        ),
+        "Grammar": (
+            "كتابة قصيرة",
+            "نثبت القواعد جوه جمل من تعبير نور نفسها.",
+        ),
+        "Writing/Grammar": (
+            "كتابة قصيرة",
+            "نقوّي الربط والتعبير بجمل قصيرة ثم نوسعها تدريجيًا.",
+        ),
+        "Speaking/Use": (
+            "محادثة واقعية",
+            "نتمرن على ردود طبيعية في مواقف قصيرة من الحياة.",
+        ),
+    }
+    return mapping.get(
+        weakest,
+        (
+            "محادثة واقعية",
+            "نكمل استخدام اللغة في موقف عملي قصير.",
+        ),
+    )

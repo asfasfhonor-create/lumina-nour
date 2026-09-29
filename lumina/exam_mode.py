@@ -55,12 +55,12 @@ def _pick_checks(lessons, store, limit: int = 5):
 
 
 def render_exam_mode() -> None:
-    st.markdown('<div class="section-title">🧪 Exam Mode</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🧪 وضع الاختبار</div>', unsafe_allow_html=True)
     render_context_help("exam_mode")
     st.markdown(
         '<div class="mission"><b>اختبار من المحتوى الموثق فقط.</b><br>'
         '<span class="muted">الأسئلة هنا تأتي من خرائط الدروس المأخوذة من المصادر، '
-        'والنتيجة تدخل Learning Brain بدل ما تكون درجة منفصلة.</span></div>',
+        'والنتيجة تساعد البرنامج يفهم نقاط القوة والحاجات اللي محتاجة مراجعة.</span></div>',
         unsafe_allow_html=True,
     )
 
@@ -86,7 +86,7 @@ def render_exam_mode() -> None:
 
     st.caption(
         f"{len(checks)} سؤال · من {unit_title} · "
-        "Adaptive set: نقاط الضعف والتعلم الجاري أولًا"
+        "الأسئلة الأهم للمراجعة تظهر أولًا"
     )
 
     answers: dict[str, int] = {}
@@ -169,13 +169,13 @@ def render_exam_mode() -> None:
         st.success(f"النتيجة: {score}/{len(checks)}")
 
         if score == len(checks):
-            st.info("ممتاز. النتيجة أضافت Learning Evidence، لكنها لا تمنح Mastery تلقائيًا من اختبار واحد.")
+            st.info("ممتاز. النتيجة اتسجلت ضمن تقدّمك، لكن الإتقان الكامل يحتاج أكتر من دليل واحد.")
         else:
-            st.warning("الأخطاء اتسجلت تلقائيًا في Mistake Notebook وReview Queue.")
+            st.warning("الأسئلة اللي محتاجة مراجعة اتضافت تلقائيًا لقسم مراجعاتي.")
 
         with st.expander("مراجعة النتيجة", expanded=True):
             for idx, (lesson, check, correct) in enumerate(results, start=1):
                 icon = "✅" if correct else "❌"
                 st.write(f"{icon} {idx}. {lesson.title}")
                 if not correct:
-                    st.caption(f"Hint للمراجعة: {check.hint} · Source: {lesson.source_pages}")
+                    st.caption(f"تلميح للمراجعة: {check.hint} · المصدر: {lesson.source_pages}")

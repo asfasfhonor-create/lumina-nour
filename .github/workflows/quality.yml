@@ -610,3 +610,29 @@ jobs:
           assert callable(persist_profile_state)
           print("Persistence outage fallback imports OK")
           PY
+
+      - name: Streamlit runtime health smoke test
+        run: |
+          set -e
+          streamlit run app.py --server.headless true --server.port 8501 > /tmp/lumina-streamlit.log 2>&1 &
+          APP_PID=$!
+          trap 'kill $APP_PID 2>/dev/null || true' EXIT
+          python - <<'PY'
+          import time
+          from urllib.request import urlopen
+
+          last_error = None
+          for _ in range(20):
+              try:
+                  with urlopen("http://127.0.0.1:8501/_stcore/health", timeout=2) as response:
+                      body = response.read().decode("utf-8", errors="replace")
+                      assert response.status == 200
+                      assert "ok" in body.lower()
+                      print("Streamlit runtime health OK")
+                      break
+              except Exception as exc:
+                  last_error = exc
+                  time.sleep(0.5)
+          else:
+              raise SystemExit(f"Streamlit health check failed: {last_error}")
+          PY

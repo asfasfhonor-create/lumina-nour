@@ -480,3 +480,24 @@ jobs:
           assert callable(build_weekly_plan)
           print("Weekly plan contracts OK")
           PY
+
+      - name: Validate future skill registration
+        run: |
+          python - <<'PY'
+          from lumina.module_registry import LearningModule, get_module, register_module
+
+          future = LearningModule(
+              id="research_skills_test",
+              title="Research Skills",
+              description="Test-only future skill module.",
+              category="life_skill",
+              icon="🔎",
+              track="enrichment",
+              mastery_dimensions=("questioning", "sources", "verification"),
+              stages=("starter", "builder"),
+              activity_types=("mission", "project"),
+          )
+          register_module(future)
+          assert get_module("research_skills_test") == future
+          print("Future skill registration OK")
+          PY

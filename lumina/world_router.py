@@ -6,6 +6,8 @@ from lumina.worlds.science import render_science_world
 from lumina.worlds.math import render_math_world
 from lumina.worlds.ict import render_ict_world
 from lumina.worlds.arabic import render_arabic_world
+from lumina.worlds.social import render_social_world
+from lumina.worlds.religion import render_religion_world
 from lumina.parent_dashboard import render_parent_dashboard
 
 
@@ -15,6 +17,8 @@ WORLD_RENDERERS = {
     "math": render_math_world,
     "ict": render_ict_world,
     "arabic": render_arabic_world,
+    "social": render_social_world,
+    "religion": render_religion_world,
 }
 
 

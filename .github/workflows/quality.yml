@@ -246,3 +246,29 @@ jobs:
               assert lesson.source_pages
           print("Arabic, Social, Religion foundations OK")
           PY
+
+      - name: Validate Science Unit 2 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.science_unit2 import SCIENCE_UNIT2_LESSONS
+
+          assert len(SCIENCE_UNIT2_LESSONS) == 2
+          assert [lesson.title for lesson in SCIENCE_UNIT2_LESSONS] == ["Mirrors", "Lenses"]
+          assert all(lesson.checks for lesson in SCIENCE_UNIT2_LESSONS)
+          print("Science Unit 2 lesson contracts OK")
+          PY
+
+      - name: Validate Math Unit 2 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.math_unit2 import MATH_UNIT2_LESSONS
+
+          assert len(MATH_UNIT2_LESSONS) == 3
+          assert [lesson.title for lesson in MATH_UNIT2_LESSONS] == [
+              "Ratio",
+              "Proportion",
+              "Direct Variation and Inverse Variation",
+          ]
+          assert all(lesson.checks for lesson in MATH_UNIT2_LESSONS)
+          print("Math Unit 2 lesson contracts OK")
+          PY

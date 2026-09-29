@@ -1507,3 +1507,16 @@ jobs:
           assert [check.difficulty for _, check in challenge] == [1, 2, 3]
           print("Gentle exam difficulty cap OK")
           PY
+
+      - name: Validate large curriculum upload settings
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import tomllib
+
+          config = tomllib.loads(Path(".streamlit/config.toml").read_text(encoding="utf-8"))
+          server = config.get("server", {})
+          assert int(server.get("maxUploadSize", 0)) >= 300
+          assert int(server.get("maxMessageSize", 0)) >= 300
+          print("Large curriculum upload settings OK")
+          PY

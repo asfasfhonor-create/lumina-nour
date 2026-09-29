@@ -31,6 +31,8 @@ jobs:
           import lumina.worlds.arabic
           import lumina.worlds.social
           import lumina.worlds.religion
+          import lumina.worlds.ai_lab
+          import lumina.review_center
           import lumina.parent_dashboard
           import lumina.persistence.session_store
           print("Import smoke test OK")

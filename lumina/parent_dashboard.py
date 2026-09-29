@@ -9,9 +9,10 @@ from lumina.persistence.session_store import get_learning_store, persistence_sta
 from lumina.persistence.base import PersistenceError
 from lumina.persistence.backup import export_learning_backup, restore_learning_backup
 from lumina.learning.evidence_cache import group_by_lesson
+from lumina.readiness import build_release_readiness
 
 
-def render_parent_dashboard(parent_pin: str | None) -> None:
+def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = False, app_pin_configured: bool = False) -> None:
     st.markdown('<div class="section-title">👨‍👧 Parent Dashboard</div>', unsafe_allow_html=True)
 
     if not parent_pin:
@@ -53,6 +54,16 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
         st.warning("Cloud persistence is unavailable in this session. Download a backup before closing.")
     else:
         st.warning("Durable cloud persistence is not configured yet; progress is session-only.")
+
+    st.markdown("### Release readiness")
+    readiness = build_release_readiness(
+        ai_available=ai_available,
+        app_pin_configured=app_pin_configured,
+        parent_pin_configured=bool(parent_pin),
+    )
+    for item in readiness:
+        icon = "✅" if item.ready else "⚠️"
+        st.write(f"{icon} **{item.label}** — {item.detail}")
 
     attempts = store.get_attempts()
     all_mistakes = store.get_mistakes()

@@ -1191,9 +1191,9 @@ jobs:
 
           flows = [
               ("📅 خطتي", "الخطة الأسبوعية"),
-              ("🧪 Exam Mode", "Exam"),
-              ("📝 مراجعاتي", "Mistake Notebook"),
-              ("👨‍👧 Parent Dashboard", "Parent Dashboard"),
+              ("🧪 وضع الاختبار", "وضع الاختبار"),
+              ("📝 مراجعاتي", "مراجعاتي"),
+              ("👨‍👧 لوحة وليّ الأمر", "Parent Dashboard"),
           ]
 
           for button_label, expected_text in flows:

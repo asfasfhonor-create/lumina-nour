@@ -1430,3 +1430,58 @@ jobs:
               ]
           print("Creative gradual prototypes OK")
           PY
+
+      - name: Validate supplementary source learning strategy
+        run: |
+          python - <<'PY'
+          from lumina.learning.source_strategy import (
+              choose_explanation_source,
+              choose_practice_source,
+              correction_references,
+              source_policy,
+          )
+          from lumina.curriculum.permanent_source_learning import _valid_practice
+
+          sources = [
+              {
+                  "active": True,
+                  "display_name": "Main",
+                  "metadata": {"resource_use": "main_book"},
+              },
+              {
+                  "active": True,
+                  "display_name": "Revision",
+                  "metadata": {"resource_use": "assessment_revision"},
+              },
+              {
+                  "active": True,
+                  "display_name": "Answers",
+                  "metadata": {"resource_use": "answer_guide"},
+              },
+          ]
+
+          assert choose_explanation_source(sources)["display_name"] == "Main"
+          assert choose_practice_source(sources)["display_name"] == "Revision"
+          refs = correction_references(sources)
+          assert [item["display_name"] for item in refs] == ["Answers"]
+          assert source_policy({"resource_use":"answer_guide"}).learner_visible is False
+          assert source_policy({"resource_use":"answer_guide"}).correction_reference is True
+
+          assert _valid_practice({
+              "supported": True,
+              "prompt": "Which idea fits?",
+              "options": ["A", "B", "C"],
+              "correct_index": 1,
+              "hint": "Think about the concept.",
+              "explanation": "B matches the source idea.",
+          })
+          assert not _valid_practice({
+              "supported": True,
+              "prompt": "Bad",
+              "options": ["A", "B"],
+              "correct_index": 0,
+              "hint": "x",
+              "explanation": "x",
+          })
+          print("Supplementary source learning strategy OK")
+          PY

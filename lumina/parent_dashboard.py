@@ -49,6 +49,7 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
                 else:
                     st.warning("اختبار الاتصال لم ينجح.")
             except PersistenceError as exc:
+                st.session_state.persistence_verified = False
                 st.error(str(exc))
     elif status["mode"] == "session_fallback":
         st.warning("Cloud persistence is unavailable in this session. Download a backup before closing.")

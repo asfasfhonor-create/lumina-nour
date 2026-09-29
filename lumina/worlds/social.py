@@ -2,7 +2,10 @@ import streamlit as st
 
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import SOCIAL_T1
-from lumina.curriculum.social_unit1 import SOCIAL_UNIT1_LESSONS
+from lumina.curriculum.social_unit1 import SOCIAL_U1_LESSONS
+from lumina.curriculum.social_unit2 import SOCIAL_U2_LESSONS
+from lumina.curriculum.social_unit3 import SOCIAL_U3_LESSONS
+from lumina.curriculum.social_unit4 import SOCIAL_U4_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
 
 
@@ -23,11 +26,10 @@ def render_social_world(ai: GeminiService) -> None:
     )
 
     if unit_title == "الملامح الطبيعية والحضارية لقارات العالم الجديد":
-        render_verified_unit(
-            "الوحدة الأولى · الملامح الطبيعية والحضارية لقارات العالم الجديد",
-            SOCIAL_UNIT1_LESSONS,
-            "social_u1_lesson",
-            module_id="social",
-        )
-    else:
-        st.info("هذه الوحدة موجودة في خريطة المنهج وسيتم تحويل دروسها إلى محتوى موثق بالتتابع.")
+        render_verified_unit("الوحدة الأولى · الملامح الطبيعية والحضارية لقارات العالم الجديد", SOCIAL_U1_LESSONS, "social_u1_lesson", module_id="social")
+    elif unit_title == "مصر في عصر محمد علي وخلفائه":
+        render_verified_unit("الوحدة الثانية · مصر في عصر محمد علي وخلفائه", SOCIAL_U2_LESSONS, "social_u2_lesson", module_id="social")
+    elif unit_title == "النظم البيئية في قارات العالم الجديد":
+        render_verified_unit("الوحدة الثالثة · النظم البيئية في قارات العالم الجديد", SOCIAL_U3_LESSONS, "social_u3_lesson", module_id="social")
+    elif unit_title == "الحركة الوطنية في مواجهة الاحتلال البريطاني":
+        render_verified_unit("الوحدة الرابعة · الحركة الوطنية في مواجهة الاحتلال البريطاني", SOCIAL_U4_LESSONS, "social_u4_lesson", module_id="social")

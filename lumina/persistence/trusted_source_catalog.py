@@ -6,7 +6,7 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from lumina.curriculum.trusted_sources import TrustedSourceRecord
+from lumina.curriculum.trusted_sources import TrustedSourceRecord, source_role_priority, SOURCE_ROLE_SUPPLIED
 from lumina.persistence.base import PersistenceError
 
 
@@ -74,17 +74,36 @@ class NeonTrustedSourceCatalog:
     def list_active(self) -> list[dict]:
         try:
             with psycopg.connect(self.database_url, row_factory=dict_row) as conn:
-                return list(
+                rows = list(
                     conn.execute(
                         """
                         select *
                         from lumina_trusted_sources
                         where learner_key = %s and active = true
-                        order by subject, term_label, display_name
                         """,
                         (self.learner_key,),
                     ).fetchall()
                 )
+
+            def _priority(row: dict) -> int:
+                metadata = row.get("metadata") or {}
+                raw = metadata.get("priority")
+                try:
+                    return int(raw)
+                except (TypeError, ValueError):
+                    return source_role_priority(
+                        str(metadata.get("source_role", SOURCE_ROLE_SUPPLIED))
+                    )
+
+            return sorted(
+                rows,
+                key=lambda row: (
+                    row.get("subject", ""),
+                    row.get("term_label", ""),
+                    -_priority(row),
+                    row.get("display_name", ""),
+                ),
+            )
         except psycopg.Error as exc:
             raise PersistenceError("تعذر قراءة قائمة المصادر الدائمة.") from exc
 

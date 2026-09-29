@@ -88,8 +88,9 @@ def _render_learning_worlds() -> None:
                 '<small>Structured learning world</small></div>',
                 unsafe_allow_html=True,
             )
-            if module.id == "english":
-                if st.button("ادخلي English Adventure", key=f"open_world_{module.id}"):
+            if module.id in {"english", "science"}:
+                label = "ادخلي English Adventure" if module.id == "english" else "ادخلي Science Lab"
+                if st.button(label, key=f"open_world_{module.id}"):
                     st.session_state.active_world = module.id
                     st.rerun()
             else:

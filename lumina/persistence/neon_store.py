@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from datetime import datetime, timezone
 
 import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from lumina.persistence.base import LearningStore
+from lumina.persistence.base import LearningStore, PersistenceError
 
 
 def _utc_now() -> datetime:
@@ -24,8 +25,15 @@ class NeonLearningStore(LearningStore):
         self.database_url = database_url
         self.learner_key = learner_key
 
+    @contextmanager
     def _connect(self):
-        return psycopg.connect(self.database_url, row_factory=dict_row)
+        try:
+            with psycopg.connect(self.database_url, row_factory=dict_row) as conn:
+                yield conn
+        except psycopg.Error as exc:
+            raise PersistenceError(
+                "تعذر الوصول إلى قاعدة بيانات تقدم نور الآن. لم يتم تسجيل هذه العملية."
+            ) from exc
 
     def record_attempt(self, attempt: dict) -> None:
         payload = dict(attempt)

@@ -47,7 +47,11 @@ def render_home_foundation() -> None:
     _render_learning_worlds()
 
     st.markdown("---")
-    c_exam, c_review, c_parent = st.columns(3)
+    c_weekly, c_exam, c_review, c_parent = st.columns(4)
+    with c_weekly:
+        if st.button("📅 خطتي", key="open_weekly_plan"):
+            st.session_state.active_world = "weekly"
+            st.rerun()
     with c_exam:
         if st.button("🧪 Exam Mode", key="open_exam_mode"):
             st.session_state.active_world = "exam"

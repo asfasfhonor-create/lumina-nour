@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta, timezone
+
 import streamlit as st
 
 from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS, all_mapped_lessons
@@ -42,6 +44,47 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
         st.metric("Mistakes to review", len(mistakes))
     with c3:
         st.metric("Reviews due", len(reviews))
+
+    st.markdown("### Weekly learning snapshot")
+    cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+
+    def _is_recent(item: dict) -> bool:
+        raw = item.get("created_at")
+        if not raw:
+            return False
+        try:
+            return datetime.fromisoformat(raw) >= cutoff
+        except ValueError:
+            return False
+
+    recent_attempts = [item for item in attempts if _is_recent(item)]
+    recent_correct = sum(1 for item in recent_attempts if item.get("correct") is True)
+    recent_mistakes = [item for item in store.get_mistakes() if _is_recent(item)]
+    active_subjects = sorted({
+        item.get("module_id")
+        for item in recent_attempts
+        if item.get("module_id")
+    })
+
+    w1, w2, w3 = st.columns(3)
+    with w1:
+        st.metric("Attempts · 7 days", len(recent_attempts))
+    with w2:
+        st.metric("Successful · 7 days", recent_correct)
+    with w3:
+        st.metric("New mistakes · 7 days", len(recent_mistakes))
+
+    if active_subjects:
+        st.caption(
+            "Subjects active this week: "
+            + " · ".join(SUBJECT_LABELS.get(sid, sid) for sid in active_subjects)
+        )
+    else:
+        st.caption("No timestamped learning evidence in the last 7 days yet.")
+
+    badges = st.session_state.get("badges", [])
+    if badges:
+        st.caption("Badges earned: " + " · ".join(badges))
 
     profile = st.session_state.get("english_profile", {})
     st.markdown("### Real English profile")

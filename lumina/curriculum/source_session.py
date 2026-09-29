@@ -17,7 +17,7 @@ def render_temporary_source_session(
     current Streamlit session and are never promoted to the trusted library.
     """
     st.markdown("---")
-    st.caption("Advanced source session · temporary upload, not permanent storage")
+    st.caption("📎 اسألي من كتاب أو مذكرة في الجلسة الحالية")
     uploaded = st.file_uploader(
         "حمّلي نسخة الكتاب الموثوق لهذه الجلسة",
         type=["pdf"],
@@ -50,14 +50,14 @@ def render_temporary_source_session(
         use_container_width=True,
     ):
         if not ai.available:
-            st.warning("الشرح من الكتاب يحتاج Gemini API Key.")
+            st.warning("ميزة الشرح الذكي من الملف مش مفعّلة حاليًا.")
             return
 
         grounded = build_grounded_pdf(source, uploaded.getvalue())
         prompt = curriculum_prompt(source, question, unit_title=section_title)
-        with st.spinner("بقرأ المصدر الموثوق..."):
+        with st.spinner("بقرأ المصدر..."):
             st.markdown(ai.generate([grounded.part, prompt]))
         st.caption(
-            f"Grounded to temporary source: {source.display_name} · "
+            f"المصدر المستخدم الآن: {source.display_name} · "
             "لا يتم حفظ الملف أو اعتباره مصدرًا دائمًا تلقائيًا."
         )

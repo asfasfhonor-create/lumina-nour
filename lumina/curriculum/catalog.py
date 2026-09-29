@@ -1,6 +1,11 @@
 from typing import Dict, Tuple
 
-from lumina.curriculum.models import CurriculumSource, CurriculumUnit
+from lumina.curriculum.models import (
+    CurriculumSource,
+    CurriculumUnit,
+    SOURCE_ROLE_OFFICIAL,
+    SOURCE_ROLE_SUPPLIED,
+)
 
 
 ENGLISH_T1 = CurriculumSource(
@@ -10,6 +15,8 @@ ENGLISH_T1 = CurriculumSource(
     filename="English_language_prep3_t1.pdf",
     term="Term 1",
     language="English",
+    source_role=SOURCE_ROLE_OFFICIAL,
+    publisher="Ministry of Education",
     extraction_mode="page_image",
     units=(
         CurriculumUnit("u1", "Personal Identity"),
@@ -30,6 +37,8 @@ SCIENCE_T1 = CurriculumSource(
     filename="العلوم باللغة الانجليزية-كتاب الطالب-0d9bc9e8.pdf",
     term="Term 1",
     language="English",
+    source_role=SOURCE_ROLE_OFFICIAL,
+    publisher="Ministry of Education",
     extraction_mode="page_image",
     units=(
         CurriculumUnit("u1", "Force and Motion", ("Motion in One Direction", "Graphic Representation of Motion", "Scalars and Vectors")),
@@ -46,6 +55,8 @@ SCIENCE_T2 = CurriculumSource(
     filename="العلوم باللغة الانجليزية-كتاب الطالب-0d9bc9e8.pdf",
     term="Term 2",
     language="English",
+    source_role=SOURCE_ROLE_OFFICIAL,
+    publisher="Ministry of Education",
     extraction_mode="page_image",
     units=(
         CurriculumUnit("t2_u1", "Chemical Reactions", ("Chemical Reactions", "Rate of the Chemical Reaction")),
@@ -65,6 +76,8 @@ MATH_T1 = CurriculumSource(
     filename="الرياضيات باللغة الانجليزية-كتاب الطالب-334a9f66.pdf",
     term="Term 1",
     language="English",
+    source_role=SOURCE_ROLE_OFFICIAL,
+    publisher="Ministry of Education",
     extraction_mode="mixed",
     units=(
         CurriculumUnit("u1", "Relations and Functions", ("Cartesian Product", "Relations", "Functions (Mapping)", "Polynomial Functions")),
@@ -82,6 +95,8 @@ MATH_T2 = CurriculumSource(
     filename="الرياضيات باللغة الانجليزية-كتاب الطالب-334a9f66.pdf",
     term="Term 2",
     language="English",
+    source_role=SOURCE_ROLE_OFFICIAL,
+    publisher="Ministry of Education",
     extraction_mode="mixed",
     units=(
         CurriculumUnit(
@@ -137,6 +152,8 @@ ARABIC_T1 = CurriculumSource(
     filename="Arabic_language_prep3_t1.pdf",
     term="Term 1",
     language="Arabic",
+    source_role=SOURCE_ROLE_OFFICIAL,
+    publisher="وزارة التربية والتعليم",
     extraction_mode="page_image",
     units=(
         CurriculumUnit("intro", "فراعنة عظماء"),
@@ -153,6 +170,8 @@ SOCIAL_T1 = CurriculumSource(
     filename="Social_studies_prep3_t1.pdf",
     term="Term 1",
     language="Arabic",
+    source_role=SOURCE_ROLE_OFFICIAL,
+    publisher="وزارة التربية والتعليم",
     extraction_mode="page_image",
     units=(
         CurriculumUnit("u1", "الملامح الطبيعية والحضارية لقارات العالم الجديد"),
@@ -169,6 +188,8 @@ RELIGION_T1 = CurriculumSource(
     filename="Islamic_religion_prep3_t1.pdf",
     term="Term 1",
     language="Arabic",
+    source_role=SOURCE_ROLE_OFFICIAL,
+    publisher="وزارة التربية والتعليم",
     extraction_mode="text",
     units=(
         CurriculumUnit("u1", "قيم الإسلام في بناء الفرد والمجتمع"),
@@ -184,6 +205,8 @@ ICT_T2 = CurriculumSource(
     filename="computer_3prep_scond_term_english.pdf",
     term="Second Semester",
     language="English",
+    source_role=SOURCE_ROLE_SUPPLIED,
+    publisher=None,
     extraction_mode="text",
     units=(
         CurriculumUnit("c1", "Data", ("Data Types", "Constants & Variables", "Assignment statement", "Operator Precedence", "Errors")),

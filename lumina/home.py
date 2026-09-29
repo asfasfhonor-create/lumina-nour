@@ -6,6 +6,8 @@ from lumina.learning.missions import choose_mission
 from lumina.persistence.session_store import get_learning_store
 from lumina.module_registry import get_module, get_school_subjects
 from lumina.session_state import current_level
+from lumina.persistence.profile_state import persist_profile_state
+from lumina.learning.missions import get_lesson_by_id, get_module_for_lesson_id
 
 
 def render_home_foundation() -> None:
@@ -84,9 +86,30 @@ def _render_daily_mission() -> None:
         st.session_state.daily_mission_date = today
         st.session_state.daily_mission_lesson_id = None
 
-    mission = choose_mission(store)
+    mission = None
+    target_id = st.session_state.get("daily_mission_lesson_id")
+    if target_id:
+        lesson = get_lesson_by_id(target_id)
+        module_id = get_module_for_lesson_id(target_id)
+        if lesson is not None and module_id is not None:
+            from lumina.curriculum.mapped_curriculum import SUBJECT_LABELS
+            from lumina.learning.missions import MissionRecommendation
+            mission = MissionRecommendation(
+                module_id=module_id,
+                subject_label=SUBJECT_LABELS.get(module_id, module_id),
+                lesson_id=lesson.id,
+                lesson_title=lesson.title,
+                source_pages=lesson.source_pages,
+                reason="مهمة اليوم المختارة",
+            )
+
     if mission is None:
-        return
+        mission = choose_mission(store)
+        if mission is None:
+            return
+        st.session_state.daily_mission_lesson_id = mission.lesson_id
+        st.session_state.daily_mission_date = today
+        persist_profile_state()
 
     st.markdown('<div class="section-title">🎯 مهمة اليوم</div>', unsafe_allow_html=True)
     st.markdown(
@@ -96,8 +119,6 @@ def _render_daily_mission() -> None:
     )
 
     if st.button("ابدئي مهمة اليوم", key="open_daily_mission"):
-        st.session_state.daily_mission_lesson_id = mission.lesson_id
-        st.session_state.daily_mission_date = today
         st.session_state.active_world = "mission"
         st.rerun()
 

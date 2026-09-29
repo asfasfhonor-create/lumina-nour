@@ -3,7 +3,7 @@ from __future__ import annotations
 import streamlit as st
 
 from lumina.persistence.base import PersistenceError
-from lumina.persistence.session_store import get_learning_store
+from lumina.persistence.session_store import get_learning_store, persistence_status
 
 
 PROFILE_KEYS = (
@@ -43,4 +43,27 @@ def persist_profile_state() -> None:
         store.save_profile_state(state)
     except PersistenceError as exc:
         st.session_state.persistence_disabled_for_session = True
+        st.session_state.persistence_warning = str(exc)
+
+
+
+def verify_persistence_after_hydration() -> None:
+    """Verify durable storage once per session after profile hydration succeeds."""
+    if st.session_state.get("persistence_verified", False):
+        return
+
+    status = persistence_status()
+    if not status.get("durable"):
+        return
+
+    store = get_learning_store()
+    try:
+        st.session_state.persistence_verified = bool(store.health_check())
+        if not st.session_state.persistence_verified:
+            st.session_state.persistence_warning = (
+                "اتصال الحفظ السحابي موجود، لكن مخطط قاعدة البيانات غير مكتمل."
+            )
+    except PersistenceError as exc:
+        st.session_state.persistence_disabled_for_session = True
+        st.session_state.persistence_verified = False
         st.session_state.persistence_warning = str(exc)

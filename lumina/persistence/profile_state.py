@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from lumina.persistence.base import PersistenceError
 from lumina.persistence.session_store import get_learning_store
 
 
@@ -20,7 +21,12 @@ def hydrate_profile_state() -> None:
         return
 
     store = get_learning_store()
-    state = store.get_profile_state() or {}
+    try:
+        state = store.get_profile_state() or {}
+    except PersistenceError as exc:
+        st.session_state.persistence_disabled_for_session = True
+        st.session_state.persistence_warning = str(exc)
+        state = {}
     for key in PROFILE_KEYS:
         if key in state and state[key] is not None:
             st.session_state[key] = state[key]
@@ -31,4 +37,8 @@ def hydrate_profile_state() -> None:
 def persist_profile_state() -> None:
     store = get_learning_store()
     state = {key: st.session_state.get(key) for key in PROFILE_KEYS}
-    store.save_profile_state(state)
+    try:
+        store.save_profile_state(state)
+    except PersistenceError as exc:
+        st.session_state.persistence_disabled_for_session = True
+        st.session_state.persistence_warning = str(exc)

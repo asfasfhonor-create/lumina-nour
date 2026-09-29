@@ -2,7 +2,9 @@ import streamlit as st
 
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import RELIGION_T1
-from lumina.curriculum.religion_unit1 import RELIGION_UNIT1_LESSONS
+from lumina.curriculum.religion_unit1 import RELIGION_U1_LESSONS
+from lumina.curriculum.religion_unit2 import RELIGION_U2_LESSONS
+from lumina.curriculum.religion_unit3 import RELIGION_U3_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
 
 
@@ -23,11 +25,8 @@ def render_religion_world(ai: GeminiService) -> None:
     )
 
     if unit_title == "قيم الإسلام في بناء الفرد والمجتمع":
-        render_verified_unit(
-            "الوحدة الأولى · قيم الإسلام في بناء الفرد والمجتمع",
-            RELIGION_UNIT1_LESSONS,
-            "religion_u1_lesson",
-            module_id="religion",
-        )
-    else:
-        st.info("هذه الوحدة موجودة في خريطة المنهج وسيتم تحويل دروسها إلى محتوى موثق بالتتابع.")
+        render_verified_unit("الوحدة الأولى · قيم الإسلام في بناء الفرد والمجتمع", RELIGION_U1_LESSONS, "religion_u1_lesson", module_id="religion")
+    elif unit_title == "الإسلام دين وحياة":
+        render_verified_unit("الوحدة الثانية · الإسلام دين وحياة", RELIGION_U2_LESSONS, "religion_u2_lesson", module_id="religion")
+    elif unit_title == "تحمل المسئولية في الإسلام":
+        render_verified_unit("الوحدة الثالثة · تحمل المسئولية في الإسلام", RELIGION_U3_LESSONS, "religion_u3_lesson", module_id="religion")

@@ -4,6 +4,8 @@ from datetime import date, timedelta
 
 import streamlit as st
 
+from lumina.persistence.profile_state import persist_profile_state
+
 
 XP_PER_NEW_SUCCESS = 10
 
@@ -49,6 +51,7 @@ def apply_success_reward(
     st.session_state.xp = int(st.session_state.get("xp", 0)) + XP_PER_NEW_SUCCESS
     st.session_state.streak = _recalculate_streak()
     _update_badges()
+    persist_profile_state()
     return XP_PER_NEW_SUCCESS
 
 

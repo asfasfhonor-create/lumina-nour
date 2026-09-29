@@ -314,3 +314,17 @@ jobs:
           assert all(lesson.checks for group in groups for lesson in group)
           print("Complete first-term Math mapping OK")
           PY
+
+      - name: Validate Real English baseline
+        run: |
+          python - <<'PY'
+          from lumina.learning.english_profile import BASELINE_ITEMS, score_baseline
+
+          assert len(BASELINE_ITEMS) == 6
+          perfect = {item["id"]: item["correct_index"] for item in BASELINE_ITEMS}
+          result = score_baseline(perfect)
+          assert result.correct == 6
+          assert result.total == 6
+          assert result.broad_band == "Independent-start"
+          print("Real English baseline OK")
+          PY

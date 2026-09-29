@@ -1,5 +1,7 @@
 import streamlit as st
 
+from lumina.context_help import render_context_help
+
 from lumina.learning.weekly_plan import build_weekly_plan
 from lumina.persistence.session_store import get_learning_store
 
@@ -9,6 +11,7 @@ def render_weekly_plan() -> None:
     plan = build_weekly_plan(store, limit=5)
 
     st.markdown('<div class="section-title">📅 الخطة الأسبوعية</div>', unsafe_allow_html=True)
+    render_context_help("weekly_plan")
     st.caption("خطة صغيرة ومتوازنة: المراجعات المستحقة أولًا، ثم تعلم جديد من مواد مختلفة.")
 
     if not plan:

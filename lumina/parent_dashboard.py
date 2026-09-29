@@ -40,6 +40,14 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
     st.markdown("### System status")
     if status["durable"]:
         st.success(f"Durable learning storage: {status['label']}")
+        if st.button("اختبر اتصال الحفظ السحابي", key="parent_test_persistence"):
+            try:
+                if store.health_check():
+                    st.success("اتصال قاعدة البيانات يعمل الآن.")
+                else:
+                    st.warning("اختبار الاتصال لم ينجح.")
+            except Exception as exc:
+                st.error(str(exc))
     elif status["mode"] == "session_fallback":
         st.warning("Cloud persistence is unavailable in this session. Download a backup before closing.")
     else:

@@ -1,6 +1,6 @@
 # LUMINA — Permanent Trusted Source Architecture
 
-Status: implementation contract (storage provider not frozen)
+Status: provider selected; runtime credentials/upload wiring pending
 
 ## Goal
 
@@ -27,7 +27,9 @@ Keeping large PDFs outside the relational learning database reduces database blo
 
 ## Provider decision
 
-Do not freeze a storage vendor until live deployment constraints and current free-tier limits are checked. The application contract uses `storage_provider + storage_key`, so the provider can be selected later without changing the curriculum model.
+Neon Object Storage is the selected durable binary provider for LUMINA. The dedicated LUMINA Neon project reports object storage as enabled, and a private bucket named `lumina-trusted-sources` has been created on the production `main` branch. PostgreSQL continues to store metadata/provenance only. The application contract keeps `storage_provider + storage_key` so migration remains possible later without rewriting curriculum records.
+
+Runtime upload/download wiring still requires a branch-scoped storage credential to be stored securely in Streamlit Secrets. No storage credential may be committed to GitHub or written into source metadata.
 
 ## Acceptance gates
 

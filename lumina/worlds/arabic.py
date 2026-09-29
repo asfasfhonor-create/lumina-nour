@@ -6,6 +6,7 @@ from lumina.curriculum.arabic_unit1 import ARABIC_U1_LESSONS
 from lumina.curriculum.arabic_unit2 import ARABIC_U2_LESSONS
 from lumina.curriculum.arabic_unit3 import ARABIC_U3_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
+from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_arabic_world(ai: GeminiService) -> None:
@@ -32,3 +33,10 @@ def render_arabic_world(ai: GeminiService) -> None:
         render_verified_unit("الوحدة الثالثة · أنا والمستقبل", ARABIC_U3_LESSONS, "arabic_u3_lesson", module_id="arabic")
     else:
         st.info("الجزء التمهيدي موجود في المصدر وسيظل متاحًا كمادة موثقة منفصلة عن الوحدات الثلاث.")
+
+    render_temporary_source_session(
+        ai,
+        source,
+        section_title=unit_title,
+        key_prefix="arabic_source_session",
+    )

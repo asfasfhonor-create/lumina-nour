@@ -1175,3 +1175,50 @@ jobs:
           print("All school worlds open and return successfully")
           PY
           rm -f .streamlit/secrets.toml
+
+      - name: Streamlit AppTest learning flow smoke
+        run: |
+          mkdir -p .streamlit
+          cat > .streamlit/secrets.toml <<'EOF'
+          GEMINI_API_KEY = ""
+          NOUR_APP_PIN = ""
+          PARENT_PIN = ""
+          NEON_DATABASE_URL = ""
+          NOUR_LEARNER_KEY = ""
+          EOF
+          python - <<'PY'
+          from streamlit.testing.v1 import AppTest
+
+          flows = [
+              ("📅 خطتي", "خطتي"),
+              ("🧪 Exam Mode", "Exam"),
+              ("📝 مراجعاتي", "Mistake Notebook"),
+              ("👨‍👧 Parent Dashboard", "Parent Dashboard"),
+          ]
+
+          for button_label, expected_text in flows:
+              at = AppTest.from_file("app.py", default_timeout=20)
+              at.run()
+              assert not at.exception, (button_label, at.exception)
+
+              target = next(button for button in at.button if button.label == button_label)
+              target.click()
+              at.run()
+              assert not at.exception, (button_label, at.exception)
+
+              rendered = " ".join(
+                  [m.value for m in at.markdown]
+                  + [c.value for c in at.caption]
+                  + [i.value for i in at.info]
+                  + [w.value for w in at.warning]
+              )
+              assert expected_text in rendered, (button_label, expected_text, rendered[:700])
+
+              back = next(button for button in at.button if button.label == "← العودة إلى عالم نور")
+              back.click()
+              at.run()
+              assert not at.exception, (button_label, "back", at.exception)
+
+          print("Weekly, exam, review, and parent flows open and return successfully")
+          PY
+          rm -f .streamlit/secrets.toml

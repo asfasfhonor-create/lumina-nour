@@ -7,6 +7,7 @@ from lumina.curriculum.coverage import SOURCE_COVERAGE
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.persistence.session_store import get_learning_store
 from lumina.persistence.backup import export_learning_backup, restore_learning_backup
+from lumina.learning.evidence_cache import group_by_lesson
 
 
 def render_parent_dashboard(parent_pin: str | None) -> None:
@@ -35,8 +36,11 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
 
     store = get_learning_store()
     attempts = store.get_attempts()
-    mistakes = store.get_mistakes(unresolved_only=True)
+    all_mistakes = store.get_mistakes()
+    mistakes = [item for item in all_mistakes if not item.get("resolved", False)]
     reviews = store.get_reviews("due")
+    attempts_by_lesson = group_by_lesson(attempts)
+    mistakes_by_lesson = group_by_lesson(all_mistakes)
 
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -63,7 +67,7 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
 
     recent_attempts = [item for item in attempts if _is_recent(item)]
     recent_correct = sum(1 for item in recent_attempts if item.get("correct") is True)
-    recent_mistakes = [item for item in store.get_mistakes() if _is_recent(item)]
+    recent_mistakes = [item for item in all_mistakes if _is_recent(item)]
     active_subjects = sorted({
         item.get("module_id")
         for item in recent_attempts
@@ -123,8 +127,8 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
 
         for lesson in subject_lessons:
             snapshot = derive_mastery(
-                store.get_attempts(lesson.id),
-                store.get_mistakes(lesson.id),
+                attempts_by_lesson.get(lesson.id, []),
+                mistakes_by_lesson.get(lesson.id, []),
             )
             if snapshot.state != "not_started":
                 started += 1
@@ -144,7 +148,10 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
             )
             for unit_title, lessons in units.items():
                 unit_states = [
-                    derive_mastery(store.get_attempts(lesson.id), store.get_mistakes(lesson.id)).state
+                    derive_mastery(
+                        attempts_by_lesson.get(lesson.id, []),
+                        mistakes_by_lesson.get(lesson.id, []),
+                    ).state
                     for lesson in lessons
                 ]
                 unit_started = sum(state != "not_started" for state in unit_states)

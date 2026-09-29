@@ -1,8 +1,9 @@
 import streamlit as st
 from google.genai import types
 from PIL import Image
-from lumina.module_registry import get_school_subjects, get_module
 from lumina.ai_service import GeminiService
+from lumina.home import render_home_foundation
+from lumina.session_state import initialize_session_state
 
 st.set_page_config(page_title="LUMINA | Nour's World", page_icon="✨", layout="centered", initial_sidebar_state="collapsed")
 
@@ -31,67 +32,8 @@ div[data-testid="stTabs"] button { font-weight:800; }
 </style>
 """, unsafe_allow_html=True)
 
-if "xp" not in st.session_state:
-    st.session_state.xp = 120
-if "streak" not in st.session_state:
-    st.session_state.streak = 3
-if "daily_done" not in st.session_state:
-    st.session_state.daily_done = False
-
-level_number = max(1, st.session_state.xp // 100 + 1)
-
-st.markdown("""
-<div class="hero">
-  <div class="brand">LUMINA · NOUR'S WORLD</div>
-  <div class="hello">أهلاً يا نور ✨ جاهزة لمهمة صغيرة النهارده؟</div>
-  <div class="muted">مساحتك للمذاكرة، الاكتشاف، الإنجليزي والـ AI — خطوة ممتعة كل يوم.</div>
-</div>
-""", unsafe_allow_html=True)
-
-c1, c2, c3 = st.columns(3)
-with c1:
-    st.markdown(f'<div class="stat">⭐ <b>{st.session_state.xp} XP</b><span class="muted">نقاطك</span></div>', unsafe_allow_html=True)
-with c2:
-    st.markdown(f'<div class="stat">🔥 <b>{st.session_state.streak} أيام</b><span class="muted">Streak · تجريبي</span></div>', unsafe_allow_html=True)
-with c3:
-    st.markdown(f'<div class="stat">🌱 <b>Level {level_number}</b><span class="muted">Explorer</span></div>', unsafe_allow_html=True)
-
-st.markdown('<div class="section-title">🎯 مهمة اليوم</div>', unsafe_allow_html=True)
-st.markdown('<div class="mission"><b>English Mini Mission</b><br><span class="muted">اكتبي 3 جمل قصيرة عن يومك بالإنجليزي. هنراجعها معًا قبل تسجيل الـ XP.</span></div>', unsafe_allow_html=True)
-daily_text = st.text_area("مهمة اليوم", placeholder="Write 3 short sentences...", key="daily_text", label_visibility="collapsed")
-if not st.session_state.daily_done:
-    if st.button("راجعي المهمة وسجلي +20 XP", key="daily_xp"):
-        sentences = [s.strip() for s in daily_text.replace("!", ".").replace("?", ".").split(".") if s.strip()]
-        if len(sentences) < 3:
-            st.warning("اكتبي 3 جمل على الأقل الأول — المهم المحاولة 🌱")
-        else:
-            st.session_state.xp += 20
-            st.session_state.daily_done = True
-            st.balloons()
-            st.rerun()
-else:
-    st.success("مهمة اليوم اتسجلت 🎉 +20 XP — الحفظ الدائم هنفعله مع قاعدة البيانات.")
-
-st.markdown('<div class="section-title">📚 اختاري عالمك</div>', unsafe_allow_html=True)
-cols = st.columns(2)
-subjects = get_school_subjects()
-for i, module in enumerate(subjects):
-    with cols[i % 2]:
-        st.markdown(
-            f'<div class="subject"><h4>{module.icon} {module.title}</h4>'
-            f'<span class="muted">{module.description}</span><br>'
-            '<small>🚧 جاري بناء التجربة من منهج نور الحالي</small></div>',
-            unsafe_allow_html=True,
-        )
-
-ai_module = get_module("ai")
-if ai_module:
-    st.markdown(f'<div class="section-title">{ai_module.icon} {ai_module.title}</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="mission"><b>قريبًا: AI Detective + Prompt Challenges + Creative Builder</b><br>'
-        '<span class="muted">مش الهدف ناخد الإجابة من الـ AI؛ الهدف نتعلم نسأله صح، نراجعه، نكتشف أخطاءه ونصنع به حاجات جديدة.</span></div>',
-        unsafe_allow_html=True,
-    )
+initialize_session_state()
+render_home_foundation()
 
 st.markdown('<div class="section-title">⚡ Quick Access · أدواتك الحالية</div>', unsafe_allow_html=True)
 api_key = st.secrets.get("GEMINI_API_KEY", None)
@@ -139,8 +81,6 @@ with tabs[1]:
         "المحقق التاريخي 📜": "اشرح دراسات ثالثة إعدادي لنور كتحقيق وقصة. شجع الاستنتاج والربط ولا تخترع تفاصيل منهجية.",
         "صديقتك الملهمة 🌸": "ساعد نور على تنظيم مذاكرتها وشجعها بلطف ومن دون مبالغة أو ضغط.",
     }
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []
     for m in st.session_state.chat_history:
         with st.chat_message(m["role"]):
             st.markdown(m["content"])
@@ -197,8 +137,6 @@ with tabs[5]:
         st.markdown(text)
 
 with tabs[6]:
-    if "tasks_list" not in st.session_state:
-        st.session_state.tasks_list = []
     task = st.text_input("هدف صغير لليوم", key="task")
     if st.button("أضيفيه", key="task_add") and task:
         st.session_state.tasks_list.append(task)

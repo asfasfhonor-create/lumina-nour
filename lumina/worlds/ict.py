@@ -7,6 +7,7 @@ from lumina.curriculum.ict_chapter2 import ICT_CHAPTER2_LESSONS
 from lumina.curriculum.ict_chapter3 import ICT_CHAPTER3_LESSONS
 from lumina.curriculum.ict_chapter4 import ICT_CHAPTER4_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
+from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_ict_world(ai: GeminiService) -> None:
@@ -33,3 +34,10 @@ def render_ict_world(ai: GeminiService) -> None:
         render_verified_unit("Chapter III · Looping & Procedures", ICT_CHAPTER3_LESSONS, "ict_c3_lesson", module_id="ict")
     elif chapter_title == "Cyber bullying":
         render_verified_unit("Chapter IV · Cyber bullying", ICT_CHAPTER4_LESSONS, "ict_c4_lesson", module_id="ict")
+    render_temporary_source_session(
+        ai,
+        source,
+        section_title=chapter_title,
+        key_prefix="ict_source_session",
+    )
+

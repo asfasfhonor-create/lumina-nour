@@ -65,7 +65,7 @@ def learning_stage(attempts: list[dict], mistakes: list[dict]) -> LearningStage:
 
     if not attempts or unresolved:
         return STAGES[GENTLE_START]
-    if len(distinct_correct) >= 2 and len(correct) >= 3:
+    if len(distinct_correct) >= 2 and len(correct) >= 2:
         return STAGES[READY_CHALLENGE]
     return STAGES[BUILDING]
 

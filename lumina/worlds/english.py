@@ -8,7 +8,11 @@ from lumina.curriculum.english_curriculum import get_english_lessons
 from lumina.curriculum.english_reviews import get_review
 from lumina.curriculum.source_session import render_temporary_source_session
 from lumina.learning.lesson_view import render_verified_unit
-from lumina.learning.english_profile import BASELINE_ITEMS, score_baseline
+from lumina.learning.english_profile import (
+    BASELINE_ITEMS,
+    score_baseline,
+    support_instruction,
+)
 from lumina.persistence.profile_state import persist_profile_state
 
 
@@ -94,13 +98,21 @@ def _render_real_english(ai: GeminiService) -> None:
 
     mode = st.radio(
         "اختاري تدريب",
-        ["تحديد نقطة البداية", "كتابة قصيرة", "محادثة واقعية", "كلمات في سياق"],
+        [
+            "تحديد نقطة البداية",
+            "قراءة وفهم",
+            "كتابة قصيرة",
+            "محادثة واقعية",
+            "كلمات في سياق",
+        ],
         horizontal=False,
         key="real_english_mode",
     )
 
     if mode == "تحديد نقطة البداية":
         _level_snapshot()
+    elif mode == "قراءة وفهم":
+        _reading_mission()
     elif mode == "كتابة قصيرة":
         _writing_snapshot(ai)
     elif mode == "محادثة واقعية":
@@ -138,6 +150,7 @@ def _level_snapshot() -> None:
             "baseline_total": result.total,
             "broad_band": result.broad_band,
             "support_note": result.note,
+            "skill_scores": result.skill_scores,
         }
         persist_profile_state()
         st.success(f"نقطة البداية: {result.broad_band} · {result.correct}/{result.total}")
@@ -153,6 +166,44 @@ def _level_snapshot() -> None:
             f"مستوى Real English الحالي: {profile.get('broad_band', 'لسه متحددش')} · "
             f"اختبار البداية {profile.get('baseline_correct', 0)}/{profile.get('baseline_total', 0)}"
         )
+        skill_scores = profile.get("skill_scores") or {}
+        if skill_scores:
+            st.markdown("**صورة مبدئية للمهارات**")
+            for skill, values in skill_scores.items():
+                st.write(f"• {skill}: {values.get('correct', 0)}/{values.get('total', 0)}")
+
+def _reading_mission() -> None:
+    st.markdown("### 📖 Reading Detective")
+    st.caption("قصة قصيرة، سؤال واحد، واستنتاج من المعنى — مش حفظ كلمات.")
+
+    passage = (
+        "Nora joined a school club because she wanted to become more confident. "
+        "At first, she rarely spoke during meetings. After a few weeks, she started "
+        "sharing one idea each time. Her friends listened and encouraged her."
+    )
+    st.info(passage)
+
+    answer = st.radio(
+        "What changed about Nora?",
+        [
+            "She became more willing to share her ideas.",
+            "She stopped attending the club.",
+            "She decided she disliked her friends.",
+        ],
+        index=None,
+        key="real_english_reading_answer",
+    )
+
+    if st.button("Check my idea", key="real_english_reading_check", use_container_width=True):
+        if answer is None:
+            st.warning("اختاري إجابة الأول.")
+            return
+        if answer.startswith("She became"):
+            st.success("Exactly 👏 You used the story to infer the change in her confidence.")
+            st.caption("Inference = نفهم معنى غير مكتوب حرفيًا لكن الدليل في القصة بيوصّل له.")
+        else:
+            st.warning("Look again at what she did at first, then what she started doing after a few weeks.")
+
 
 def _need_ai(ai: GeminiService) -> bool:
     if not ai.available:
@@ -169,7 +220,10 @@ def _writing_snapshot(ai: GeminiService) -> None:
         placeholder="My name is Nour. I like...",
     )
     if st.button("راجعي كتابتي", key="english_world_check") and writing and _need_ai(ai):
-        prompt = f"""You are Nour's English coach. She is an Egyptian third-prep language-school student, but this track is designed to improve her English beyond her school grade.
+        profile = st.session_state.get("english_profile", {})
+        support = support_instruction(profile)
+        prompt = f"""You are Nour's English coach. This track is designed to improve her real English beyond her school grade.
+Adaptive support rule: {support}
 
 Her writing:
 {writing}
@@ -204,7 +258,10 @@ def _conversation_mission(ai: GeminiService) -> None:
     )
 
     if st.button("Continue the conversation", key="english_world_conversation_go") and _need_ai(ai):
+        profile = st.session_state.get("english_profile", {})
+        support = support_instruction(profile)
         prompt = f"""Act as a friendly English conversation partner for Nour.
+Adaptive support rule: {support}
 Situation: {situation}
 Nour's reply: {answer if answer else "[no reply yet]"}
 
@@ -224,8 +281,11 @@ def _vocabulary_mission(ai: GeminiService) -> None:
         key="english_world_vocab_topic",
     )
     if st.button("ابدئي تحدّي الكلمات", key="english_world_vocab_go") and _need_ai(ai):
+        profile = st.session_state.get("english_profile", {})
+        support = support_instruction(profile)
         prompt = f"""Create a tiny vocabulary mission for Nour about: {topic}.
 She is improving real English beyond her school grade.
+Adaptive support rule: {support}
 
 Include exactly:
 - 3 useful words/expressions in context, not isolated translation lists.

@@ -13,15 +13,15 @@ from lumina.persistence.profile_state import persist_profile_state
 
 
 def render_english_world(ai: GeminiService) -> None:
-    st.markdown('<div class="section-title">🇬🇧 English Adventure</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🇬🇧 مغامرة الإنجليزي · English Adventure</div>', unsafe_allow_html=True)
     render_context_help("english", label="💬 قوليلي العالم ده بيعمل إيه")
     st.markdown(
-        '<div class="mission"><b>Two tracks, one goal: stronger English.</b><br>'
-        '<span class="muted">School English follows Nour\'s curriculum. Real English grows her actual language level beyond the school grade.</span></div>',
+        '<div class="mission"><b>مساران، وهدف واحد: English أقوى.</b><br>'
+        '<span class="muted">School English ماشي مع منهج نور، وReal English يطوّر مستواها الحقيقي أبعد من حدود المنهج.</span></div>',
         unsafe_allow_html=True,
     )
 
-    school_tab, real_tab = st.tabs(["📘 School English", "🚀 Real English"])
+    school_tab, real_tab = st.tabs(["📘 منهج المدرسة", "🚀 Real English"])
 
     with school_tab:
         _render_school_track(ai)
@@ -33,19 +33,19 @@ def render_english_world(ai: GeminiService) -> None:
 def _render_school_track(ai: GeminiService) -> None:
     source = ENGLISH_T1
     st.markdown(
-        '<div class="track-card"><b>School English · Curriculum Grounded</b><br>'
-        '<span class="muted">The school track uses the trusted curriculum source and refuses to invent missing curriculum content.</span></div>',
+        '<div class="track-card"><b>School English · من كتاب نور</b><br>'
+        '<span class="muted">المسار المدرسي يعتمد على المصدر المعتمد، وما يضيفش محتوى منهجي غير موجود.</span></div>',
         unsafe_allow_html=True,
     )
 
-    st.caption(f"Trusted source: {source.display_name}")
+    st.caption(f"المصدر: {source.display_name}")
     unit_title = st.selectbox(
-        "Choose unit / review",
+        "اختاري الوحدة أو المراجعة",
         [unit.title for unit in source.units],
         key="school_english_unit",
     )
 
-    st.markdown("**Source map**")
+    st.markdown("**خريطة الوحدات**")
     for unit in source.units:
         prefix = "→" if unit.title == unit_title else "•"
         st.write(f"{prefix} {unit.title}")

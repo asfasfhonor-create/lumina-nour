@@ -10,6 +10,7 @@ from lumina.curriculum.science_t2_unit1 import SCIENCE_T2_UNIT1_LESSONS
 from lumina.curriculum.science_t2_unit2 import SCIENCE_T2_UNIT2_LESSONS
 from lumina.curriculum.science_t2_unit3 import SCIENCE_T2_UNIT3_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
+from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_science_world(ai: GeminiService) -> None:
@@ -87,3 +88,10 @@ def render_science_world(ai: GeminiService) -> None:
             "This unit is inventoried from the trusted source. "
             "Its verified lesson data will be connected progressively without inventing content."
         )
+
+    render_temporary_source_session(
+        ai,
+        source,
+        section_title=unit_title,
+        key_prefix="science_source_session",
+    )

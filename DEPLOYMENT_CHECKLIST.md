@@ -65,3 +65,21 @@ Do not merge the development PR until:
 - No secret values appear in GitHub.
 - Source coverage labels match the actual supplied files.
 - User approves the final merge.
+
+
+## Live Neon status
+
+- Dedicated Neon project created: `LUMINA-NOUR`.
+- Neon project ID: `delicate-sun-65530150`.
+- Region: Frankfurt / AWS eu-central-1.
+- Plan: Free.
+- Auth: disabled.
+- Production schema applied successfully.
+- Verified production tables:
+  - `lumina_learning_attempts`
+  - `lumina_mistakes`
+  - `lumina_reviews`
+  - `lumina_profile_state`
+  - `lumina_trusted_sources`
+- Direct production database write/read/delete smoke test: passed.
+- Remaining live gate: configure `NEON_DATABASE_URL` and `NOUR_LEARNER_KEY` in the actual Streamlit deployment secrets, then verify close/reopen persistence through the deployed app.

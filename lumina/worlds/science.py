@@ -3,6 +3,7 @@ import streamlit as st
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import SCIENCE_T1
 from lumina.curriculum.science_unit1 import SCIENCE_UNIT1_LESSONS
+from lumina.curriculum.science_unit2 import SCIENCE_UNIT2_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
 
 
@@ -27,6 +28,13 @@ def render_science_world(ai: GeminiService) -> None:
             "Unit 1 · Force and Motion",
             SCIENCE_UNIT1_LESSONS,
             "science_u1_lesson",
+            module_id="science",
+        )
+    elif unit_title == "Light Energy (Mirrors and Lenses)":
+        render_verified_unit(
+            "Unit 2 · Light Energy (Mirrors and Lenses)",
+            SCIENCE_UNIT2_LESSONS,
+            "science_u2_lesson",
             module_id="science",
         )
     else:

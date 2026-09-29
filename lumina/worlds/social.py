@@ -30,13 +30,13 @@ def render_social_world(ai: GeminiService) -> None:
     )
 
     if unit_title == "الملامح الطبيعية والحضارية لقارات العالم الجديد":
-        render_verified_unit("الوحدة الأولى · الملامح الطبيعية والحضارية لقارات العالم الجديد", SOCIAL_U1_LESSONS, "social_u1_lesson", module_id="social")
+        render_verified_unit("الوحدة الأولى · الملامح الطبيعية والحضارية لقارات العالم الجديد", SOCIAL_U1_LESSONS, "social_u1_lesson", module_id="social", ai=ai)
     elif unit_title == "مصر في عصر محمد علي وخلفائه":
-        render_verified_unit("الوحدة الثانية · مصر في عصر محمد علي وخلفائه", SOCIAL_U2_LESSONS, "social_u2_lesson", module_id="social")
+        render_verified_unit("الوحدة الثانية · مصر في عصر محمد علي وخلفائه", SOCIAL_U2_LESSONS, "social_u2_lesson", module_id="social", ai=ai)
     elif unit_title == "النظم البيئية في قارات العالم الجديد":
-        render_verified_unit("الوحدة الثالثة · النظم البيئية في قارات العالم الجديد", SOCIAL_U3_LESSONS, "social_u3_lesson", module_id="social")
+        render_verified_unit("الوحدة الثالثة · النظم البيئية في قارات العالم الجديد", SOCIAL_U3_LESSONS, "social_u3_lesson", module_id="social", ai=ai)
     elif unit_title == "الحركة الوطنية في مواجهة الاحتلال البريطاني":
-        render_verified_unit("الوحدة الرابعة · الحركة الوطنية في مواجهة الاحتلال البريطاني", SOCIAL_U4_LESSONS, "social_u4_lesson", module_id="social")
+        render_verified_unit("الوحدة الرابعة · الحركة الوطنية في مواجهة الاحتلال البريطاني", SOCIAL_U4_LESSONS, "social_u4_lesson", module_id="social", ai=ai)
     render_temporary_source_session(
         ai,
         source,

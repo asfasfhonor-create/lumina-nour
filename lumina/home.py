@@ -15,7 +15,7 @@ from lumina.context_help import help_text, render_home_help
 
 def render_home_foundation() -> None:
     """Render the current Nour's World foundation without owning learning business logic."""
-    photo_col, hero_col = st.columns([1.25, 4], vertical_alignment="center")
+    photo_col, hero_col = st.columns([1.55, 4], vertical_alignment="center")
     with photo_col:
         photo_bytes = Path("assets/nour_avatar.jpg").read_bytes()
         photo_b64 = base64.b64encode(photo_bytes).decode("ascii")

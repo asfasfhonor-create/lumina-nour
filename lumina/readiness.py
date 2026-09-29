@@ -12,6 +12,7 @@ class ReadinessItem:
     label: str
     ready: bool
     detail: str
+    required: bool = True
 
 
 def build_release_readiness(
@@ -56,12 +57,24 @@ def build_release_readiness(
             key="parent_pin",
             label="Parent Dashboard protection",
             ready=parent_pin_configured,
-            detail="Configured" if parent_pin_configured else "PARENT_PIN not configured",
+            detail="Configured" if parent_pin_configured else "Optional / not configured",
+            required=False,
         ),
         ReadinessItem(
             key="app_pin",
             label="Whole-app PIN",
             ready=app_pin_configured,
             detail="Configured" if app_pin_configured else "Optional / not configured",
+            required=False,
         ),
     )
+
+
+
+def release_blockers(items: tuple[ReadinessItem, ...]) -> tuple[ReadinessItem, ...]:
+    """Return only required readiness items that still block a production release."""
+    return tuple(item for item in items if item.required and not item.ready)
+
+
+def is_release_ready(items: tuple[ReadinessItem, ...]) -> bool:
+    return not release_blockers(items)

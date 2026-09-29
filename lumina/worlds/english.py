@@ -5,6 +5,7 @@ from lumina.curriculum.catalog import ENGLISH_T1
 from lumina.curriculum.grounding import build_grounded_pdf, curriculum_prompt
 from lumina.curriculum.english_unit1 import UNIT1_LESSONS
 from lumina.curriculum.english_unit2 import UNIT2_LESSONS
+from lumina.curriculum.english_unit3 import UNIT3_LESSONS
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.learning.progress_view import render_learning_brain_summary
 from lumina.session_state import (
@@ -63,6 +64,12 @@ def _render_school_track(ai: GeminiService) -> None:
             "Unit 2 · Communication with Family and Friends",
             UNIT2_LESSONS,
             "english_u2_lesson",
+        )
+    elif unit_title == "Artificial Intelligence":
+        _render_verified_unit(
+            "Unit 3 · Artificial Intelligence",
+            UNIT3_LESSONS,
+            "english_u3_lesson",
         )
 
     st.markdown("---")

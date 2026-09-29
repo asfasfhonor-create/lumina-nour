@@ -23,6 +23,60 @@ from lumina.curriculum.trusted_source_storage import StorageConfig, NeonTrustedS
 from lumina.persistence.trusted_source_catalog import NeonTrustedSourceCatalog
 
 
+def _suggest_source_profile(filename: str) -> dict[str, str]:
+    name = (filename or "").lower()
+
+    subject = "english"
+    display_name = filename
+    resource_use = "support"
+    resource_use_label = "مساعد عام"
+
+    if "math" in name:
+        subject = "math"
+    elif "science" in name or "ساينس" in name or "prep3 notebook" in name:
+        subject = "science"
+    elif "english" in name:
+        subject = "english"
+
+    if "guide" in name and "answer" in name:
+        resource_use = "answer_guide"
+        resource_use_label = "مرجع تصحيح"
+    elif "assessment" in name or "final revision" in name or "p2" in name:
+        resource_use = "assessment_revision"
+        resource_use_label = "اختبارات ومراجعة"
+    elif "notebook" in name:
+        resource_use = "revision_exam"
+        resource_use_label = "مراجعة وامتحانات"
+    else:
+        resource_use = "main_book"
+        resource_use_label = "شرح وتدريب"
+
+    if subject == "math":
+        if resource_use == "main_book":
+            display_name = "El-Moasser Maths · Main Book · Prep 3 · Term 1 · 2027"
+        elif resource_use == "assessment_revision":
+            display_name = "El-Moasser Maths · Assessments & Final Revision · Prep 3 · Term 1 · 2027"
+        else:
+            display_name = "El-Moasser Maths · Guide Answers · Prep 3 · Term 1 · 2027"
+    elif subject == "science":
+        if resource_use == "main_book":
+            display_name = "El-Moasser Science · Main Book · Prep 3 · Term 1 · 2027"
+        else:
+            display_name = "El-Moasser Science · Notebook · Prep 3 · Term 1 · 2027"
+    elif subject == "english":
+        display_name = "El-Moasser English · Guide Answers · Prep 3 · Term 1 · 2027"
+
+    return {
+        "subject": subject,
+        "display_name": display_name,
+        "resource_use": resource_use,
+        "resource_use_label": resource_use_label,
+        "term_label": "Term 1",
+        "publisher": "المعاصر",
+        "edition_label": "2027",
+    }
+
+
 def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = False, app_pin_configured: bool = False) -> None:
     st.markdown('<div class="section-title">👨‍👧 لوحة وليّ الأمر</div>', unsafe_allow_html=True)
 
@@ -280,58 +334,41 @@ def _render_trusted_sources() -> None:
         st.warning("تخزين الملفات الدائم غير متاح دلوقتي. جرّب مرة تانية لاحقًا.")
         return
 
-    uploaded = st.file_uploader(
+    uploaded_files = st.file_uploader(
         "أضف كتابًا أو مذكرة كمصدر دائم",
         type=["pdf", "jpg", "jpeg", "png", "webp"],
+        accept_multiple_files=True,
         key="parent_trusted_source_upload",
     )
 
-    if uploaded:
-        display_name = st.text_input(
-            "اسم المصدر داخل البرنامج",
-            value=uploaded.name,
-            key="parent_trusted_source_display_name",
-        )
-        subject_id = st.selectbox(
-            "المادة",
-            list(SUBJECT_LABELS.keys()),
-            format_func=lambda sid: SUBJECT_LABELS.get(sid, sid),
-            key="parent_trusted_source_subject",
-        )
-        term_label = st.text_input(
-            "الترم / الفصل الدراسي",
-            placeholder="مثال: Term 1",
-            key="parent_trusted_source_term",
-        )
-        unit_label = st.text_input(
-            "الوحدة / الفصل — اختياري",
-            key="parent_trusted_source_unit",
-        )
-        source_role = st.selectbox(
-            "نوع المصدر",
-            [SOURCE_ROLE_OFFICIAL, SOURCE_ROLE_SUPPLEMENTARY],
-            format_func=lambda role: SOURCE_ROLE_LABELS[role],
-            help=(
-                "المصدر الرسمي له الأولوية في تحديد المنهج والمعلومة. "
-                "المصدر المساعد يُستخدم للشرح والأمثلة والتدريب بدون أن يغيّر مرجع المنهج الأساسي."
-            ),
-            key="parent_trusted_source_role",
-        )
-        publisher = st.text_input(
-            "الناشر / اسم السلسلة — اختياري",
-            placeholder="مثال: وزارة التربية والتعليم / المعاصر",
-            key="parent_trusted_source_publisher",
-        )
-        edition_label = st.text_input(
-            "الطبعة / السنة — اختياري",
-            placeholder="مثال: 2026 / 2025–2026",
-            key="parent_trusted_source_edition",
+    if uploaded_files:
+        st.caption(
+            f"تم اختيار **{len(uploaded_files)}** ملف. "
+            "LUMINA هيصنّف كتب المعاصر المعروفة تلقائيًا، وتقدر تحفظهم كلهم بضغطة واحدة."
         )
 
-        if st.button("اعتماد وحفظ المصدر", key="parent_trusted_source_save", use_container_width=True):
-            if not term_label.strip():
-                st.warning("اكتب الترم أو الفصل الدراسي الأول.")
-            else:
+        batch_profiles = []
+        for uploaded in uploaded_files:
+            profile = _suggest_source_profile(uploaded.name)
+            batch_profiles.append((uploaded, profile))
+            with st.container(border=True):
+                st.write(f"**{profile['display_name']}**")
+                st.caption(
+                    f"{SUBJECT_LABELS.get(profile['subject'], profile['subject'])} · "
+                    f"{profile['term_label']} · {profile['resource_use_label']} · "
+                    f"{profile['publisher']} · {profile['edition_label']}"
+                )
+
+        if st.button(
+            f"اعتماد وحفظ كل الملفات ({len(uploaded_files)})",
+            key="parent_trusted_source_save_all",
+            use_container_width=True,
+        ):
+            created_count = 0
+            duplicate_count = 0
+            failed = []
+
+            for uploaded, profile in batch_profiles:
                 try:
                     upload = SourceUpload(
                         filename=uploaded.name,
@@ -342,26 +379,38 @@ def _render_trusted_sources() -> None:
                     record = build_trusted_record(
                         upload,
                         learner_key=learner_key,
-                        display_name=display_name,
-                        subject=subject_id,
-                        term_label=term_label,
-                        unit_label=unit_label or None,
+                        display_name=profile["display_name"],
+                        subject=profile["subject"],
+                        term_label=profile["term_label"],
+                        unit_label=None,
                         storage_provider=NEON_OBJECT_STORAGE,
                         storage_key=storage_key,
-                        source_role=source_role,
-                        publisher=publisher or None,
-                        edition_label=edition_label or None,
+                        metadata={
+                            "resource_use": profile["resource_use"],
+                            "resource_use_label": profile["resource_use_label"],
+                        },
+                        source_role=SOURCE_ROLE_SUPPLEMENTARY,
+                        publisher=profile["publisher"],
+                        edition_label=profile["edition_label"],
                     )
                     created = catalog.register(record)
                     if created:
-                        st.success("تم حفظ المصدر واعتماده بشكل دائم ✅")
+                        created_count += 1
                     else:
-                        st.info("المصدر ده محفوظ بالفعل، ومش محتاج نضيف نسخة مكررة.")
-                    st.rerun()
+                        duplicate_count += 1
                 except (ValueError, PersistenceError) as exc:
-                    st.error(str(exc))
+                    failed.append(f"{uploaded.name}: {exc}")
                 except Exception:
-                    st.error("تعذر حفظ المصدر الدائم الآن. لم يتم اعتماده.")
+                    failed.append(f"{uploaded.name}: تعذر الحفظ")
+
+            if created_count:
+                st.success(f"تم حفظ واعتماد {created_count} مصدر بشكل دائم ✅")
+            if duplicate_count:
+                st.info(f"{duplicate_count} ملف كان محفوظ بالفعل وتم منع التكرار.")
+            if failed:
+                st.error("تعذر حفظ بعض الملفات: " + " · ".join(failed))
+            if not failed:
+                st.rerun()
 
     try:
         sources = catalog.list_active()
@@ -386,6 +435,8 @@ def _render_trusted_sources() -> None:
                     st.caption(f"الناشر / السلسلة: {metadata['publisher']}")
                 if metadata.get("edition_label"):
                     st.caption(f"الطبعة / السنة: {metadata['edition_label']}")
+                if metadata.get("resource_use_label"):
+                    st.caption(f"الاستخدام داخل LUMINA: {metadata['resource_use_label']}")
                 if source.get("unit_label"):
                     st.caption(f"الوحدة / الفصل: {source['unit_label']}")
                 st.caption(f"الملف: {source['filename']}")

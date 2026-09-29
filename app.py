@@ -58,7 +58,13 @@ except PersistenceError as exc:
     st.caption("تم التحويل مؤقتًا للحفظ داخل الجلسة الحالية حتى لا يتوقف البرنامج.")
 
 storage = persistence_status()
-storage_note = "الحفظ الدائم فعال" if storage["durable"] else "الحفظ الدائم غير مفعل"
+if storage["durable"] and st.session_state.get("persistence_verified", False):
+    storage_note = "الحفظ الدائم متحقق ويعمل"
+elif storage["durable"]:
+    storage_note = "الحفظ الدائم مهيأ لكنه غير متحقق"
+else:
+    storage_note = "الحفظ الدائم غير مفعل"
+
 st.caption(
     f"LUMINA · built for Nour ✨ | Development branch · "
     f"{storage_note} · {storage['label']}"

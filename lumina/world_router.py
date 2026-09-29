@@ -4,6 +4,7 @@ from lumina.ai_service import GeminiService
 from lumina.worlds.english import render_english_world
 from lumina.worlds.science import render_science_world
 from lumina.worlds.math import render_math_world
+from lumina.worlds.ict import render_ict_world
 from lumina.parent_dashboard import render_parent_dashboard
 
 
@@ -11,6 +12,7 @@ WORLD_RENDERERS = {
     "english": render_english_world,
     "science": render_science_world,
     "math": render_math_world,
+    "ict": render_ict_world,
 }
 
 

@@ -29,25 +29,25 @@ def build_release_readiness(
     return (
         ReadinessItem(
             key="curriculum",
-            label="Mapped curriculum",
+            label="المنهج المرتبط",
             ready=mapped_count > 0,
-            detail=f"{mapped_count} mapped learning blocks",
+            detail=f"{mapped_count} درس/جزء تعلّم مرتبط",
         ),
         ReadinessItem(
             key="ai",
-            label="Gemini tutor",
+            label="المساعد الذكي",
             ready=ai_available,
-            detail="Configured" if ai_available else "GEMINI_API_KEY not configured",
+            detail="مفعّل" if ai_available else "غير مفعّل حاليًا",
         ),
         ReadinessItem(
             key="storage",
-            label="Durable learning storage",
+            label="الحفظ الدائم للتقدّم",
             ready=bool(storage["durable"] and storage_verified),
             detail=(
-                f"{storage['label']} · verified"
+                f"{storage['label']} · تم التحقق"
                 if storage["durable"] and storage_verified
                 else (
-                    f"{storage['label']} · configured, not verified"
+                    f"{storage['label']} · مفعّل ولم يتم التحقق بعد"
                     if storage["durable"]
                     else storage["label"]
                 )
@@ -55,16 +55,16 @@ def build_release_readiness(
         ),
         ReadinessItem(
             key="parent_pin",
-            label="Parent Dashboard protection",
+            label="حماية لوحة وليّ الأمر",
             ready=parent_pin_configured,
-            detail="Configured" if parent_pin_configured else "Optional / not configured",
+            detail="مفعّلة" if parent_pin_configured else "اختيارية وغير مفعّلة",
             required=False,
         ),
         ReadinessItem(
             key="app_pin",
-            label="Whole-app PIN",
+            label="رمز دخول البرنامج",
             ready=app_pin_configured,
-            detail="Configured" if app_pin_configured else "Optional / not configured",
+            detail="مفعّل" if app_pin_configured else "اختياري وغير مفعّل",
             required=False,
         ),
     )

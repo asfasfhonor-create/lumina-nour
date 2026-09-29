@@ -38,6 +38,11 @@ def render_home_foundation() -> None:
     _render_daily_mission()
     _render_learning_worlds()
 
+    st.markdown("---")
+    if st.button("👨‍👧 Parent Dashboard", key="open_parent_dashboard"):
+        st.session_state.active_world = "parent"
+        st.rerun()
+
 
 def _render_daily_mission() -> None:
     st.markdown('<div class="section-title">🎯 مهمة اليوم</div>', unsafe_allow_html=True)

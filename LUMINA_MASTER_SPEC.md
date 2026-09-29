@@ -1,7 +1,7 @@
 # LUMINA / NOUR'S WORLD — MASTER SPECIFICATION
 
-**Status:** Master v1.5 — APPROVED IMPLEMENTATION AUTHORITY  
-**Date:** 2026-09-29  
+**Status:** Master v1.6 — APPROVED IMPLEMENTATION AUTHORITY  
+**Date:** 2026-09-30  
 **Product owner:** Mohamed  
 **Learner:** Nour  
 **Repository:** `mohamed-hamuda/lumina-nour`
@@ -170,6 +170,17 @@ Use it now for a question, explanation, homework, summary, or practice without m
 
 ### Permanent trusted source
 Intentionally classify and index it into the learning library.
+
+Permanent sources use an explicit hierarchy:
+- **Official / Ministry** — defines curriculum scope and authoritative school content.
+- **Supplied by parent** — trusted parent-provided material whose role is explicitly recorded.
+- **Supplementary** — external books/notes used to strengthen explanation, examples, practice and revision without silently overriding the official source.
+
+Supplementary books are not passive PDF storage. Their intended roles are recorded, including:
+- Main Book → explanation + examples + supported practice.
+- Assessments / Final Revision → practice + review + assessment patterns.
+- Notebook / Revision Book → review + exam-style reinforcement.
+- Answer Guide → correction reference only; hidden from learner-facing study content.
 
 The system must not silently promote an arbitrary uploaded file into authoritative curriculum.
 
@@ -489,6 +500,13 @@ Review should use a different question/context when possible rather than simply 
 
 Adaptive difficulty and scaffolding should change from observed learning evidence.
 
+Current approved difficulty progression:
+- **Level 1 — Gentle start:** one small concept check, no pressure, no timer, no penalty.
+- **Level 2 — Build understanding:** a small application after evidence of initial understanding.
+- **Level 3 — Light challenge:** only after at least two distinct successful checks and no unresolved misconception forcing a step-back.
+
+If Nour struggles, LUMINA must step down automatically, reveal progressively stronger hints, re-explain from verified evidence, and later revisit the concept in a different context. Difficulty must never rise merely because of age or school grade.
+
 ---
 
 ## 17. Exam Mode
@@ -799,6 +817,11 @@ Development branch:
 
 Current branch now includes:
 - modular home/router/world structure;
+- a gentle adaptive-scaffolding engine with three evidence-driven difficulty levels;
+- one-question-at-a-time cognitive-load control and progressive hints;
+- creative mission framing across subject worlds;
+- live supplementary-source learning support that can use saved Main Books for simpler/creative explanations and revision books for source-grounded extra practice;
+- learner-facing Answer Guides kept hidden and reserved as correction references;
 - seven enabled school-subject worlds;
 - mapped curriculum registry across supplied subjects;
 - separate School English and Real English tracks;
@@ -837,7 +860,8 @@ Still required before V1 production merge:
 - explicit Mohamed approval before merging PR #1 to `main`.
 
 Post-V1 depth improvements remain planned rather than release blockers:
-- richer subject-specific adventures and activities;
+- richer subject-specific adventures and activity formats beyond the current mission/puzzle foundation;
+- broader lesson-by-lesson Level 2/3 curated question coverage beyond the initial Science/Math prototypes;
 - deeper adaptive Tutor Profile/scaffolding;
 - broader Real English listening/speaking/pronunciation;
 - deeper AI Lab progression and evidence-based badges;
@@ -1135,3 +1159,24 @@ Persistence implementation consolidation:
 - Runtime selection uses `NEON_DATABASE_URL` + `NOUR_LEARNER_KEY`; when they are absent, the app safely falls back to session-only prototype storage.
 - The Neon connection must remain server-side and use SSL; hosted production should prefer the Neon pooled connection string.
 - Activation still requires a dedicated Neon account/project connection and applying the prepared schema before the production merge.
+
+
+---
+
+## 42. Master v1.6 change note
+
+This revision records Mohamed's approved direction that LUMINA must make learning attractive and indirect rather than behave like a PDF library or hard question bank.
+
+Approved implementation rules:
+- learning should feel like missions, puzzles, stories, short challenges and discovery where appropriate;
+- understanding comes before memorization;
+- difficulty rises only from demonstrated evidence;
+- one small task is preferred over a large intimidating question block;
+- wrong answers trigger support, not punishment;
+- supplementary books must actively support explanation, examples, practice, revision and correction according to their role;
+- official Ministry sources remain authoritative for curriculum scope;
+- Main Books may enrich teaching, assessment/revision books may generate practice, and Answer Guides remain hidden correction references;
+- generated supplementary practice is not automatically treated as official mastery evidence;
+- Science and Maths contain the first curated Level 1 → Level 2 → Level 3 prototype flows, to be generalized after learner validation.
+
+This change strengthens Sections 2, 6, 11, 16 and 19 without changing the product mission.

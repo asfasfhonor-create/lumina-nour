@@ -4,6 +4,9 @@ from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import MATH_T1, MATH_T2
 from lumina.curriculum.math_unit1 import MATH_UNIT1_LESSONS
 from lumina.curriculum.math_unit2 import MATH_UNIT2_LESSONS
+from lumina.curriculum.math_unit3 import MATH_UNIT3_LESSONS
+from lumina.curriculum.math_unit4 import MATH_UNIT4_LESSONS
+from lumina.curriculum.math_unit5 import MATH_UNIT5_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
 
 
@@ -40,6 +43,27 @@ def render_math_world(ai: GeminiService) -> None:
             "Unit 2 · Ratio, Proportion, Direct Variation and Inverse Variation",
             MATH_UNIT2_LESSONS,
             "math_u2_lesson",
+            module_id="math",
+        )
+    elif source.id == "math_prep3_t1" and unit_title == "Statistics":
+        render_verified_unit(
+            "Unit 3 · Statistics",
+            MATH_UNIT3_LESSONS,
+            "math_u3_lesson",
+            module_id="math",
+        )
+    elif source.id == "math_prep3_t1" and unit_title == "Trigonometry":
+        render_verified_unit(
+            "Unit 4 · Trigonometry",
+            MATH_UNIT4_LESSONS,
+            "math_u4_lesson",
+            module_id="math",
+        )
+    elif source.id == "math_prep3_t1" and unit_title == "Coordinate Geometry":
+        render_verified_unit(
+            "Unit 5 · Coordinate Geometry",
+            MATH_UNIT5_LESSONS,
+            "math_u5_lesson",
             module_id="math",
         )
     else:

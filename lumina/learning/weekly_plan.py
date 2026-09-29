@@ -5,6 +5,7 @@ from datetime import date
 
 from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS
 from lumina.learning.progress import NOT_STARTED, derive_mastery
+from lumina.learning.evidence_cache import snapshot_learning_evidence
 
 
 @dataclass(frozen=True)
@@ -47,6 +48,10 @@ def build_weekly_plan(store, limit: int = 5) -> tuple[WeeklyPlanItem, ...]:
         if len(items) >= limit:
             return tuple(items)
 
+    evidence = snapshot_learning_evidence(store)
+    attempts_by_lesson = evidence["attempts_by_lesson"]
+    mistakes_by_lesson = evidence["mistakes_by_lesson"]
+
     subject_queues: dict[str, list] = {}
     for module_id, units in MAPPED_CURRICULUM.items():
         queue = []
@@ -55,8 +60,8 @@ def build_weekly_plan(store, limit: int = 5) -> tuple[WeeklyPlanItem, ...]:
                 if lesson.id in seen_lessons:
                     continue
                 state = derive_mastery(
-                    store.get_attempts(lesson.id),
-                    store.get_mistakes(lesson.id),
+                    attempts_by_lesson.get(lesson.id, []),
+                    mistakes_by_lesson.get(lesson.id, []),
                 ).state
                 if state == NOT_STARTED:
                     queue.append(lesson)

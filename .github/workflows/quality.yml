@@ -1012,3 +1012,21 @@ jobs:
           assert snapshot.unresolved_mistakes == 1
           print("Unresolved mistakes correctly keep Needs review")
           PY
+
+      - name: Validate stable daily mission persistence
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lumina.persistence.profile_state import PROFILE_KEYS
+
+          assert "daily_mission_lesson_id" in PROFILE_KEYS
+          assert "daily_mission_date" in PROFILE_KEYS
+
+          home = Path("lumina/home.py").read_text(encoding="utf-8")
+          daily = Path("lumina/daily_mission.py").read_text(encoding="utf-8")
+          assert "persist_profile_state()" in home
+          assert "persist_profile_state()" in daily
+          assert "daily_mission_date" in home
+          assert "daily_mission_date" in daily
+          print("Stable daily mission persistence OK")
+          PY

@@ -6,6 +6,9 @@ from lumina.curriculum.science_unit1 import SCIENCE_UNIT1_LESSONS
 from lumina.curriculum.science_unit2 import SCIENCE_UNIT2_LESSONS
 from lumina.curriculum.science_unit3 import SCIENCE_UNIT3_LESSONS
 from lumina.curriculum.science_unit4 import SCIENCE_UNIT4_LESSONS
+from lumina.curriculum.science_t2_unit1 import SCIENCE_T2_UNIT1_LESSONS
+from lumina.curriculum.science_t2_unit2 import SCIENCE_T2_UNIT2_LESSONS
+from lumina.curriculum.science_t2_unit3 import SCIENCE_T2_UNIT3_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
 
 
@@ -56,6 +59,27 @@ def render_science_world(ai: GeminiService) -> None:
             "Unit 4 · Reproduction and Species Continuity",
             SCIENCE_UNIT4_LESSONS,
             "science_u4_lesson",
+            module_id="science",
+        )
+    elif source.id == "science_prep3_t2" and unit_title == "Chemical Reactions":
+        render_verified_unit(
+            "Term 2 · Unit 1 · Chemical Reactions",
+            SCIENCE_T2_UNIT1_LESSONS,
+            "science_t2_u1_lesson",
+            module_id="science",
+        )
+    elif source.id == "science_prep3_t2" and unit_title == "Electric Energy and Radioactivity":
+        render_verified_unit(
+            "Term 2 · Unit 2 · Electric Energy and Radioactivity",
+            SCIENCE_T2_UNIT2_LESSONS,
+            "science_t2_u2_lesson",
+            module_id="science",
+        )
+    elif source.id == "science_prep3_t2" and unit_title == "Genetics":
+        render_verified_unit(
+            "Term 2 · Unit 3 · Genetics",
+            SCIENCE_T2_UNIT3_LESSONS,
+            "science_t2_u3_lesson",
             module_id="science",
         )
     else:

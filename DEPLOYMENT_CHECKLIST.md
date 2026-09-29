@@ -9,17 +9,19 @@ Configure only in Streamlit secrets. Never commit real values.
 - `GEMINI_API_KEY` — AI features.
 - `NOUR_APP_PIN` — optional whole-app PIN.
 - `PARENT_PIN` — optional Parent Dashboard PIN.
-- `SUPABASE_URL` — dedicated LUMINA Supabase project URL.
-- `SUPABASE_SECRET_KEY` — server-side secret/service-role key for the dedicated LUMINA project.
+- `NEON_DATABASE_URL` — pooled Neon PostgreSQL connection string for the dedicated LUMINA NOUR database.
 - `NOUR_LEARNER_KEY` — stable internal learner key for Nour.
+
+The Neon connection string must remain server-side and use SSL. Prefer the pooled connection string from Neon for hosted app traffic.
 
 ## Database activation
 
-1. Create a **dedicated LUMINA Neon project**. Do not reuse PROJECT LEDGER databases.
-2. Apply `postgres/neon_schema.sql` in the Neon SQL editor.
-3. Copy the Neon server-side connection string with SSL enabled.
-4. Add `DATABASE_URL` and `NOUR_LEARNER_KEY` to Streamlit secrets.
+1. Create a dedicated **LUMINA NOUR** Neon project on the Free plan. Do not reuse PROJECT LEDGER databases.
+2. Apply `neon/lumina_schema.sql` once in the Neon SQL editor.
+3. Copy the **pooled** PostgreSQL connection string with SSL enabled.
+4. Add `NEON_DATABASE_URL` and `NOUR_LEARNER_KEY` to Streamlit secrets.
 5. Launch the app and verify that attempts, mistakes, reviews, XP, streak, badges, and English profile survive a fresh browser session.
+6. Export a portable backup from Parent Dashboard and verify that it contains remote learning evidence but no secrets.
 
 ## Curriculum checks
 
@@ -50,13 +52,15 @@ Configure only in Streamlit secrets. Never commit real values.
 - Real English baseline stores profile.
 - Curriculum Search finds examples in English and Arabic and grounds AI answers to mapped evidence.
 - Gemini provider failure does not crash the app.
+- Neon disconnect/failure is surfaced without exposing credentials.
+- Fresh browser session restores durable learner profile and history from Neon.
 
 ## Release gates
 
 Do not merge the development PR until:
 
 - GitHub Quality workflow is green on the exact candidate commit.
-- Durable persistence is activated and verified, or explicitly deferred for a prototype release.
+- Dedicated Neon persistence is activated and verified, or explicitly deferred for a prototype release.
 - Mobile/live UI smoke testing is complete.
 - No secret values appear in GitHub.
 - Source coverage labels match the actual supplied files.

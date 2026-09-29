@@ -2,9 +2,9 @@ import streamlit as st
 
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import ENGLISH_T1
-from lumina.curriculum.grounding import build_grounded_pdf, curriculum_prompt
 from lumina.curriculum.english_curriculum import get_english_lessons
 from lumina.curriculum.english_reviews import get_review
+from lumina.curriculum.source_session import render_temporary_source_session
 from lumina.learning.lesson_view import render_verified_unit
 from lumina.learning.english_profile import BASELINE_ITEMS, score_baseline
 from lumina.persistence.profile_state import persist_profile_state
@@ -73,36 +73,12 @@ def _render_school_track(ai: GeminiService) -> None:
                 module_id="english",
             )
 
-    st.markdown("---")
-    st.caption("Advanced source session")
-    uploaded = st.file_uploader(
-        "Load the trusted school English book for this session",
-        type=["pdf"],
-        key="school_english_source_pdf",
-        help=(
-            "Optional advanced source session until permanent document storage is connected. "
-            f"Expected source: {source.filename}"
-        ),
+    render_temporary_source_session(
+        ai,
+        source,
+        section_title=unit_title,
+        key_prefix="english_source_session",
     )
-
-    if uploaded:
-        if uploaded.name != source.filename:
-            st.warning(
-                "The filename is different from the inventoried trusted source. "
-                "LUMINA will treat it as temporary material and will not silently promote it to the trusted curriculum library."
-            )
-
-        grounded = build_grounded_pdf(source, uploaded.read())
-        question = st.text_input(
-            "Ask anything from the loaded book",
-            key="school_english_question",
-            placeholder="Explain the main idea, vocabulary, grammar, or give me a short practice...",
-        )
-
-        if st.button("Teach me from the book", key="school_english_teach") and question and _need_ai(ai):
-            prompt = curriculum_prompt(source, question, unit_title=unit_title)
-            with st.spinner("Reading the trusted school source..."):
-                st.markdown(ai.generate([grounded.part, prompt]))
 
 
 def _render_real_english(ai: GeminiService) -> None:

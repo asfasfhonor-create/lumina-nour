@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import streamlit as st
 
+from lumina.context_help import render_context_help
+
 from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS
 from lumina.persistence.session_store import get_learning_store
 from lumina.learning.rewards import apply_success_reward
@@ -54,6 +56,7 @@ def _pick_checks(lessons, store, limit: int = 5):
 
 def render_exam_mode() -> None:
     st.markdown('<div class="section-title">🧪 Exam Mode</div>', unsafe_allow_html=True)
+    render_context_help("exam_mode")
     st.markdown(
         '<div class="mission"><b>اختبار من المحتوى الموثق فقط.</b><br>'
         '<span class="muted">الأسئلة هنا تأتي من خرائط الدروس المأخوذة من المصادر، '

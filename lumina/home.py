@@ -35,8 +35,8 @@ def render_home_foundation() -> None:
         """
         <div class="hero">
           <div class="brand">LUMINA · NOUR'S WORLD</div>
-          <div class="hello">أهلاً يا نور ✨ جاهزة لمهمة صغيرة النهارده؟</div>
-          <div class="muted">مساحتك للمذاكرة، الاكتشاف، الإنجليزي والـ AI — خطوة ممتعة كل يوم.</div>
+          <div class="hello">أهلاً يا نور ✨ جاهزة نبدأ حاجة حلوة النهارده؟</div>
+          <div class="muted">عالمك للمذاكرة والاكتشاف والإنجليزي والذكاء الاصطناعي — خطوة صغيرة كل يوم.</div>
         </div>
         """,
             unsafe_allow_html=True,
@@ -51,18 +51,18 @@ def render_home_foundation() -> None:
         )
     with c2:
         st.markdown(
-            f'<div class="stat">🔥 <b>{st.session_state.streak} أيام</b><span class="muted">Streak · تعلم فعلي</span></div>',
+            f'<div class="stat">🔥 <b>{st.session_state.streak} أيام</b><span class="muted">أيام التعلّم المتتالية</span></div>',
             unsafe_allow_html=True,
         )
     with c3:
         st.markdown(
-            f'<div class="stat">🌱 <b>Level {level_number}</b><span class="muted">Explorer</span></div>',
+            f'<div class="stat">🌱 <b>المستوى {level_number}</b><span class="muted">مستكشفة</span></div>',
             unsafe_allow_html=True,
         )
 
     badges = st.session_state.get("badges", [])
     if badges:
-        st.caption("🏅 Badges: " + " · ".join(badges))
+        st.caption("🏅 شاراتك: " + " · ".join(badges))
 
     _render_daily_mission()
     _render_learning_worlds()
@@ -78,7 +78,7 @@ def render_home_foundation() -> None:
             st.session_state.active_world = "weekly"
             st.rerun()
     with top_right:
-        if st.button("🧪 Exam Mode", key="open_exam_mode", use_container_width=True, help=help_text("exam_mode")):
+        if st.button("🧪 وضع الاختبار", key="open_exam_mode", use_container_width=True, help=help_text("exam_mode")):
             st.session_state.active_world = "exam"
             st.rerun()
 
@@ -88,7 +88,7 @@ def render_home_foundation() -> None:
             st.session_state.active_world = "review"
             st.rerun()
     with bottom_right:
-        if st.button("👨‍👧 Parent Dashboard", key="open_parent_dashboard", use_container_width=True):
+        if st.button("👨‍👧 لوحة وليّ الأمر", key="open_parent_dashboard", use_container_width=True):
             st.session_state.active_world = "parent"
             st.rerun()
 
@@ -149,18 +149,18 @@ def _render_learning_worlds() -> None:
             st.markdown(
                 f'<div class="subject"><h4>{module.icon} {module.title}</h4>'
                 f'<span class="muted">{module.description}</span><br>'
-                '<small>Structured learning world</small></div>',
+                '<small>عالم تعلّم منظم</small></div>',
                 unsafe_allow_html=True,
             )
             if module.id in {"english", "science", "math", "ict", "arabic", "social", "religion"}:
                 labels = {
-                    "english": "ادخلي English Adventure",
-                    "science": "ادخلي Science Lab",
-                    "math": "ادخلي Math Quest",
-                    "ict": "ادخلي ICT Lab",
-                    "arabic": "ادخلي Arabic World",
-                    "social": "ادخلي Social Detective",
-                    "religion": "ادخلي Religion Journey",
+                    "english": "ابدئي مغامرة الإنجليزي",
+                    "science": "ادخلي معمل العلوم",
+                    "math": "ابدئي تحدّي الرياضيات",
+                    "ict": "ادخلي معمل الكمبيوتر",
+                    "arabic": "ادخلي عالم العربي",
+                    "social": "ابدئي مغامرة الدراسات",
+                    "religion": "ابدئي رحلة الدين",
                 }
                 label = labels[module.id]
                 if st.button(label, key=f"open_world_{module.id}", help=help_text(module.id)):
@@ -181,10 +181,10 @@ def _render_learning_worlds() -> None:
             unsafe_allow_html=True,
         )
         st.markdown(
-            '<div class="mission"><b>AI Detective + Prompt Challenges + Fact Checker</b><br>'
+            '<div class="mission"><b>محقق الذكاء الاصطناعي · تحديات كتابة الأوامر · التحقق من المعلومات</b><br>'
             '<span class="muted">نتعلم نسأل صح، نراجع الإجابات، ونبحث عن الدليل بدل الثقة العمياء.</span></div>',
             unsafe_allow_html=True,
         )
-        if st.button("ادخلي AI Lab", key="open_world_ai", help=help_text("ai")):
+        if st.button("ادخلي عالم الذكاء الاصطناعي", key="open_world_ai", help=help_text("ai")):
             st.session_state.active_world = "ai"
             st.rerun()

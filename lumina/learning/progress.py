@@ -26,7 +26,8 @@ def derive_mastery(
     """Derive a conservative mastery state from learning evidence.
 
     This is an initial provider-independent rule, intentionally conservative:
-    repeated success on the same single check is not enough for Mastered.
+    repeated success on the same underlying check is not enough for Mastered,
+    even if it happened in lesson, review, or exam contexts.
     The thresholds remain replaceable/configurable as the Master requires.
     """
     attempts_list = list(attempts)
@@ -43,9 +44,9 @@ def derive_mastery(
 
     correct = [a for a in attempts_list if a.get("correct") is True]
     distinct = {
-        a.get("evidence_id") or a.get("check_id")
+        a.get("check_id") or a.get("evidence_id")
         for a in correct
-        if a.get("evidence_id") or a.get("check_id")
+        if a.get("check_id") or a.get("evidence_id")
     }
     last_correct = attempts_list[-1].get("correct") is True
 

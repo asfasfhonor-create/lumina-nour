@@ -27,7 +27,8 @@ def derive_mastery(
 
     This is an initial provider-independent rule, intentionally conservative:
     repeated success on the same underlying check is not enough for Mastered,
-    even if it happened in lesson, review, or exam contexts.
+    even if it happened in lesson, review, or exam contexts. Any unresolved
+    mistake keeps the lesson in Needs review until that mistake is resolved.
     The thresholds remain replaceable/configurable as the Master requires.
     """
     attempts_list = list(attempts)
@@ -50,9 +51,9 @@ def derive_mastery(
     }
     last_correct = attempts_list[-1].get("correct") is True
 
-    if mistakes_list and not last_correct:
+    if mistakes_list:
         state = NEEDS_REVIEW
-    elif len(correct) >= 3 and len(distinct) >= 2 and not mistakes_list:
+    elif len(correct) >= 3 and len(distinct) >= 2:
         state = MASTERED
     elif last_correct:
         state = LEARNING

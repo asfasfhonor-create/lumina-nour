@@ -14,6 +14,7 @@ BACKUP_KEYS = (
     "learning_attempts",
     "mistake_notebook",
     "review_queue",
+    "english_profile",
 )
 
 

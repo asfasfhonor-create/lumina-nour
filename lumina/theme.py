@@ -8,6 +8,11 @@ GLOBAL_CSS = """
 .stApp { background:linear-gradient(155deg,#100d2d 0%,#231a54 45%,#151a3d 100%); color:#f7f4ff; }
 .block-container { max-width:760px; padding-top:1rem; padding-bottom:5rem; }
 [data-testid="stHeader"] { background:transparent; }
+/* Nour-facing app: hide Streamlit's unlabeled developer toolbar so mobile users
+   only see LUMINA controls with explicit text labels. App management remains
+   available from Streamlit Community Cloud. */
+[data-testid="stToolbar"] { display:none !important; }
+[data-testid="stDecoration"] { display:none !important; }
 .hero { background:linear-gradient(135deg,rgba(255,118,172,.16),rgba(116,185,255,.12)); border:1px solid rgba(255,255,255,.15); border-radius:26px; padding:20px; margin-bottom:14px; box-shadow:0 16px 50px rgba(0,0,0,.22); }
 .brand { font-family:'Plus Jakarta Sans',sans-serif; direction:ltr; font-size:2.15rem; font-weight:800; margin:0; background:linear-gradient(100deg,#ff8fc1,#b9a7ff,#7ed6ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 .hello { font-size:1.35rem; font-weight:800; margin:.35rem 0 .1rem; }

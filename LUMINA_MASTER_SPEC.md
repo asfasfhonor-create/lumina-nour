@@ -1,6 +1,6 @@
 # LUMINA / NOUR'S WORLD — MASTER SPECIFICATION
 
-**Status:** Master v1.3 — APPROVED IMPLEMENTATION AUTHORITY  
+**Status:** Master v1.4 — APPROVED IMPLEMENTATION AUTHORITY  
 **Date:** 2026-09-29  
 **Product owner:** Mohamed  
 **Learner:** Nour  
@@ -1098,3 +1098,17 @@ This revision records additional verified implementation progress:
 - Learner profile state can hydrate automatically when a durable backend is configured.
 - A cross-subject Curriculum Search now searches the 144 structured learning blocks and can ask the AI to explain only from the verified mapped evidence, explicitly refusing to invent unsupported details.
 - Durable persistence activation still requires a dedicated LUMINA backend/project and server-side secrets before production release.
+
+
+---
+
+## 43. Master v1.4 change note
+
+Persistence provider decision:
+- LUMINA NOUR will use a dedicated Neon PostgreSQL database as the preferred durable persistence backend.
+- Existing PROJECT LEDGER and PROJECT LEDGER UAT Supabase projects remain untouched.
+- The application uses a backend-independent LearningStore contract; Neon is selected by `NEON_DATABASE_URL`.
+- The previous Supabase adapter is retained only as a legacy development fallback and is not the production recommendation.
+- The Neon schema covers learning attempts, mistakes, reviews, and learner profile state.
+- Portable backup/restore now reads from and writes to the active persistence store, allowing migration between temporary session storage and Neon without losing learning evidence.
+- Production should use Neon's pooled PostgreSQL connection string with SSL enabled.

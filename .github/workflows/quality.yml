@@ -1110,12 +1110,12 @@ jobs:
           for expected in [
               "🔎 ابحثي في المنهج",
               "📅 خطتي",
-              "🧪 Exam Mode",
+              "🧪 وضع الاختبار",
               "📝 مراجعاتي",
-              "👨‍👧 Parent Dashboard",
-              "ادخلي English Adventure",
-              "ادخلي Science Lab",
-              "ادخلي Math Quest",
+              "👨‍👧 لوحة وليّ الأمر",
+              "ابدئي مغامرة الإنجليزي",
+              "ادخلي معمل العلوم",
+              "ابدئي تحدّي الرياضيات",
           ]:
               assert expected in labels, (expected, labels)
 
@@ -1141,13 +1141,13 @@ jobs:
           from streamlit.testing.v1 import AppTest
 
           worlds = [
-              ("ادخلي English Adventure", "English Adventure"),
-              ("ادخلي Science Lab", "Science Lab"),
-              ("ادخلي Math Quest", "Math Quest"),
-              ("ادخلي Arabic World", "Arabic World"),
-              ("ادخلي Social Detective", "Social Detective"),
-              ("ادخلي Religion Journey", "Religion Journey"),
-              ("ادخلي ICT Lab", "ICT Lab"),
+              ("ابدئي مغامرة الإنجليزي", "English Adventure"),
+              ("ادخلي معمل العلوم", "معمل العلوم"),
+              ("ابدئي تحدّي الرياضيات", "Math Quest"),
+              ("ادخلي عالم العربي", "Arabic World"),
+              ("ابدئي مغامرة الدراسات", "Social Detective"),
+              ("ابدئي رحلة الدين", "Religion Journey"),
+              ("ادخلي معمل الكمبيوتر", "ICT Lab"),
           ]
 
           for button_label, expected_title in worlds:

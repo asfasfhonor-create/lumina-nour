@@ -13,7 +13,7 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_social_world(ai: GeminiService) -> None:
-    st.markdown('<div class="section-title">🌍 Social Detective</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🌍 مغامرة الدراسات</div>', unsafe_allow_html=True)
     render_context_help("social", label="💬 قوليلي العالم ده بيعمل إيه")
     st.markdown(
         '<div class="mission"><b>خريطة + دليل + استنتاج.</b><br>'

@@ -22,6 +22,7 @@ def initialize_session_state() -> None:
         "badges": [],
         "daily_mission_lesson_id": None,
         "daily_mission_date": None,
+        "profile_hydrated": False,
     }
     for key, value in defaults.items():
         if key not in st.session_state:

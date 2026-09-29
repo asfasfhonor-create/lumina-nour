@@ -9,6 +9,7 @@ class EnglishBaselineResult:
     total: int
     broad_band: str
     note: str
+    skill_scores: dict[str, dict[str, int]]
 
 
 BASELINE_ITEMS = (
@@ -91,9 +92,46 @@ def score_baseline(answers: dict[str, int]) -> EnglishBaselineResult:
         band = "Independent-start"
         note = "Begin with less Arabic support and more open-ended reading, writing, and conversation."
 
+    skill_scores: dict[str, dict[str, int]] = {}
+    for item in BASELINE_ITEMS:
+        skill = item["skill"]
+        bucket = skill_scores.setdefault(skill, {"correct": 0, "total": 0})
+        bucket["total"] += 1
+        if answers.get(item["id"]) == item["correct_index"]:
+            bucket["correct"] += 1
+
     return EnglishBaselineResult(
         correct=correct,
         total=total,
         broad_band=band,
         note=note,
+        skill_scores=skill_scores,
+    )
+
+
+def support_level(profile: dict | None) -> str:
+    """Translate the current broad band into a gentle language-support policy."""
+    band = str((profile or {}).get("broad_band", ""))
+    if band == "Independent-start":
+        return "light"
+    if band == "Developing":
+        return "medium"
+    return "high"
+
+
+def support_instruction(profile: dict | None) -> str:
+    level = support_level(profile)
+    if level == "light":
+        return (
+            "Use mostly natural English. Give Arabic only for a genuinely blocking idea. "
+            "Invite a slightly longer learner response."
+        )
+    if level == "medium":
+        return (
+            "Use clear natural English with short sentences. Give one brief Arabic hint when useful. "
+            "Ask for a short but complete learner response."
+        )
+    return (
+        "Use very clear short English and brief Arabic support for meaning. "
+        "Ask for one small learner response at a time and avoid overload."
     )

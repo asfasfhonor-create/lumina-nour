@@ -1267,3 +1267,32 @@ jobs:
 
           print("Friendly contextual help is wired across Nour's main experience")
           PY
+
+      - name: Validate learner-facing visual and copy guard
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          home = Path("lumina/home.py").read_text(encoding="utf-8")
+          theme = Path("lumina/theme.py").read_text(encoding="utf-8")
+          app = Path("app.py").read_text(encoding="utf-8")
+          quick = Path("lumina/quick_access.py").read_text(encoding="utf-8")
+          config = Path(".streamlit/config.toml").read_text(encoding="utf-8")
+
+          assert "nour-photo-wrap" in home
+          assert "nour-photo-glow" in theme
+          assert "object-fit:cover" in theme
+          assert '[data-testid="stToolbar"]' in theme
+          assert 'toolbarMode = "minimal"' in config
+
+          learner_text = "\n".join([home, app, quick])
+          for forbidden in [
+              "Gemini API Key",
+              "Development branch",
+              "Parent Dashboard",
+              "Exam Mode",
+          ]:
+              assert forbidden not in learner_text, forbidden
+
+          print("Learner-facing visual and copy guard OK")
+          PY

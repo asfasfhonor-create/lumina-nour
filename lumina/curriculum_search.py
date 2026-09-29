@@ -5,8 +5,8 @@ from lumina.curriculum.search import lesson_by_id, search_curriculum
 
 
 def render_curriculum_search(ai: GeminiService) -> None:
-    st.markdown('<div class="section-title">🔎 Curriculum Search</div>', unsafe_allow_html=True)
-    st.caption("ابحثي داخل المحتوى المرسوم والموثق من كتبك — من غير اختراع Term أو درس غير موجود.")
+    st.markdown('<div class="section-title">🔎 البحث في المنهج</div>', unsafe_allow_html=True)
+    st.caption("ابحثي داخل المحتوى الموثق من كتبك — من غير إضافة درس أو معلومة مش موجودة في المصدر.")
 
     query = st.text_input(
         "اكتبي كلمة أو فكرة",
@@ -40,7 +40,7 @@ def render_curriculum_search(ai: GeminiService) -> None:
     st.markdown(f"### {lesson.title}")
     for point in lesson.evidence_summary:
         st.write(f"• {point}")
-    st.caption(f"Source: {lesson.source_pages} · {lesson.source_id}")
+    st.caption(f"المصدر: {lesson.source_pages} · {lesson.source_id}")
 
     if st.button(
         "افتحي الدرس كامل",
@@ -57,7 +57,7 @@ def render_curriculum_search(ai: GeminiService) -> None:
     )
     if st.button("اشرح من الجزء الموثق", key=f"curriculum_ask_{lesson.id}") and question:
         if not ai.available:
-            st.warning("الشرح الذكي يحتاج Gemini API Key.")
+            st.warning("الشرح الذكي مش مفعّل حاليًا. تقدري تفتحي الدرس وتكمّلي المراجعة عادي.")
             return
 
         source_text = "\n".join(f"- {point}" for point in lesson.evidence_summary)
@@ -79,4 +79,4 @@ Nour's question:
 Use the tutor pattern: explain briefly, give one small example only if supported by the evidence, then ask one checking question."""
         )
         st.markdown(response)
-        st.caption(f"Grounded to: {lesson.source_pages}")
+        st.caption(f"الشرح مبني على المصدر: {lesson.source_pages}")

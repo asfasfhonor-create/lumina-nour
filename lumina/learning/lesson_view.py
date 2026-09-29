@@ -14,11 +14,11 @@ def render_verified_unit(
     module_id: str,
 ) -> None:
     st.markdown(f"### {title}")
-    st.caption("Verified from a trusted curriculum source.")
+    st.caption("محتوى موثّق من مصدر المنهج.")
     render_learning_brain_summary([lesson.id for lesson in lessons])
 
     lesson = st.selectbox(
-        "Choose lesson",
+        "اختاري الدرس",
         lessons,
         format_func=lambda item: item.title,
         key=select_key,
@@ -29,20 +29,20 @@ def render_verified_unit(
 def render_verified_lesson(lesson, *, module_id: str) -> None:
     store = get_learning_store()
     st.markdown(f"### {lesson.title}")
-    st.caption(f"Verified curriculum extract · {lesson.source_pages}")
+    st.caption(f"من المصدر: {lesson.source_pages}")
 
-    with st.expander("What you will learn", expanded=True):
+    with st.expander("هنتعلم إيه؟", expanded=True):
         for objective in lesson.objectives:
             st.write(f"• {objective}")
 
-    st.markdown("**Key words / language**")
+    st.markdown("**الكلمات والمصطلحات المهمة**")
     st.write(" · ".join(lesson.key_terms))
 
-    st.markdown("**Core ideas from the lesson**")
+    st.markdown("**أهم أفكار الدرس**")
     for point in lesson.evidence_summary:
         st.write(f"• {point}")
 
-    st.markdown("#### Quick understanding checks")
+    st.markdown("#### أسئلة سريعة للتأكد من الفهم")
     for check in lesson.checks:
         answer = st.radio(
             check.prompt,
@@ -52,7 +52,7 @@ def render_verified_lesson(lesson, *, module_id: str) -> None:
         )
 
         if st.button(
-            "Check my thinking",
+            "تحققي من إجابتي",
             key=f"lesson_check_button_{module_id}_{lesson.id}_{check.id}",
         ) and answer:
             selected_index = list(check.options).index(answer)
@@ -79,9 +79,9 @@ def render_verified_lesson(lesson, *, module_id: str) -> None:
                     evidence_id=check.id,
                     activity_type="lesson",
                 )
-                st.success("Good thinking — this matches the lesson.")
+                st.success("إجابة صحيحة 👏 الفكرة واضحة عندك.")
                 if earned_xp:
-                    st.caption(f"+{earned_xp} XP for new demonstrated learning evidence.")
+                    st.caption(f"+{earned_xp} XP لأنك أثبتّي فهم جديد.")
             else:
                 store.record_mistake(
                     {
@@ -109,17 +109,17 @@ def render_verified_lesson(lesson, *, module_id: str) -> None:
                         "source_pages": lesson.source_pages,
                     }
                 )
-                st.warning("Not yet. Use the hint, then try again.")
-                st.info(f"Hint: {check.hint}")
+                st.warning("مش لسه. استخدمي التلميح وجربي مرة تانية.")
+                st.info(f"تلميح: {check.hint}")
 
     attempts = store.get_attempts(lesson.id)
     mistakes = store.get_mistakes(lesson.id)
     mastery = derive_mastery(attempts, mistakes)
     st.caption(
-        f"Mastery: {mastery_label(mastery.state)} · "
-        f"{mastery.correct_attempts}/{mastery.attempts} successful attempt(s) · "
-        f"{mastery.distinct_evidence} distinct evidence item(s) · "
-        f"{mastery.unresolved_mistakes} unresolved mistake(s)"
+        f"حالة التعلّم: {mastery_label(mastery.state)} · "
+        f"{mastery.correct_attempts}/{mastery.attempts} محاولات صحيحة · "
+        f"{mastery.distinct_evidence} أدلة فهم مختلفة · "
+        f"{mastery.unresolved_mistakes} أخطاء محتاجة مراجعة"
     )
 
     due_reviews = [
@@ -128,4 +128,4 @@ def render_verified_lesson(lesson, *, module_id: str) -> None:
         if review.get("lesson_id") == lesson.id
     ]
     if due_reviews:
-        st.warning("Review due: this lesson has something worth revisiting before moving on.")
+        st.warning("في نقطة في الدرس محتاجة مراجعة قبل ما نعتبرها ثابتة.")

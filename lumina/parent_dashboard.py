@@ -54,8 +54,11 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
         if not raw:
             return False
         try:
-            return datetime.fromisoformat(raw) >= cutoff
-        except ValueError:
+            when = raw if isinstance(raw, datetime) else datetime.fromisoformat(str(raw))
+            if when.tzinfo is None:
+                when = when.replace(tzinfo=timezone.utc)
+            return when >= cutoff
+        except (TypeError, ValueError):
             return False
 
     recent_attempts = [item for item in attempts if _is_recent(item)]
@@ -172,8 +175,8 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
 def _render_backup_tools() -> None:
     st.markdown("### Backup / Restore")
     st.caption(
-        "Temporary safety net until automatic cloud persistence is connected. "
-        "The backup contains learning progress, not API keys."
+        "Portable safety copy. When Neon is active, the database remains the primary source of truth. "
+        "The backup contains learning progress, never database passwords or API keys."
     )
 
     st.download_button(

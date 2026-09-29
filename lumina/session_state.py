@@ -9,6 +9,7 @@ def initialize_session_state() -> None:
         "daily_done": False,
         "tasks_list": [],
         "chat_history": [],
+        "active_world": None,
     }
     for key, value in defaults.items():
         if key not in st.session_state:

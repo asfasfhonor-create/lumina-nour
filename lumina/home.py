@@ -13,17 +13,24 @@ from lumina.learning.missions import get_lesson_by_id, get_module_for_lesson_id
 from lumina.context_help import help_text, render_home_help
 
 
+def _load_nour_photo_b64() -> str:
+    parts_dir = Path("assets/nour_avatar_parts")
+    parts = sorted(parts_dir.glob("*.txt"))
+    if not parts:
+        return ""
+    return "".join(part.read_text(encoding="utf-8").strip() for part in parts)
+
+
 def render_home_foundation() -> None:
     """Render the current Nour's World foundation without owning learning business logic."""
     photo_col, hero_col = st.columns([1.55, 4], vertical_alignment="center")
     with photo_col:
-        photo_bytes = Path("assets/nour_avatar.jpg").read_bytes()
-        photo_b64 = base64.b64encode(photo_bytes).decode("ascii")
+        photo_b64 = _load_nour_photo_b64()
         st.markdown(
             f"""
             <div class="nour-photo-wrap" aria-label="صورة نور">
               <div class="nour-photo-glow">
-                <img src="data:image/jpeg;base64,{photo_b64}" alt="نور" />
+                <img src="data:image/jpeg;base64,{photo_b64}" alt="صورة نور" />
               </div>
               <div class="nour-photo-badge">✨ NOUR</div>
             </div>

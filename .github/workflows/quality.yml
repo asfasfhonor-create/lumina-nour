@@ -758,3 +758,40 @@ jobs:
 
           print("Safe AI provider failures OK")
           PY
+
+      - name: Scan repository for committed secrets
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          ignored = {
+              ".streamlit/secrets.example.toml",
+          }
+          patterns = {
+              "Google API key": re.compile(r"AIza[0-9A-Za-z_-]{30,}"),
+              "Neon/Postgres credential URL": re.compile(
+                  r"postgres(?:ql)?://[^\s:'\"]+:[^\s@'\"]+@[^\s'\"]+"
+              ),
+              "Supabase service role JWT": re.compile(r"eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+"),
+          }
+
+          findings = []
+          for path in Path(".").rglob("*"):
+              if not path.is_file():
+                  continue
+              rel = path.as_posix()
+              if rel.startswith(".git/") or rel in ignored:
+                  continue
+              try:
+                  text = path.read_text(encoding="utf-8")
+              except (UnicodeDecodeError, OSError):
+                  continue
+              for label, pattern in patterns.items():
+                  if pattern.search(text):
+                      findings.append(f"{label}: {rel}")
+
+          if findings:
+              raise SystemExit("Potential committed secrets found:\n" + "\n".join(findings))
+          print("Committed secret scan OK")
+          PY

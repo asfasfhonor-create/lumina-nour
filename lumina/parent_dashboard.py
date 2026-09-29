@@ -1,6 +1,6 @@
 import streamlit as st
 
-from lumina.curriculum.english_curriculum import ENGLISH_UNIT_LESSONS, all_english_lessons
+from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS, all_mapped_lessons
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.persistence.session_store import get_learning_store
 from lumina.persistence.backup import export_learning_backup, restore_learning_backup
@@ -55,46 +55,63 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
     else:
         st.caption("No Real English baseline completed yet.")
 
-    st.markdown("### English curriculum progress")
-    unit_rows = []
-    for unit_title, lessons in ENGLISH_UNIT_LESSONS.items():
-        states = []
-        for lesson in lessons:
-            lesson_attempts = [a for a in attempts if a.get("lesson_id") == lesson.id]
-            lesson_mistakes = store.get_mistakes(lesson.id)
-            states.append(derive_mastery(lesson_attempts, lesson_mistakes).state)
+    st.markdown("### Curriculum progress — all subjects")
+    total_started = 0
+    total_mapped = 0
 
-        started = sum(1 for state in states if state != "not_started")
-        needs_review = sum(1 for state in states if state == "needs_review")
-        mastered = sum(1 for state in states if state == "mastered")
-        unit_rows.append((unit_title, started, needs_review, mastered, len(lessons)))
+    for subject_id, units in MAPPED_CURRICULUM.items():
+        subject_lessons = all_mapped_lessons(subject_id)
+        total_mapped += len(subject_lessons)
+        started = 0
+        needs_review = 0
+        mastered = 0
 
-    for unit_title, started, needs_review, mastered, total in unit_rows:
-        st.write(
-            f"**{unit_title}** — started {started}/{total} · "
-            f"needs review {needs_review} · mastered {mastered}"
-        )
+        for lesson in subject_lessons:
+            snapshot = derive_mastery(
+                store.get_attempts(lesson.id),
+                store.get_mistakes(lesson.id),
+            )
+            if snapshot.state != "not_started":
+                started += 1
+            if snapshot.state == "needs_review":
+                needs_review += 1
+            if snapshot.state == "mastered":
+                mastered += 1
+
+        total_started += started
+        with st.expander(
+            f"{SUBJECT_LABELS.get(subject_id, subject_id)} · {started}/{len(subject_lessons)} started",
+            expanded=False,
+        ):
+            st.write(
+                f"Needs review: **{needs_review}** · Mastered: **{mastered}** · "
+                f"Mapped lessons: **{len(subject_lessons)}**"
+            )
+            for unit_title, lessons in units.items():
+                unit_states = [
+                    derive_mastery(store.get_attempts(lesson.id), store.get_mistakes(lesson.id)).state
+                    for lesson in lessons
+                ]
+                unit_started = sum(state != "not_started" for state in unit_states)
+                unit_review = sum(state == "needs_review" for state in unit_states)
+                unit_mastered = sum(state == "mastered" for state in unit_states)
+                st.caption(
+                    f"{unit_title}: started {unit_started}/{len(lessons)} · "
+                    f"review {unit_review} · mastered {unit_mastered}"
+                )
 
     if mistakes:
         st.markdown("### Current weak points")
         for mistake in mistakes:
+            subject = SUBJECT_LABELS.get(mistake.get("module_id"), mistake.get("module_id", ""))
             st.write(
-                f"• {mistake.get('lesson_title', mistake.get('lesson_id'))} — "
+                f"• **{subject}** · {mistake.get('lesson_title', mistake.get('lesson_id'))} — "
                 f"{mistake.get('mistake_type', 'learning mistake')}"
             )
 
-    total_lessons = len(all_english_lessons())
-    started_lessons = 0
-    states = []
-    for lesson in all_english_lessons():
-        snapshot = derive_mastery(store.get_attempts(lesson.id), store.get_mistakes(lesson.id))
-        states.append(snapshot.state)
-        if snapshot.state != "not_started":
-            started_lessons += 1
-
     st.caption(
-        f"English mapped lessons: {total_lessons} · started: {started_lessons} · "
-        f"overall view uses evidence, not button clicks."
+        f"Mapped curriculum lessons across all subjects: {total_mapped} · "
+        f"started: {total_started} · progress is based on evidence, not button clicks."
     )
 
     _render_backup_tools()

@@ -88,11 +88,12 @@ def _render_learning_worlds() -> None:
                 '<small>Structured learning world</small></div>',
                 unsafe_allow_html=True,
             )
-            if module.id in {"english", "science", "math"}:
+            if module.id in {"english", "science", "math", "ict"}:
                 labels = {
                     "english": "ادخلي English Adventure",
                     "science": "ادخلي Science Lab",
                     "math": "ادخلي Math Quest",
+                    "ict": "ادخلي ICT Lab",
                 }
                 label = labels[module.id]
                 if st.button(label, key=f"open_world_{module.id}"):

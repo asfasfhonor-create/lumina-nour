@@ -1086,7 +1086,7 @@ jobs:
           source = Path("lumina/curriculum/source_session.py").read_text(encoding="utf-8")
           assert "build_grounded_pdf" in source
           assert "curriculum_prompt" in source
-          assert "temporary upload, not permanent storage" in source
+          assert "اسألي من كتاب أو مذكرة في الجلسة الحالية" in source
           print("Page-aware curriculum source sessions wired across all school worlds")
           PY
 

@@ -164,12 +164,29 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
 
     if mistakes:
         st.markdown("### Current weak points")
+        seen_weak_lessons = set()
         for mistake in mistakes:
+            lesson_id = mistake.get("lesson_id")
+            if not lesson_id or lesson_id in seen_weak_lessons:
+                continue
+            seen_weak_lessons.add(lesson_id)
+
             subject = SUBJECT_LABELS.get(mistake.get("module_id"), mistake.get("module_id", ""))
-            st.write(
-                f"• **{subject}** · {mistake.get('lesson_title', mistake.get('lesson_id'))} — "
-                f"{mistake.get('mistake_type', 'learning mistake')}"
-            )
+            with st.container(border=True):
+                st.write(
+                    f"**{subject}** · {mistake.get('lesson_title', lesson_id)} — "
+                    f"{mistake.get('mistake_type', 'learning mistake')}"
+                )
+                if mistake.get("source_pages"):
+                    st.caption(f"Source: {mistake['source_pages']}")
+                if st.button(
+                    "افتحي نقطة الضعف",
+                    key=f"parent_open_weak_{lesson_id}",
+                    use_container_width=True,
+                ):
+                    st.session_state.focus_lesson_id = lesson_id
+                    st.session_state.active_world = "lesson_focus"
+                    st.rerun()
 
     st.caption(
         f"Mapped curriculum lessons across all subjects: {total_mapped} · "

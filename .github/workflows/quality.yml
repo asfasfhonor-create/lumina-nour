@@ -1630,3 +1630,31 @@ jobs:
           assert "skill_scores" in source
           print("Parent Real English skill detail OK")
           PY
+
+      - name: Validate adaptive Real English focus recommendation
+        run: |
+          python - <<'PY'
+          from lumina.learning.english_profile import recommended_focus
+
+          label, reason = recommended_focus({})
+          assert label == "تحديد نقطة البداية"
+          assert reason
+
+          label, reason = recommended_focus({
+              "skill_scores": {
+                  "Reading": {"correct": 0, "total": 1},
+                  "Vocabulary": {"correct": 1, "total": 1},
+              }
+          })
+          assert label == "قراءة وفهم"
+          assert "الاستنتاج" in reason or "المعنى" in reason
+
+          label, reason = recommended_focus({
+              "skill_scores": {
+                  "Speaking/Use": {"correct": 0, "total": 1},
+                  "Reading": {"correct": 1, "total": 1},
+              }
+          })
+          assert label == "محادثة واقعية"
+          print("Adaptive Real English focus recommendation OK")
+          PY

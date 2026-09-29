@@ -114,3 +114,30 @@ class SupabaseLearningStore(LearningStore):
         if status is not None:
             params["status"] = f"eq.{status}"
         return self._request("lumina_reviews", params=params) or []
+
+
+    def get_profile_state(self) -> dict:
+        rows = self._request(
+            "lumina_profile_state",
+            params={
+                "select": "state",
+                "learner_key": f"eq.{self.learner_key}",
+                "limit": "1",
+            },
+        ) or []
+        if not rows:
+            return {}
+        return rows[0].get("state") or {}
+
+    def save_profile_state(self, state: dict) -> None:
+        self._request(
+            "lumina_profile_state",
+            method="POST",
+            params={"on_conflict": "learner_key"},
+            payload={
+                "learner_key": self.learner_key,
+                "state": state,
+                "updated_at": _utc_now(),
+            },
+            prefer="resolution=merge-duplicates,return=minimal",
+        )

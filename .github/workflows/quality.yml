@@ -328,3 +328,91 @@ jobs:
           assert result.broad_band == "Independent-start"
           print("Real English baseline OK")
           PY
+
+      - name: Validate all-subject mapped curriculum registry
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import (
+              MAPPED_CURRICULUM,
+              all_mapped_lessons,
+              curriculum_counts,
+          )
+
+          counts = curriculum_counts()
+          assert set(MAPPED_CURRICULUM) == {
+              "english", "science", "math", "arabic", "social", "religion", "ict"
+          }
+          assert counts["english"] == 36
+          assert counts["science"] == 14
+          assert counts["math"] == 35
+          assert counts["arabic"] == 12
+          assert counts["social"] == 11
+          assert counts["religion"] == 21
+          assert counts["ict"] == 13
+          assert len(all_mapped_lessons()) == 142
+          assert all(lesson.checks for lesson in all_mapped_lessons())
+          print("All-subject mapped curriculum registry OK:", counts)
+          PY
+
+      - name: Validate complete ICT mapping
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.ict_chapter1 import ICT_CHAPTER1_LESSONS
+          from lumina.curriculum.ict_chapter2 import ICT_CHAPTER2_LESSONS
+          from lumina.curriculum.ict_chapter3 import ICT_CHAPTER3_LESSONS
+          from lumina.curriculum.ict_chapter4 import ICT_CHAPTER4_LESSONS
+          assert [len(x) for x in (
+              ICT_CHAPTER1_LESSONS,
+              ICT_CHAPTER2_LESSONS,
+              ICT_CHAPTER3_LESSONS,
+              ICT_CHAPTER4_LESSONS,
+          )] == [5,3,4,1]
+          print("Complete ICT mapping OK")
+          PY
+
+      - name: Validate complete Arabic Social Religion mapping
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.arabic_unit1 import ARABIC_U1_LESSONS
+          from lumina.curriculum.arabic_unit2 import ARABIC_U2_LESSONS
+          from lumina.curriculum.arabic_unit3 import ARABIC_U3_LESSONS
+          from lumina.curriculum.social_unit1 import SOCIAL_U1_LESSONS
+          from lumina.curriculum.social_unit2 import SOCIAL_U2_LESSONS
+          from lumina.curriculum.social_unit3 import SOCIAL_U3_LESSONS
+          from lumina.curriculum.social_unit4 import SOCIAL_U4_LESSONS
+          from lumina.curriculum.religion_unit1 import RELIGION_U1_LESSONS
+          from lumina.curriculum.religion_unit2 import RELIGION_U2_LESSONS
+          from lumina.curriculum.religion_unit3 import RELIGION_U3_LESSONS
+
+          assert [len(x) for x in (ARABIC_U1_LESSONS, ARABIC_U2_LESSONS, ARABIC_U3_LESSONS)] == [4,4,4]
+          assert [len(x) for x in (SOCIAL_U1_LESSONS, SOCIAL_U2_LESSONS, SOCIAL_U3_LESSONS, SOCIAL_U4_LESSONS)] == [3,3,3,2]
+          assert [len(x) for x in (RELIGION_U1_LESSONS, RELIGION_U2_LESSONS, RELIGION_U3_LESSONS)] == [7,7,7]
+          print("Arabic, Social, Religion mappings OK")
+          PY
+
+      - name: Validate complete second-term Math Science mapping
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.science_t2_unit1 import SCIENCE_T2_UNIT1_LESSONS
+          from lumina.curriculum.science_t2_unit2 import SCIENCE_T2_UNIT2_LESSONS
+          from lumina.curriculum.science_t2_unit3 import SCIENCE_T2_UNIT3_LESSONS
+          from lumina.curriculum.math_t2_unit1 import MATH_T2_UNIT1_LESSONS
+          from lumina.curriculum.math_t2_unit2 import MATH_T2_UNIT2_LESSONS
+          from lumina.curriculum.math_t2_unit3 import MATH_T2_UNIT3_LESSONS
+          from lumina.curriculum.math_t2_unit4 import MATH_T2_UNIT4_LESSONS
+          from lumina.curriculum.math_t2_unit5 import MATH_T2_UNIT5_LESSONS
+
+          assert [len(x) for x in (
+              SCIENCE_T2_UNIT1_LESSONS,
+              SCIENCE_T2_UNIT2_LESSONS,
+              SCIENCE_T2_UNIT3_LESSONS,
+          )] == [2,3,1]
+          assert [len(x) for x in (
+              MATH_T2_UNIT1_LESSONS,
+              MATH_T2_UNIT2_LESSONS,
+              MATH_T2_UNIT3_LESSONS,
+              MATH_T2_UNIT4_LESSONS,
+              MATH_T2_UNIT5_LESSONS,
+          )] == [3,4,2,4,7]
+          print("Second-term Math and Science mappings OK")
+          PY

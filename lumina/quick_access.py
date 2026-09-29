@@ -120,11 +120,11 @@ def _render_problem_coach(ai: GeminiService) -> None:
     if camera_file:
         image = Image.open(camera_file)
         st.image(image, use_container_width=True)
-        if st.button("ابدئي معايا من أول Hint", key="solve") and _need_ai(ai):
+        if st.button("ابدئي معايا من أول تلميح", key="solve") and _need_ai(ai):
             text = ai.generate([
                 image,
                 (
-                    "أنت Homework Coach لنور في ثالثة إعدادي. لا تعط الحل النهائي مباشرة. "
+                    أنت مدرب واجبات لنور في ثالثة إعدادي. لا تعط الحل النهائي مباشرة. "
                     "حدد المطلوب، اسألها كيف تبدأ، ثم أعط Hint أول واضح وطريقة التفكير المناسبة فقط."
                 ),
             ])

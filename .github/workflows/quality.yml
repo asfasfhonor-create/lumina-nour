@@ -1057,9 +1057,9 @@ jobs:
           assert '"persistence_verification_attempted": False' in state
           assert 'persistence_verification_attempted' in profile
           assert 'st.session_state.persistence_verification_attempted = True' in profile
-          assert 'الحفظ الدائم متحقق ويعمل' in app
-          assert 'الحفظ الدائم مهيأ لكنه غير متحقق' in app
-          print("Persistence verification is bounded and footer is accurate")
+          assert 'التقدّم محفوظ تلقائيًا' in app
+          assert 'جارٍ التحقق من الحفظ التلقائي' in app
+          print("Persistence verification is bounded and learner-facing footer is accurate")
           PY
 
       - name: Validate page-aware source sessions across school worlds

@@ -38,7 +38,7 @@ def _suggest_source_profile(filename: str) -> dict[str, str]:
     elif "english" in name:
         subject = "english"
 
-    if "guide" in name and "answer" in name:
+    if ("guide" in name and "answer" in name) or "p3" in name:
         resource_use = "answer_guide"
         resource_use_label = "مرجع تصحيح"
     elif "assessment" in name or "final revision" in name or "p2" in name:

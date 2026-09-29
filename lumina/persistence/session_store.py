@@ -98,6 +98,8 @@ class SessionLearningStore(LearningStore):
             "learning_days",
             "rewarded_evidence",
             "english_profile",
+            "daily_mission_lesson_id",
+            "daily_mission_date",
         )
         return {key: st.session_state.get(key) for key in keys}
 

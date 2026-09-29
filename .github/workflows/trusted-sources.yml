@@ -1,0 +1,73 @@
+name: Trusted Source Contracts
+
+on:
+  push:
+    branches:
+      - feature/nour-mobile-ui
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  trusted-source-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate trusted-source model
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.trusted_sources import SourceUpload, TRUSTED, build_trusted_record
+
+          upload = SourceUpload(
+              filename="../Science.pdf",
+              mime_type="application/pdf",
+              data=b"%PDF-1.7 trusted fixture",
+          )
+          assert upload.filename == "Science.pdf"
+          assert len(upload.digest) == 64
+
+          record = build_trusted_record(
+              upload,
+              learner_key="nour",
+              display_name="Science Book",
+              subject="science",
+              term_label="T1",
+              storage_provider="test-provider",
+              storage_key="sources/science.pdf",
+          )
+          assert record.trust_status == TRUSTED
+          assert record.source_id.startswith("src_")
+          assert record.sha256 == upload.digest
+          assert record.size_bytes == len(upload.data)
+
+          try:
+              SourceUpload(filename="empty.pdf", mime_type="application/pdf", data=b"")
+          except ValueError:
+              pass
+          else:
+              raise AssertionError("empty uploads must be rejected")
+
+          try:
+              SourceUpload(filename="notes.exe", mime_type="application/octet-stream", data=b"x")
+          except ValueError:
+              pass
+          else:
+              raise AssertionError("unsupported uploads must be rejected")
+
+          print("Trusted source contracts OK")
+          PY
+
+      - name: Validate Neon source catalog schema
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          sql = Path("neon/lumina_schema.sql").read_text(encoding="utf-8")
+          assert "lumina_trusted_sources" in sql
+          assert "unique (learner_key, sha256)" in sql
+          assert "storage_provider" in sql
+          assert "storage_key" in sql
+          print("Trusted source schema OK")
+          PY

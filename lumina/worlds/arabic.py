@@ -1,5 +1,7 @@
 import streamlit as st
 
+from lumina.context_help import render_context_help
+
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import ARABIC_T1
 from lumina.curriculum.arabic_unit1 import ARABIC_U1_LESSONS
@@ -11,6 +13,7 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 def render_arabic_world(ai: GeminiService) -> None:
     st.markdown('<div class="section-title">📖 Arabic World</div>', unsafe_allow_html=True)
+    render_context_help("arabic", label="💬 قوليلي العالم ده بيعمل إيه")
     st.markdown(
         '<div class="mission"><b>نفهم اللغة ونستخدمها، مش نحفظها بس.</b><br>'
         '<span class="muted">الشرح يحافظ على ترتيب ومصطلحات كتاب نور، مع تدريب على الفهم والتعبير.</span></div>',

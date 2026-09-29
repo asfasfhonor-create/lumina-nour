@@ -7,6 +7,7 @@ from lumina.curriculum.social_unit2 import SOCIAL_U2_LESSONS
 from lumina.curriculum.social_unit3 import SOCIAL_U3_LESSONS
 from lumina.curriculum.social_unit4 import SOCIAL_U4_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
+from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_social_world(ai: GeminiService) -> None:
@@ -33,3 +34,10 @@ def render_social_world(ai: GeminiService) -> None:
         render_verified_unit("الوحدة الثالثة · النظم البيئية في قارات العالم الجديد", SOCIAL_U3_LESSONS, "social_u3_lesson", module_id="social")
     elif unit_title == "الحركة الوطنية في مواجهة الاحتلال البريطاني":
         render_verified_unit("الوحدة الرابعة · الحركة الوطنية في مواجهة الاحتلال البريطاني", SOCIAL_U4_LESSONS, "social_u4_lesson", module_id="social")
+    render_temporary_source_session(
+        ai,
+        source,
+        section_title=unit_title,
+        key_prefix="social_source_session",
+    )
+

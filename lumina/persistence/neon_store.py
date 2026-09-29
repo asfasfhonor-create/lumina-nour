@@ -244,3 +244,9 @@ class NeonLearningStore(LearningStore):
                 """,
                 (self.learner_key, Jsonb(state), _utc_now()),
             )
+
+
+    def health_check(self) -> bool:
+        with self._connect() as conn:
+            row = conn.execute("select 1 as ok").fetchone()
+        return bool(row and row.get("ok") == 1)

@@ -134,3 +134,24 @@ jobs:
               assert lesson.source_pages
           print("English Unit 3 lesson contracts OK")
           PY
+
+      - name: Validate complete English curriculum mapping
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.english_curriculum import ENGLISH_UNIT_LESSONS, all_english_lessons
+          from lumina.curriculum.english_reviews import REVIEW1, REVIEW2
+
+          assert list(ENGLISH_UNIT_LESSONS) == [
+              "Personal Identity",
+              "Communication with Family and Friends",
+              "Artificial Intelligence",
+              "Screen Time",
+              "Design Thinking",
+              "Why Do We Like Stories?",
+          ]
+          assert len(all_english_lessons()) == 36
+          assert all(len(lessons) == 6 for lessons in ENGLISH_UNIT_LESSONS.values())
+          assert len(REVIEW1.checks) == 3
+          assert len(REVIEW2.checks) == 3
+          print("Complete English curriculum mapping OK")
+          PY

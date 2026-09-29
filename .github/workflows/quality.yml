@@ -662,3 +662,38 @@ jobs:
           assert callable(lumina.lesson_focus.render_lesson_focus)
           print("Focused lesson navigation OK")
           PY
+
+      - name: Validate bounded persistence query counts
+        run: |
+          python - <<'PY'
+          from lumina.learning.missions import choose_mission
+          from lumina.learning.weekly_plan import build_weekly_plan
+
+          class CountingStore:
+              def __init__(self):
+                  self.calls = {"attempts": 0, "mistakes": 0, "reviews": 0}
+
+              def get_attempts(self, lesson_id=None):
+                  self.calls["attempts"] += 1
+                  assert lesson_id is None, "planner must bulk-fetch attempts"
+                  return []
+
+              def get_mistakes(self, lesson_id=None, unresolved_only=False):
+                  self.calls["mistakes"] += 1
+                  assert lesson_id is None, "planner must bulk-fetch mistakes"
+                  return []
+
+              def get_reviews(self, status=None):
+                  self.calls["reviews"] += 1
+                  return []
+
+          daily = CountingStore()
+          assert choose_mission(daily) is not None
+          assert daily.calls == {"attempts": 1, "mistakes": 1, "reviews": 1}, daily.calls
+
+          weekly = CountingStore()
+          assert build_weekly_plan(weekly, limit=5)
+          assert weekly.calls == {"attempts": 1, "mistakes": 1, "reviews": 1}, weekly.calls
+
+          print("Bounded persistence query counts OK")
+          PY

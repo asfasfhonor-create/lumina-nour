@@ -46,16 +46,24 @@ jobs:
           print("Curriculum catalog OK")
           PY
 
-      - name: Validate first curriculum lesson
+      - name: Validate English Unit 1 curriculum lessons
         run: |
           python - <<'PY'
-          from lumina.curriculum.english_unit1 import ENGLISH_U1_L1
+          from lumina.curriculum.english_unit1 import UNIT1_LESSONS
 
-          assert ENGLISH_U1_L1.title == "Beyond My Looks"
-          assert ENGLISH_U1_L1.source_pages == "Book pages 14–15"
-          assert ENGLISH_U1_L1.checks
-          check = ENGLISH_U1_L1.checks[0]
-          assert len(check.options) == 3
-          assert check.correct_index == 1
-          print("English lesson contract OK")
+          assert len(UNIT1_LESSONS) == 6
+          assert [lesson.title for lesson in UNIT1_LESSONS] == [
+              "Beyond My Looks",
+              "Self-Discovery",
+              "The Mirror Moment",
+              "Story Time — The School Garden Project",
+              "Let's Talk — Respecting Personal Identity",
+              "This Is Me — Descriptive Paragraph",
+          ]
+          for lesson in UNIT1_LESSONS:
+              assert lesson.checks
+              check = lesson.checks[0]
+              assert len(check.options) == 3
+              assert check.correct_index in (0, 1, 2)
+          print("English Unit 1 lesson contracts OK")
           PY

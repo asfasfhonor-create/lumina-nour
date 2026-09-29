@@ -6,6 +6,7 @@ from lumina.curriculum.grounding import build_grounded_pdf, curriculum_prompt
 from lumina.curriculum.english_curriculum import get_english_lessons
 from lumina.curriculum.english_reviews import get_review
 from lumina.learning.lesson_view import render_verified_unit
+from lumina.learning.english_profile import BASELINE_ITEMS, score_baseline
 
 
 def render_english_world(ai: GeminiService) -> None:
@@ -112,18 +113,64 @@ def _render_real_english(ai: GeminiService) -> None:
 
     mode = st.radio(
         "Choose a mission",
-        ["Writing Snapshot", "Real-life Conversation", "Vocabulary in Context"],
+        ["Level Snapshot", "Writing Snapshot", "Real-life Conversation", "Vocabulary in Context"],
         horizontal=False,
         key="real_english_mode",
     )
 
-    if mode == "Writing Snapshot":
+    if mode == "Level Snapshot":
+        _level_snapshot()
+    elif mode == "Writing Snapshot":
         _writing_snapshot(ai)
     elif mode == "Real-life Conversation":
         _conversation_mission(ai)
     else:
         _vocabulary_mission(ai)
 
+
+def _level_snapshot() -> None:
+    st.markdown("### Real English · Level Snapshot")
+    st.caption(
+        "Quick starting-point check only — not a formal CEFR certificate. "
+        "It helps LUMINA decide how much support and challenge to use."
+    )
+
+    answers = {}
+    for item in BASELINE_ITEMS:
+        choice = st.radio(
+            f"{item['skill']} · {item['prompt']}",
+            list(item["options"]),
+            index=None,
+            key=f"english_baseline_{item['id']}",
+        )
+        if choice is not None:
+            answers[item["id"]] = list(item["options"]).index(choice)
+
+    if st.button("Show my starting point", key="english_baseline_submit"):
+        if len(answers) != len(BASELINE_ITEMS):
+            st.warning("كمّلي كل الأسئلة الأول عشان الصورة تكون مفيدة.")
+            return
+
+        result = score_baseline(answers)
+        st.session_state.english_profile = {
+            "baseline_correct": result.correct,
+            "baseline_total": result.total,
+            "broad_band": result.broad_band,
+            "support_note": result.note,
+        }
+        st.success(f"Starting band: {result.broad_band} · {result.correct}/{result.total}")
+        st.write(result.note)
+        st.info(
+            "ده مجرد Starting Point. المستوى الحقيقي هيتحدث من الكتابة، القراءة، "
+            "المحادثة، والاستماع مع الوقت — مش من اختبار واحد."
+        )
+
+    profile = st.session_state.get("english_profile", {})
+    if profile:
+        st.caption(
+            f"Current Real English profile: {profile.get('broad_band', 'Not set')} · "
+            f"baseline {profile.get('baseline_correct', 0)}/{profile.get('baseline_total', 0)}"
+        )
 
 def _need_ai(ai: GeminiService) -> bool:
     if not ai.available:

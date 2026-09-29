@@ -48,15 +48,13 @@ def render_home_foundation() -> None:
         if st.button("👨‍👧 Parent Dashboard", key="open_parent_dashboard"):
             st.session_state.active_world = "parent"
             st.rerun()
-        st.session_state.active_world = "parent"
-        st.rerun()
 
 
 def _render_daily_mission() -> None:
     st.markdown('<div class="section-title">🎯 مهمة اليوم</div>', unsafe_allow_html=True)
     st.markdown(
         '<div class="mission"><b>English Mini Mission</b><br>'
-        '<span class="muted">اكتبي 3 جمل قصيرة عن يومك بالإنجليزي. هنراجعها معًا قبل تسجيل الـ XP.</span></div>',
+        '<span class="muted">اكتبي 3 جمل قصيرة عن يومك بالإنجليزي. المهمة تسجل ممارسة اليوم؛ الـXP الكامل هيبقى مربوط بتقييم تعليمي حقيقي.</span></div>',
         unsafe_allow_html=True,
     )
     daily_text = st.text_area(
@@ -67,7 +65,7 @@ def _render_daily_mission() -> None:
     )
 
     if not st.session_state.daily_done:
-        if st.button("راجعي المهمة وسجلي +20 XP", key="daily_xp"):
+        if st.button("سجلي محاولة اليوم", key="daily_xp"):
             sentences = [
                 sentence.strip()
                 for sentence in daily_text.replace("!", ".").replace("?", ".").split(".")
@@ -76,12 +74,11 @@ def _render_daily_mission() -> None:
             if len(sentences) < 3:
                 st.warning("اكتبي 3 جمل على الأقل الأول — المهم المحاولة 🌱")
             else:
-                st.session_state.xp += 20
                 st.session_state.daily_done = True
                 st.balloons()
                 st.rerun()
     else:
-        st.success("مهمة اليوم اتسجلت 🎉 +20 XP — الحفظ الدائم هنفعله مع قاعدة البيانات.")
+        st.success("ممارسة اليوم اتسجلت 🎉 — مش هنمنح XP تعليمي من غير دليل تعلم حقيقي.")
 
 
 def _render_learning_worlds() -> None:

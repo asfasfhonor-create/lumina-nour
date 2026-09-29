@@ -26,6 +26,7 @@ jobs:
           import lumina.ai_service
           import lumina.worlds.english
           import lumina.worlds.science
+          import lumina.worlds.math
           import lumina.parent_dashboard
           import lumina.persistence.session_store
           print("Import smoke test OK")
@@ -183,4 +184,22 @@ jobs:
               assert lesson.checks
               assert lesson.source_pages
           print("Science Unit 1 lesson contracts OK")
+          PY
+
+      - name: Validate Math Unit 1 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.math_unit1 import MATH_UNIT1_LESSONS
+
+          assert len(MATH_UNIT1_LESSONS) == 4
+          assert [lesson.title for lesson in MATH_UNIT1_LESSONS] == [
+              "Cartesian Product",
+              "Relations",
+              "Functions (Mapping)",
+              "Polynomial Functions",
+          ]
+          for lesson in MATH_UNIT1_LESSONS:
+              assert lesson.checks
+              assert lesson.source_pages
+          print("Math Unit 1 lesson contracts OK")
           PY

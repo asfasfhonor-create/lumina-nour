@@ -862,3 +862,18 @@ jobs:
           assert len({lesson.id for lesson, _ in picked}) == len(picked)
           print("Adaptive exam selection OK")
           PY
+
+      - name: Validate persistence health checks
+        run: |
+          python - <<'PY'
+          from lumina.persistence.session_store import SessionLearningStore
+          from lumina.persistence.neon_store import NeonLearningStore
+
+          assert SessionLearningStore().health_check() is True
+          neon = NeonLearningStore(
+              "postgresql://user:password@example.invalid/db?sslmode=require",
+              "nour",
+          )
+          assert callable(neon.health_check)
+          print("Persistence health-check contracts OK")
+          PY

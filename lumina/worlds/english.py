@@ -7,6 +7,7 @@ from lumina.curriculum.english_curriculum import get_english_lessons
 from lumina.curriculum.english_reviews import get_review
 from lumina.learning.lesson_view import render_verified_unit
 from lumina.learning.english_profile import BASELINE_ITEMS, score_baseline
+from lumina.persistence.profile_state import persist_profile_state
 
 
 def render_english_world(ai: GeminiService) -> None:
@@ -158,6 +159,7 @@ def _level_snapshot() -> None:
             "broad_band": result.broad_band,
             "support_note": result.note,
         }
+        persist_profile_state()
         st.success(f"Starting band: {result.broad_band} · {result.correct}/{result.total}")
         st.write(result.note)
         st.info(

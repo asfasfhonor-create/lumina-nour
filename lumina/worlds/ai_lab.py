@@ -33,7 +33,7 @@ def _need_ai(ai: GeminiService) -> bool:
 
 
 def _prompt_challenge(ai: GeminiService) -> None:
-    st.markdown("### Prompt Challenge")
+    st.markdown("### تحدّي كتابة Prompt")
     st.write("عايزة الـAI يشرح لكِ **photosynthesis** بطريقة تناسب طالبة عمرها 14 سنة، بمثال بسيط، وبعدها يسألك سؤالًا واحدًا للتأكد من الفهم.")
     prompt = st.text_area("اكتبي الـPrompt بتاعك", key="ai_prompt_challenge")
 
@@ -61,7 +61,7 @@ Keep it concise and mostly in Arabic, preserving AI terms in English."""
 
 
 def _ai_detective(ai: GeminiService) -> None:
-    st.markdown("### AI Detective")
+    st.markdown("### محقق الذكاء الاصطناعي")
     st.write("تخيلي إن AI قال: **“أي إجابة مكتوبة بثقة لازم تكون صحيحة.”**")
     answer = st.radio(
         "إيه المشكلة في الكلام ده؟",
@@ -76,15 +76,15 @@ def _ai_detective(ai: GeminiService) -> None:
     if st.button("اكشفي الدليل", key="ai_detective_check") and answer:
         if answer.startswith("الـAI ممكن"):
             st.success("بالضبط. أسلوب الكلام الواثق مش دليل على صحة المعلومة.")
-            st.info("قاعدة AI Detective: Claim → Evidence → Source → Compare.")
+            st.info("قاعدة التحقق: ادعاء → دليل → مصدر → مقارنة.")
         else:
             st.warning("جربي تاني: هل طريقة صياغة الإجابة تكفي لإثبات الحقيقة؟")
 
 
 def _fact_checker(ai: GeminiService) -> None:
-    st.markdown("### Fact Checker")
+    st.markdown("### التحقق من معلومة")
     claim = st.text_input(
-        "اكتبي Claim عايزة تختبريه",
+        "اكتبي معلومة عايزة تتحققي منها",
         key="ai_fact_claim",
         placeholder="مثال: The Great Wall of China is visible from the Moon with the naked eye.",
     )

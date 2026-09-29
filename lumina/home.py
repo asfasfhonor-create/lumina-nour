@@ -1,5 +1,4 @@
 from datetime import date
-import base64
 from pathlib import Path
 
 import streamlit as st

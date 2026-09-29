@@ -3,305 +3,166 @@ from google import genai
 from google.genai import types
 from PIL import Image
 
-# إعداد الصفحة لتلائم الهواتف الذكية تماماً
-st.set_page_config(
-    page_title="LUMINA | Nour M. Hussein",
-    page_icon="✨",
-    layout="centered",
-    initial_sidebar_state="collapsed"
-)
+st.set_page_config(page_title="LUMINA | Nour's World", page_icon="✨", layout="centered", initial_sidebar_state="collapsed")
 
-# تخصيص واجهة عصرية وفائقة الأناقة (Cyber-Pastel Glassmorphism)
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap');
-    
-    * {
-        font-family: 'Cairo', sans-serif;
-        direction: rtl;
-    }
-    
-    .stApp {
-        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-        color: #f1f2f6;
-    }
-    
-    .hero-card {
-        background: rgba(255, 255, 255, 0.07);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 24px;
-        padding: 24px 16px;
-        text-align: center;
-        margin-bottom: 25px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    }
-    
-    .brand-title {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 2.8rem;
-        font-weight: 900;
-        background: linear-gradient(120deg, #ff76ac, #a29bfe, #74b9ff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        letter-spacing: 2px;
-        margin: 0;
-        direction: ltr;
-    }
-    
-    .author-badge {
-        font-family: 'Plus Jakarta Sans', 'Cairo', sans-serif;
-        display: inline-block;
-        background: linear-gradient(90deg, rgba(255, 118, 172, 0.2), rgba(162, 155, 254, 0.2));
-        border: 1px solid rgba(255, 118, 172, 0.4);
-        color: #ff9ff3;
-        font-size: 0.95rem;
-        font-weight: 700;
-        padding: 4px 16px;
-        border-radius: 50px;
-        margin-top: 8px;
-        margin-bottom: 8px;
-        direction: ltr;
-    }
-    
-    .sub-tagline {
-        color: #dcdde1;
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-top: 5px;
-    }
-    
-    .feature-card {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 18px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 16px;
-        margin-bottom: 16px;
-    }
-    
-    .stButton>button {
-        width: 100%;
-        border-radius: 16px;
-        background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 50%, #7873f5 100%);
-        color: #ffffff !important;
-        font-weight: 800;
-        font-size: 1rem;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        box-shadow: 0 4px 18px rgba(255, 118, 172, 0.35);
-        transition: all 0.3s ease;
-    }
-    
-    .stButton>button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 22px rgba(255, 118, 172, 0.5);
-    }
-    
-    .stTextInput>div>div>input, .stTextArea>div>div>textarea {
-        background: rgba(255, 255, 255, 0.08) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 14px !important;
-        color: #ffffff !important;
-    }
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+* { font-family:'Cairo',sans-serif; }
+.stApp { background:linear-gradient(155deg,#100d2d 0%,#231a54 45%,#151a3d 100%); color:#f7f4ff; }
+.block-container { max-width:760px; padding-top:1rem; padding-bottom:5rem; }
+[data-testid="stHeader"] { background:transparent; }
+.hero { background:linear-gradient(135deg,rgba(255,118,172,.16),rgba(116,185,255,.12)); border:1px solid rgba(255,255,255,.15); border-radius:26px; padding:20px; margin-bottom:14px; box-shadow:0 16px 50px rgba(0,0,0,.22); }
+.brand { font-family:'Plus Jakarta Sans',sans-serif; direction:ltr; font-size:2.15rem; font-weight:800; margin:0; background:linear-gradient(100deg,#ff8fc1,#b9a7ff,#7ed6ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.hello { font-size:1.35rem; font-weight:800; margin:.35rem 0 .1rem; }
+.muted { color:#d9d3eb; font-size:.92rem; }
+.stat { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:12px; text-align:center; min-height:86px; }
+.stat b { display:block; font-size:1.15rem; }
+.section-title { font-size:1.18rem; font-weight:900; margin:1.15rem 0 .5rem; }
+.subject { background:rgba(255,255,255,.065); border:1px solid rgba(255,255,255,.11); border-radius:20px; padding:14px; margin-bottom:8px; min-height:118px; }
+.subject h4 { margin:0 0 4px; }
+.mission { background:linear-gradient(135deg,rgba(255,118,172,.13),rgba(120,115,245,.14)); border:1px solid rgba(255,160,205,.24); border-radius:22px; padding:16px; }
+.feature-card { background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.1); border-radius:20px; padding:14px; margin-bottom:14px; }
+.stButton>button { width:100%; border-radius:14px; min-height:46px; font-weight:800; border:0; background:linear-gradient(135deg,#ff758c,#ff7eb3 50%,#7873f5); color:white; }
+.stTextInput input,.stTextArea textarea { border-radius:14px !important; }
+div[data-testid="stTabs"] button { font-weight:800; }
+@media (max-width:640px){ .block-container{padding-left:.8rem;padding-right:.8rem}.brand{font-size:1.85rem}.hello{font-size:1.18rem}.stat{min-height:78px;padding:9px} }
 </style>
 """, unsafe_allow_html=True)
 
-# واجهة الهيدر الترحيبي
+if "xp" not in st.session_state: st.session_state.xp = 120
+if "streak" not in st.session_state: st.session_state.streak = 3
+if "daily_done" not in st.session_state: st.session_state.daily_done = False
+
 st.markdown("""
-<div class="hero-card">
-    <div class="brand-title">LUMINA</div>
-    <div class="author-badge">👑 Designed Exclusively for Nour M. Hussein</div>
-    <div class="sub-tagline">منظومة الذكاء الخارق ورفيقة التفوق في الشهادة الإعدادية ✨</div>
+<div class="hero">
+  <div class="brand">LUMINA · NOUR'S WORLD</div>
+  <div class="hello">أهلاً يا نور ✨ جاهزة لمهمة صغيرة النهارده؟</div>
+  <div class="muted">مساحتك للمذاكرة، التجربة، والإنجليزي — خطوة صغيرة كل يوم.</div>
 </div>
 """, unsafe_allow_html=True)
 
-# استدعاء مفتاح الـ API
+c1,c2,c3 = st.columns(3)
+with c1: st.markdown(f'<div class="stat">⭐ <b>{st.session_state.xp} XP</b><span class="muted">نقاطك</span></div>', unsafe_allow_html=True)
+with c2: st.markdown(f'<div class="stat">🔥 <b>{st.session_state.streak} أيام</b><span class="muted">Streak</span></div>', unsafe_allow_html=True)
+with c3: st.markdown('<div class="stat">🌱 <b>Level 2</b><span class="muted">Explorer</span></div>', unsafe_allow_html=True)
+
+st.markdown('<div class="section-title">🎯 مهمة اليوم</div>', unsafe_allow_html=True)
+st.markdown('<div class="mission"><b>English Mini Mission</b><br><span class="muted">اكتبي 3 جمل قصيرة عن يومك بالإنجليزي. مش مهم تكون مثالية — المهم نجرب.</span></div>', unsafe_allow_html=True)
+if not st.session_state.daily_done:
+    if st.button("أنجزت المهمة +20 XP", key="daily_xp"):
+        st.session_state.xp += 20
+        st.session_state.daily_done = True
+        st.balloons()
+        st.rerun()
+else:
+    st.success("مهمة اليوم اتسجلت 🎉 +20 XP")
+
+st.markdown('<div class="section-title">📚 اختاري عالمك</div>', unsafe_allow_html=True)
+cols = st.columns(2)
+subjects = [
+    ("🔬 Science Lab", "افهمي الفكرة بالتجربة والتشبيه."),
+    ("➗ Math Quest", "مسائل خطوة بخطوة من غير حفظ أعمى."),
+    ("🌍 Social Studies", "تاريخ وجغرافيا كقصة وتحقيق."),
+    ("🇬🇧 English Adventure", "محادثة، كلمات، وتصحيح بسيط."),
+]
+for i,(title,desc) in enumerate(subjects):
+    with cols[i%2]:
+        st.markdown(f'<div class="subject"><h4>{title}</h4><span class="muted">{desc}</span><br><small>🚧 Subject Hub — المرحلة القادمة</small></div>', unsafe_allow_html=True)
+
+st.markdown('<div class="section-title">⚡ أدواتك الحالية</div>', unsafe_allow_html=True)
 api_key = st.secrets.get("GEMINI_API_KEY", None)
 if not api_key:
-    api_key = st.sidebar.text_input("أدخلي مفتاح Gemini API:", type="password")
+    api_key = st.sidebar.text_input("Gemini API Key", type="password")
     if not api_key:
-        st.warning("يرجى تفعيل مفتاح الـ API للبدء في تشغيل النظام 🔑")
-        st.stop()
+        st.info("الأدوات الذكية تحتاج Gemini API Key. الواجهة الرئيسية تعمل بدون المفتاح.")
+client = genai.Client(api_key=api_key) if api_key else None
 
-client = genai.Client(api_key=api_key)
+def need_ai():
+    if client is None:
+        st.warning("فعّلي Gemini API Key أولاً لتشغيل الأداة.")
+        return False
+    return True
 
-# التبويبات العصرية
-tabs = st.tabs([
-    "📚 مذكرات وPDF", 
-    "💬 صالون النخبة", 
-    "📸 كاميرا المسائل", 
-    "🗣️ لغات ومحادثة", 
-    "🗝️ غرفة الهروب", 
-    "💻 بايثون للمبدعات", 
-    "🎯 مفكرتي"
-])
+tabs = st.tabs(["📄 PDF", "💬 AI Buddy", "📸 مسألة", "🇬🇧 English", "🗝️ Escape", "💻 Python", "🎯 أهدافي"])
 
-# ==================== 1. مكتبة المناهج والتقييمات ====================
 with tabs[0]:
     st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-    st.markdown("### 📚 رفيقة المنهج والتقييمات الرسمية")
-    st.write("ارفعي مذكراتك أو كتاب الوزارة (PDF) للترم الثاني، واسألي أي سؤال أو حلي نماذج الامتحانات مباشرة!")
-    
-    uploaded_pdf = st.file_uploader("اسحبي ملف الـ PDF هنا:", type=["pdf"])
+    st.subheader("رفيقة المنهج والـ PDF")
+    uploaded_pdf = st.file_uploader("ارفعي كتابًا أو مذكرة PDF", type=["pdf"], key="pdf")
     if uploaded_pdf:
-        pdf_bytes = uploaded_pdf.read()
-        st.success(f"تم استقبال الملف بنجاح: {uploaded_pdf.name} 💖")
-        
-        pdf_part = types.Part.from_bytes(data=pdf_bytes, mime_type="application/pdf")
-        
-        option = st.radio(
-            "ماذا تريدين أن نستخرج من هذا الملف؟",
-            ["حل واستفسار عن سؤال محدد", "امتحان تدريبي مطابق لأسلوب الوزارة", "ملخص ذكي للقوانين والتعريفات"],
-            horizontal=True
-        )
-        
-        if option == "حل واستفسار عن سؤال محدد":
-            q = st.text_input("اكتبي استفسارك من المنهج:")
-            if st.button("استخراج الإجابة الدقيقة 🔍"):
-                if q:
-                    with st.spinner("جاري قراءة المنهج بعناية..."):
-                        p = f"أنت معلم خاص لنور محمد حسين (3 إعدادي بمصر). أجب بدقة ومن واقع الملف المرفق فقط على السؤال: {q}"
-                        res = client.models.generate_content(model="gemini-2.5-flash", contents=[pdf_part, p])
-                        st.markdown(res.text)
-                        
-        elif option == "امتحان تدريبي مطابق لأسلوب الوزارة":
-            if st.button("توليد اختبار تدريبي مع الحل 📝"):
-                with st.spinner("جاري صياغة الأسئلة الذكية..."):
-                    p = "صغ 5 أسئلة امتحانات وتدريبات من واقع هذا الملف لنور محمد حسين، متضمنة خطوات التفكير ونموذج الإجابة."
-                    res = client.models.generate_content(model="gemini-2.5-flash", contents=[pdf_part, p])
+        pdf_part = types.Part.from_bytes(data=uploaded_pdf.read(), mime_type="application/pdf")
+        option = st.radio("عايزة نعمل إيه؟", ["سؤال من الملف", "اختبار تدريبي", "ملخص ذكي"], horizontal=True)
+        if option == "سؤال من الملف":
+            q = st.text_input("سؤالك", key="pdf_q")
+            if st.button("جاوبني من الملف", key="pdf_answer") and q and need_ai():
+                with st.spinner("بقرأ الملف..."):
+                    res=client.models.generate_content(model="gemini-2.5-flash",contents=[pdf_part,f"أنت مدرس لنور في الصف الثالث الإعدادي بمدرسة لغات في مصر. أجب من الملف فقط، وبمصطلحات المنهج الأصلية، واشرح بالعربية عند الحاجة. السؤال: {q}"])
                     st.markdown(res.text)
-                    
-        elif option == "ملخص ذكي للقوانين والتعريفات":
-            if st.button("إنشاء ملخص مركز 📑"):
-                with st.spinner("جاري تلخيص أهم النقاط..."):
-                    p = "استخرج أهم المفاهيم، القوانين، والتعريفات الأساسية من هذا الملف بأسلوب مرتب ولطيف لنور."
-                    res = client.models.generate_content(model="gemini-2.5-flash", contents=[pdf_part, p])
-                    st.markdown(res.text)
+        elif option == "اختبار تدريبي" and st.button("اعمل اختبار", key="pdf_exam") and need_ai():
+            res=client.models.generate_content(model="gemini-2.5-flash",contents=[pdf_part,"أنشئ 5 أسئلة تدريبية مناسبة للصف الثالث الإعدادي من هذا الملف، ثم ضع نموذج الإجابة بعد الأسئلة."])
+            st.markdown(res.text)
+        elif option == "ملخص ذكي" and st.button("لخّص", key="pdf_summary") and need_ai():
+            res=client.models.generate_content(model="gemini-2.5-flash",contents=[pdf_part,"لخص أهم المفاهيم والتعريفات والقوانين في هذا الملف لطالبة ثالثة إعدادي، مع الحفاظ على مصطلحات المنهج."])
+            st.markdown(res.text)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# ==================== 2. صالون النخبة والشخصيات ====================
 with tabs[1]:
-    st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-    st.markdown("### 💬 رفاق المذاكرة الأذكياء")
-    buddy = st.selectbox(
-        "اختاري من سيدرس معكِ الآن:",
-        ["أستاذ ألبرت (عالم العلوم الحماسي 🔬)", "المحقق التاريخي (أسرار دراسات 3 إعدادي 📜)", "صديقتك الملهمة (تشجيع وتنظيم 🌸)"]
-    )
-    
-    b_prompts = {
-        "أستاذ ألبرت (عالم العلوم الحماسي 🔬)": "أنت العالم ألبرت، تشرح علوم 3 إعدادي بمصر لنور محمد حسين بأسلوب مشوق وتجارب وتشبيهات خيالية ممتعة. ناديها 'الباحثة العبقرية نور'.",
-        "المحقق التاريخي (أسرار دراسات 3 إعدادي 📜)": "أنت المحقق شيرلوك للدراسات والتاريخ المصري لـ 3 إعدادي. تحل الألغاز التاريخية بأسلوب مشوق مع نور محمد حسين.",
-        "صديقتك الملهمة (تشجيع وتنظيم 🌸)": "أنتِ الصديقة المقربة والمدربة المحفزة لنور محمد حسين، تدعمينها في يومها الدراسي بحماس ولطف وتنظيم وقت."
-    }
-    
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []
-        
+    buddy=st.selectbox("مين يذاكر معاكي؟",["أستاذ ألبرت 🔬","المحقق التاريخي 📜","صديقتك الملهمة 🌸"])
+    prompts={"أستاذ ألبرت 🔬":"اشرح علوم ثالثة إعدادي لنور بأسلوب بسيط وتجريبي، ولا تجعلها تحفظ قبل أن تفهم.","المحقق التاريخي 📜":"اشرح دراسات ثالثة إعدادي لنور كتحقيق وقصة مع الالتزام بالمنهج.","صديقتك الملهمة 🌸":"ساعد نور على تنظيم مذاكرتها وشجعها بلطف ومن دون مبالغة."}
+    if "chat_history" not in st.session_state: st.session_state.chat_history=[]
     for m in st.session_state.chat_history:
-        with st.chat_message(m["role"]):
-            st.markdown(m["content"])
-            
-    c_in = st.chat_input("اكتبي ما يخطر ببالكِ يا نور...")
-    if c_in:
-        st.session_state.chat_history.append({"role": "user", "content": c_in})
-        with st.chat_message("user"):
-            st.markdown(c_in)
-        r = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=c_in,
-            config=types.GenerateContentConfig(system_instruction=b_prompts[buddy])
-        )
-        st.session_state.chat_history.append({"role": "assistant", "content": r.text})
-        with st.chat_message("assistant"):
-            st.markdown(r.text)
-    st.markdown('</div>', unsafe_allow_html=True)
+        with st.chat_message(m["role"]): st.markdown(m["content"])
+    msg=st.chat_input("اكتبي سؤالك يا نور...")
+    if msg and need_ai():
+        st.session_state.chat_history.append({"role":"user","content":msg})
+        r=client.models.generate_content(model="gemini-2.5-flash",contents=msg,config=types.GenerateContentConfig(system_instruction=prompts[buddy]))
+        st.session_state.chat_history.append({"role":"assistant","content":r.text})
+        st.rerun()
 
-# ==================== 3. كاميرا حل المسائل ====================
 with tabs[2]:
-    st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-    st.markdown("### 📸 كاميرا المسائل الذكية")
-    st.write("صوري أي رسم هندسي، دائرة كهربية، أو مسألة حسابية لتحليلها وشرحها فوراً!")
-    cam_file = st.file_uploader("ارفعي صورة المسألة:", type=["jpg", "png", "jpeg"])
-    if cam_file:
-        img = Image.open(cam_file)
-        st.image(img, use_container_width=True)
-        if st.button("تحليل وشرح خطوات الحل 💡"):
-            with st.spinner("جاري فك رموز المسألة..."):
-                res_img = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=[img, "اشرح خطوات حل هذه المسألة بالتفصيل الدقيق وبطريقة مبسطة تناسب طالبة 3 إعدادي نور محمد حسين."]
-                )
-                st.markdown(res_img.text)
-    st.markdown('</div>', unsafe_allow_html=True)
+    cam=st.file_uploader("ارفعي صورة المسألة",type=["jpg","jpeg","png"],key="problem")
+    if cam:
+        img=Image.open(cam)
+        st.image(img,use_container_width=True)
+        if st.button("فهمني الحل",key="solve") and need_ai():
+            r=client.models.generate_content(model="gemini-2.5-flash",contents=[img,"اشرح لنور، طالبة ثالثة إعدادي، طريقة التفكير والحل خطوة بخطوة. لا تكتفِ بالإجابة النهائية."])
+            st.markdown(r.text)
 
-# ==================== 4. مدرب الإنجليزية ====================
 with tabs[3]:
-    st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-    st.markdown("### 🗣️ English Lounge with Nour")
-    eng_input = st.text_area("Write something in English to practice:")
-    if st.button("Improve & Polish My English ✨"):
-        if eng_input:
-            p = f"You are a friendly British mentor for a 15-year-old girl named Nour. Polish her sentence, show natural idioms, and give a motivating friendly reply: '{eng_input}'"
-            eng_res = client.models.generate_content(model="gemini-2.5-flash", contents=p)
-            st.markdown(eng_res.text)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.subheader("English Adventure")
+    level=st.select_slider("درجة المساعدة",options=["مساعدة كبيرة","متوسطة","تحدي"],value="مساعدة كبيرة")
+    eng=st.text_area("Write 1–3 sentences in English",key="eng")
+    if st.button("ساعدني أتحسن",key="eng_go") and eng and need_ai():
+        p=f"Nour is an Egyptian third-prep language-school student whose English needs improvement. Assistance level: {level}. Correct this gently: {eng}. Show: 1) her sentence, 2) corrected version, 3) one short Arabic explanation, 4) one tiny follow-up challenge. Do not overwhelm her."
+        r=client.models.generate_content(model="gemini-2.5-flash",contents=p)
+        st.markdown(r.text)
 
-# ==================== 5. غرفة الهروب ====================
 with tabs[4]:
-    st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-    st.markdown("### 🗝️ مغامرة غرفة الهروب")
-    st.write("لغز دراسي غامض لن تفتحي الباب السري إلا بحله!")
-    sub = st.selectbox("المادة:", ["علوم 3 إعدادي", "دراسات 3 إعدادي", "رياضيات 3 إعدادي"])
-    if st.button("توليد غرفة ولغز جديد 🚪"):
-        with st.spinner("جاري بناء الغرفة السحرية..."):
-            p = f"اكتب سيناريو غرفة هروب سحرية ممتعة لنور محمد حسين، يعتمد حل الباب على سؤال ذكي من منهج {sub} وتكون الإجابة كلمة أو رقم واحد فقط."
-            esc_res = client.models.generate_content(model="gemini-2.5-flash", contents=p)
-            st.session_state["esc_puzzle"] = esc_res.text
-            
-    if "esc_puzzle" in st.session_state:
-        st.info(st.session_state["esc_puzzle"])
-        code_try = st.text_input("شفرة الخروج:")
-        if st.button("تجربة فتح الباب"):
-            check_p = f"اللغز: {st.session_state['esc_puzzle']}\nإجابة نور: {code_try}\nهل الإجابة صحيحة وتسمح بالهروب؟ أجب بحماس واحتفال إن كانت صحيحة."
-            c_res = client.models.generate_content(model="gemini-2.5-flash", contents=check_p)
-            st.success(c_res.text)
-    st.markdown('</div>', unsafe_allow_html=True)
+    sub=st.selectbox("المادة",["علوم 3 إعدادي","دراسات 3 إعدادي","رياضيات 3 إعدادي"],key="escape_sub")
+    if st.button("ابدئي المغامرة",key="escape_new") and need_ai():
+        r=client.models.generate_content(model="gemini-2.5-flash",contents=f"اصنع لغز غرفة هروب قصيرًا لنور من {sub}. لا تكشف الإجابة. اجعل الحل كلمة أو رقمًا واحدًا.")
+        st.session_state.esc_puzzle=r.text
+    if st.session_state.get("esc_puzzle"):
+        st.info(st.session_state.esc_puzzle)
+        ans=st.text_input("شفرة الخروج",key="escape_answer")
+        if st.button("افتحي الباب",key="escape_check") and ans and need_ai():
+            r=client.models.generate_content(model="gemini-2.5-flash",contents=f"اللغز: {st.session_state.esc_puzzle}\nإجابة نور: {ans}\nتحقق من الإجابة. إن كانت خطأ أعط تلميحًا فقط، وإن كانت صحيحة احتفل باختصار.")
+            st.markdown(r.text)
 
-# ==================== 6. أكاديمية بايثون ====================
 with tabs[5]:
-    st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-    st.markdown("### 💻 كود بايثون للمبتكرات الصغيرات")
-    st.write("اصنعي برامجك وألعابك البسيطة بنفسك:")
-    code_val = st.text_area("محرر الأكواد:", 'name = "Nour"\nscore = 100\nprint(f"مبروك للمبرمجة {name} مجموعك هو {score}% ✨")')
-    if st.button("شرح وتشغيل الكود بالذكاء الاصطناعي 🚀"):
-        c_res = client.models.generate_content(
-            model="gemini-2.5-flash", 
-            contents=f"اشرح لنور محمد حسين بلطف وبساطة ماذا يفعل كود بايثون هذا وما هي مخرجاته المتوقعة: \n{code_val}"
-        )
-        st.markdown(c_res.text)
-    st.markdown('</div>', unsafe_allow_html=True)
+    code=st.text_area("Python",'name = "Nour"\nscore = 100\nprint(f"Great job {name}! {score}%")',key="code")
+    if st.button("اشرح الكود",key="code_explain") and need_ai():
+        r=client.models.generate_content(model="gemini-2.5-flash",contents=f"اشرح هذا الكود لنور كمبتدئة، سطرًا سطرًا، ثم أعطها تعديلًا صغيرًا تجرب كتابته بنفسها:\n{code}")
+        st.markdown(r.text)
 
-# ==================== 7. مفكرتي وإنجازاتي ====================
 with tabs[6]:
-    st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-    st.markdown("### 🎯 إنجازات نور اليومية")
-    if "tasks_list" not in st.session_state:
-        st.session_state.tasks_list = []
-    t_add = st.text_input("إضافة هدف أو درس لليوم:")
-    if st.button("إضافة للمفكرة 📌"):
-        if t_add:
-            st.session_state.tasks_list.append(t_add)
-            st.rerun()
-            
-    for idx, item in enumerate(st.session_state.tasks_list):
-        st.checkbox(item, key=f"t_{idx}")
-        
-    if st.button("🎉 طاقة إيجابية ورسالة ملهمة لليوم"):
-        st.balloons()
-        insp = client.models.generate_content(
-            model="gemini-2.5-flash", 
-            contents="اكتب رسالة صباحية غاية في الجمال والتحفيز لطالبة الشهادة الإعدادية المتميزة 'نور محمد حسين' لتشعر بالفخر والثقة."
-        )
-        st.success(insp.text)
-    st.markdown('</div>', unsafe_allow_html=True)
+    if "tasks_list" not in st.session_state: st.session_state.tasks_list=[]
+    task=st.text_input("هدف صغير لليوم",key="task")
+    if st.button("أضيفيه",key="task_add") and task:
+        st.session_state.tasks_list.append(task)
+        st.rerun()
+    for i,item in enumerate(st.session_state.tasks_list):
+        st.checkbox(item,key=f"task_{i}")
+
+st.caption("LUMINA · built for Nour ✨ | النسخة التجريبية الجديدة على فرع التطوير")

@@ -247,6 +247,21 @@ class NeonLearningStore(LearningStore):
 
 
     def health_check(self) -> bool:
+        """Verify connectivity and the complete LUMINA persistence schema."""
         with self._connect() as conn:
-            row = conn.execute("select 1 as ok").fetchone()
-        return bool(row and row.get("ok") == 1)
+            row = conn.execute(
+                """
+                select
+                    to_regclass('public.lumina_learning_attempts') is not null as attempts_ok,
+                    to_regclass('public.lumina_mistakes') is not null as mistakes_ok,
+                    to_regclass('public.lumina_reviews') is not null as reviews_ok,
+                    to_regclass('public.lumina_profile_state') is not null as profile_ok
+                """
+            ).fetchone()
+        return bool(
+            row
+            and row.get("attempts_ok")
+            and row.get("mistakes_ok")
+            and row.get("reviews_ok")
+            and row.get("profile_ok")
+        )

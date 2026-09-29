@@ -277,16 +277,27 @@ Subject-specific extensions:
 - Religion: creed, Quran/interpretation, Tajweed, worship, biography/figures, values/ethics.
 - ICT: concept, syntax, code pattern, debugging/error, digital citizenship.
 
-## Pre-master readiness
+## Current structured mapping status
 
-The seven supplied subject areas are inventoried, and later page-level verification showed that the supplied Math and Science PDFs each bundle both Term 1 and Term 2 material in one physical file. The catalog therefore models those term scopes separately.
+The supplied curriculum has now been converted into a cross-subject structured learning registry on the development branch, while preserving source provenance and term boundaries.
+
+Current mapped learning blocks:
+- English Term 1: 36 lessons across six units, plus separate structured Review 1 and Review 2.
+- Science: 14 lessons/major lesson blocks across Term 1 and the bundled Term 2 section.
+- Mathematics: 35 lessons across Term 1 and the bundled Term 2 section.
+- Arabic Term 1: 12 integrated lesson blocks across three units. Each block can contain reading/listening plus grammar, spelling, speaking, and writing components according to the book structure.
+- Social Studies Term 1: 11 lessons across four units.
+- Islamic Religion Term 1: 21 lessons across three units.
+- ICT supplied Second Semester: 13 lessons across four chapters.
+
+Total registered structured learning blocks: 142, excluding the two separate English review blocks.
+
+Important coverage rule:
+A subject is only exposed for the term/semester supported by the supplied trusted source. LUMINA must not invent a missing term. Science and Mathematics are exceptions only because both terms were verified inside the same supplied physical PDF.
 
 Still intentionally deferred:
-- Full page-by-page indexing.
-- Exact concept extraction for every lesson.
-- Current-year external verification of ICT coverage.
-- Final retrieval implementation.
-- Mastery thresholds.
-- Database/vendor selection.
-
-These belong after the Master architecture is frozen or where the Master explicitly schedules them.
+- Fine-grained page-segment retrieval for arbitrary questions beyond the structured lesson maps.
+- Current-year external verification of the supplied ICT source.
+- Durable cloud persistence vendor.
+- Final mastery thresholds after real learner evidence.
+- Additional term sources for Arabic, English, Social Studies, and Religion if/when supplied.

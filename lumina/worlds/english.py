@@ -4,6 +4,7 @@ from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import ENGLISH_T1
 from lumina.curriculum.grounding import build_grounded_pdf, curriculum_prompt
 from lumina.curriculum.english_curriculum import get_english_lessons
+from lumina.curriculum.english_reviews import get_review
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.learning.progress_view import render_learning_brain_summary
 from lumina.session_state import (
@@ -71,7 +72,9 @@ def _render_school_track(ai: GeminiService) -> None:
             f"english_u{unit_number}_lesson",
         )
     elif unit_title in {"Review 1", "Review 2"}:
-        st.info("Structured review mode is being connected next from the verified review pages.")
+        review = get_review(unit_title)
+        if review:
+            _render_verified_unit(unit_title, (review,), f"english_{review.unit_id}_lesson")
 
     st.markdown("---")
     st.caption("Advanced source session")
@@ -238,67 +241,63 @@ def _render_verified_lesson(lesson) -> None:
     for point in lesson.evidence_summary:
         st.write(f"• {point}")
 
-    check = lesson.checks[0]
-    st.markdown("#### Quick understanding check")
-    answer = st.radio(
-        check.prompt,
-        list(check.options),
-        index=None,
-        key=f"lesson_check_{lesson.id}_{check.id}",
-    )
+    st.markdown("#### Quick understanding checks")
+    for check in lesson.checks:
+        answer = st.radio(
+            check.prompt,
+            list(check.options),
+            index=None,
+            key=f"lesson_check_{lesson.id}_{check.id}",
+        )
 
-    if st.button("Check my thinking", key=f"lesson_check_button_{lesson.id}_{check.id}") and answer:
-        selected_index = list(check.options).index(answer)
-        correct = selected_index == check.correct_index
-        attempt = {
-            "module_id": "english",
-            "unit_id": lesson.unit_id,
-            "lesson_id": lesson.id,
-            "check_id": check.id,
-            "evidence_id": check.id,
-            "answer": answer,
-            "correct": correct,
-            "source_pages": lesson.source_pages,
-        }
-        record_learning_attempt(attempt)
+        if st.button("Check my thinking", key=f"lesson_check_button_{lesson.id}_{check.id}") and answer:
+            selected_index = list(check.options).index(answer)
+            correct = selected_index == check.correct_index
+            attempt = {
+                "module_id": "english",
+                "unit_id": lesson.unit_id,
+                "lesson_id": lesson.id,
+                "check_id": check.id,
+                "evidence_id": check.id,
+                "answer": answer,
+                "correct": correct,
+                "source_pages": lesson.source_pages,
+            }
+            record_learning_attempt(attempt)
 
-        if correct:
-            resolve_mistake(lesson.id, check.id)
-            complete_review(lesson.id, check.id)
-            st.success("Good thinking — this matches the lesson.")
-            st.info(
-                "This is learning evidence, not automatic mastery. "
-                "LUMINA requires varied evidence before a lesson can become Mastered."
-            )
-        else:
-            record_mistake(
-                {
-                    "module_id": "english",
-                    "unit_id": lesson.unit_id,
-                    "lesson_id": lesson.id,
-                    "lesson_title": lesson.title,
-                    "check_id": check.id,
-                    "question": check.prompt,
-                    "answer": answer,
-                    "mistake_type": "concept_understanding",
-                    "hint": check.hint,
-                    "source_pages": lesson.source_pages,
-                    "resolved": False,
-                }
-            )
-            queue_review(
-                {
-                    "module_id": "english",
-                    "lesson_id": lesson.id,
-                    "lesson_title": lesson.title,
-                    "check_id": check.id,
-                    "status": "due",
-                    "reason": "incorrect_understanding_check",
-                    "source_pages": lesson.source_pages,
-                }
-            )
-            st.warning("Not yet. Use the hint, then try again.")
-            st.info(f"Hint: {check.hint}")
+            if correct:
+                resolve_mistake(lesson.id, check.id)
+                complete_review(lesson.id, check.id)
+                st.success("Good thinking — this matches the lesson.")
+            else:
+                record_mistake(
+                    {
+                        "module_id": "english",
+                        "unit_id": lesson.unit_id,
+                        "lesson_id": lesson.id,
+                        "lesson_title": lesson.title,
+                        "check_id": check.id,
+                        "question": check.prompt,
+                        "answer": answer,
+                        "mistake_type": "concept_understanding",
+                        "hint": check.hint,
+                        "source_pages": lesson.source_pages,
+                        "resolved": False,
+                    }
+                )
+                queue_review(
+                    {
+                        "module_id": "english",
+                        "lesson_id": lesson.id,
+                        "lesson_title": lesson.title,
+                        "check_id": check.id,
+                        "status": "due",
+                        "reason": "incorrect_understanding_check",
+                        "source_pages": lesson.source_pages,
+                    }
+                )
+                st.warning("Not yet. Use the hint, then try again.")
+                st.info(f"Hint: {check.hint}")
 
     attempts = get_learning_attempts(lesson.id)
     mistakes = get_mistakes(lesson.id)
@@ -306,6 +305,7 @@ def _render_verified_lesson(lesson) -> None:
     st.caption(
         f"Mastery: {mastery_label(mastery.state)} · "
         f"{mastery.correct_attempts}/{mastery.attempts} successful attempt(s) · "
+        f"{mastery.distinct_evidence} distinct evidence item(s) · "
         f"{mastery.unresolved_mistakes} unresolved mistake(s)"
     )
 

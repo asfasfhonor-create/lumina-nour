@@ -1600,3 +1600,21 @@ jobs:
           assert "support_instruction(profile)" in source
           print("Real English activity coverage OK")
           PY
+
+      - name: Validate durable AI literacy profile
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.worlds.ai_lab as ai_lab
+          from lumina.persistence.profile_state import PROFILE_KEYS
+
+          assert "ai_profile" in PROFILE_KEYS
+          assert ai_lab.AI_SKILL_LABELS["prompting"] == "Prompting"
+          assert ai_lab.ACTIVITY_SKILL["ai_answer_comparison"] == "comparison"
+          assert ai_lab.ACTIVITY_SKILL["ai_evidence_verification"] == "evidence"
+
+          dashboard = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert "تقدّم مهارات AI" in dashboard
+          assert "تقييم جودة الدليل" in dashboard
+          print("Durable AI literacy profile OK")
+          PY

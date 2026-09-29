@@ -1520,3 +1520,41 @@ jobs:
           assert int(server.get("maxMessageSize", 0)) >= 300
           print("Large curriculum upload settings OK")
           PY
+
+      - name: Validate hands-on AI Lab missions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.worlds.ai_lab as ai_lab
+
+          source = Path("lumina/worlds/ai_lab.py").read_text(encoding="utf-8")
+          for label in (
+              "صلّحي الـPrompt",
+              "قارني إجابتين من AI",
+              "تحققي بالدليل",
+              "اكتبي Prompt من الصفر",
+              "محقق الذكاء الاصطناعي",
+              "ابني خطة تحقق",
+          ):
+              assert label in source, label
+
+          assert callable(ai_lab._fix_the_prompt)
+          assert callable(ai_lab._compare_ai_answers)
+          assert callable(ai_lab._verify_with_evidence)
+          assert callable(ai_lab._record_ai_attempt)
+          print("Hands-on AI Lab missions OK")
+          PY
+
+      - name: Validate AI Lab evidence rules
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("lumina/worlds/ai_lab.py").read_text(encoding="utf-8")
+          assert "الثقة مقابل الدليل" in source
+          assert "الإعلان الرسمي الحديث" in source
+          assert "جودة الـPrompt تساعد، لكنها لا تضمن صحة كل معلومة" in source
+          assert "activity_type=\"ai_answer_comparison\"" in source
+          assert "activity_type=\"ai_evidence_verification\"" in source
+          print("AI Lab evidence rules OK")
+          PY

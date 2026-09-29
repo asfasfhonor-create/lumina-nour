@@ -6,7 +6,7 @@ GLOBAL_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
 * { font-family:'Cairo',sans-serif; }
 .stApp { background:linear-gradient(155deg,#100d2d 0%,#231a54 45%,#151a3d 100%); color:#f7f4ff; }
-.block-container { max-width:760px; padding-top:1rem; padding-bottom:5rem; }
+.block-container { max-width:860px; padding-top:1rem; padding-bottom:5rem; }
 /* Remove Streamlit chrome from the learner-facing experience. The owner can
    still manage the app from Streamlit Community Cloud. */
 [data-testid="stHeader"],
@@ -25,17 +25,27 @@ header[data-testid="stHeader"],
 #MainMenu {
   display:none !important;
 }
-.hero { background:linear-gradient(135deg,rgba(255,118,172,.16),rgba(116,185,255,.12)); border:1px solid rgba(255,255,255,.15); border-radius:26px; padding:20px; margin-bottom:14px; box-shadow:0 16px 50px rgba(0,0,0,.22); }
-.nour-photo-wrap { position:relative; width:118px; margin:0 auto 10px; text-align:center; }
+.hero {
+  min-height:238px; display:flex; flex-direction:column; justify-content:center;
+  background:
+    radial-gradient(circle at 88% 18%,rgba(255,229,126,.14),transparent 18%),
+    linear-gradient(135deg,rgba(255,118,172,.18),rgba(116,185,255,.13));
+  border:1px solid rgba(255,255,255,.16); border-radius:28px; padding:24px;
+  margin-bottom:14px; box-shadow:0 18px 54px rgba(0,0,0,.24);
+}
+.nour-photo-wrap { position:relative; width:190px; margin:0 auto 12px; text-align:center; }
 .nour-photo-glow {
-  width:118px; height:148px; border-radius:24px; padding:3px;
+  width:190px; height:238px; border-radius:34px; padding:5px;
   background:linear-gradient(145deg,#ff8fc1,#b9a7ff 48%,#7ed6ff);
-  box-shadow:0 10px 28px rgba(126,214,255,.16),0 7px 22px rgba(255,143,193,.14);
+  box-shadow:
+    0 18px 46px rgba(126,214,255,.20),
+    0 12px 34px rgba(255,143,193,.18),
+    inset 0 0 0 1px rgba(255,255,255,.28);
   overflow:hidden;
 }
 .nour-photo-glow img {
   display:block; width:100%; height:100%; object-fit:cover;
-  object-position:center center; border-radius:21px;
+  object-position:center center; border-radius:29px;
   filter:none; image-rendering:auto;
 }
 .nour-photo-wrap::before,
@@ -68,9 +78,10 @@ div[data-testid="stTabs"] button { font-weight:800; }
 @media (max-width:640px){
   .block-container{padding-left:.8rem;padding-right:.8rem;padding-top:.55rem}
   .brand{font-size:1.62rem}.hello{font-size:1.12rem}.stat{min-height:78px;padding:9px}
-  .nour-photo-wrap{width:104px;margin-bottom:8px}
-  .nour-photo-glow{width:104px;height:132px;border-radius:22px}
-  .nour-photo-glow img{border-radius:19px;object-position:center center}
+  .hero{min-height:auto;padding:18px;border-radius:22px}
+  .nour-photo-wrap{width:148px;margin-bottom:10px}
+  .nour-photo-glow{width:148px;height:185px;border-radius:27px;padding:4px}
+  .nour-photo-glow img{border-radius:23px;object-position:center center}
   .nour-photo-badge{font-size:.64rem;padding:4px 9px}
 }
 </style>

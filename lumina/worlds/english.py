@@ -8,6 +8,7 @@ from lumina.curriculum.english_unit2 import UNIT2_LESSONS
 from lumina.curriculum.english_unit3 import UNIT3_LESSONS
 from lumina.curriculum.english_unit4 import UNIT4_LESSONS
 from lumina.curriculum.english_unit5 import UNIT5_LESSONS
+from lumina.curriculum.english_unit6 import UNIT6_LESSONS
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.learning.progress_view import render_learning_brain_summary
 from lumina.session_state import (
@@ -84,6 +85,12 @@ def _render_school_track(ai: GeminiService) -> None:
             "Unit 5 · Design Thinking",
             UNIT5_LESSONS,
             "english_u5_lesson",
+        )
+    elif unit_title == "Why Do We Like Stories?":
+        _render_verified_unit(
+            "Unit 6 · Why Do We Like Stories?",
+            UNIT6_LESSONS,
+            "english_u6_lesson",
         )
 
     st.markdown("---")

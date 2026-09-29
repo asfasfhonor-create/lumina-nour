@@ -1217,6 +1217,8 @@ jobs:
                   + [w.value for w in at.warning]
               )
               assert expected_text in rendered, (button_label, expected_text, rendered[:700])
+              if button_label == "👨‍👧 لوحة وليّ الأمر":
+                  assert "المصادر الدائمة" in rendered, rendered[:1200]
 
               back = next(button for button in at.button if button.label == "← العودة إلى عالم نور")
               back.click()
@@ -1281,6 +1283,8 @@ jobs:
 
           assert "nour-photo-wrap" in home
           assert "nour-photo-glow" in theme
+          assert "width:118px" in theme
+          assert "filter:none" in theme
           assert "object-fit:cover" in theme
           assert '[data-testid="stToolbar"]' in theme
           assert 'toolbarMode = "viewer"' in config

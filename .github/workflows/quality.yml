@@ -994,3 +994,21 @@ jobs:
           assert derive_mastery(truly_varied).state == MASTERED
           print("Review evidence cannot inflate mastery")
           PY
+
+      - name: Validate unresolved mistakes always require review
+        run: |
+          python - <<'PY'
+          from lumina.learning.progress import NEEDS_REVIEW, derive_mastery
+
+          attempts = [
+              {"check_id": "a", "evidence_id": "a", "correct": False},
+              {"check_id": "b", "evidence_id": "b", "correct": True},
+          ]
+          unresolved = [
+              {"check_id": "a", "resolved": False},
+          ]
+          snapshot = derive_mastery(attempts, unresolved)
+          assert snapshot.state == NEEDS_REVIEW
+          assert snapshot.unresolved_mistakes == 1
+          print("Unresolved mistakes correctly keep Needs review")
+          PY

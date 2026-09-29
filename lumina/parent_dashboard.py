@@ -10,6 +10,7 @@ from lumina.persistence.base import PersistenceError
 from lumina.persistence.backup import export_learning_backup, restore_learning_backup
 from lumina.learning.evidence_cache import group_by_lesson
 from lumina.readiness import build_release_readiness, is_release_ready, release_blockers
+from lumina.config import BUILD_LABEL
 from lumina.curriculum.trusted_sources import SourceUpload, build_trusted_record, NEON_OBJECT_STORAGE
 from lumina.curriculum.trusted_source_storage import StorageConfig, NeonTrustedSourceStorage
 from lumina.persistence.trusted_source_catalog import NeonTrustedSourceCatalog
@@ -42,6 +43,7 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
     status = persistence_status()
 
     st.markdown("### حالة النظام")
+    st.caption(f"نسخة التطبيق الحالية: {BUILD_LABEL}")
     if status["durable"]:
         st.success(f"الحفظ الدائم يعمل: {status['label']}")
         if st.button("اختبر اتصال الحفظ السحابي", key="parent_test_persistence"):

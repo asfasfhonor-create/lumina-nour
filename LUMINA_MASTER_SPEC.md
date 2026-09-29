@@ -1,6 +1,6 @@
 # LUMINA / NOUR'S WORLD — MASTER SPECIFICATION
 
-**Status:** Master v1.4 — APPROVED IMPLEMENTATION AUTHORITY  
+**Status:** Master v1.5 — APPROVED IMPLEMENTATION AUTHORITY  
 **Date:** 2026-09-29  
 **Product owner:** Mohamed  
 **Learner:** Nour  
@@ -750,7 +750,7 @@ Backend selection criteria:
 - migration capability;
 - fit with Streamlit deployment.
 
-Supabase remains a candidate, not an automatic decision.
+Neon PostgreSQL is the selected durable persistence backend for LUMINA NOUR. The persistence contract remains provider-independent so this decision does not couple the learning core to Neon.
 
 ---
 
@@ -814,24 +814,24 @@ No merge to production/main is authorized merely by this Master.
 ## 31. Known gaps
 
 Still required:
-- finish durable persistence backend;
+- activate and live-verify the prepared Neon durable persistence backend;
 - complete curriculum indexing for the remaining Arabic/Social/Religion/ICT content and bundled Term 2 Math/Science lessons;
 - page/image-aware retrieval;
-- persistent database;
+- live-verified persistent database connection;
 - deepen subject-specific hubs beyond the verified foundations already present;
 - extend the initial mastery engine with configurable thresholds and richer evidence;
 - extend Mistake Notebook and spaced review beyond the current foundation;
 - adaptive Tutor Profile;
-- Exam Mode;
+- deepen Exam Mode beyond the current source-grounded foundation;
 - full Homework Coach;
 - full English development journey;
 - listening/speaking/pronunciation;
 - deepen AI Lab progression and evidence-based badges;
 - deepen Parent Dashboard analytics;
 - persistent evidence-based gamification;
-- Nour photo integration;
+- final live verification of Nour photo rendering;
 - robust error handling;
-- access protection;
+- final live verification of access protection;
 - full mobile/browser regression testing.
 
 ---
@@ -1093,7 +1093,7 @@ This revision records additional verified implementation progress:
 
 - Nour's real photo is now integrated as a repository asset and shown in the home hero.
 - An optional whole-app PIN gate is implemented in addition to the separate Parent Dashboard protection.
-- A durable persistence schema and backend adapter are prepared for a dedicated LUMINA Supabase project. Existing accounting Supabase projects remain untouched.
+- A durable persistence schema and backend adapter were initially prepared around Supabase during exploration; this historical step was superseded by the later Neon decision. Existing accounting Supabase projects remained untouched.
 - The persistence contract now covers attempts, mistakes, reviews, and learner profile state (XP, streak, badges, English profile, rewarded evidence).
 - Learner profile state can hydrate automatically when a durable backend is configured.
 - A cross-subject Curriculum Search now searches the 144 structured learning blocks and can ask the AI to explain only from the verified mapped evidence, explicitly refusing to invent unsupported details.
@@ -1108,7 +1108,20 @@ Persistence provider decision:
 - LUMINA NOUR will use a dedicated Neon PostgreSQL database as the preferred durable persistence backend.
 - Existing PROJECT LEDGER and PROJECT LEDGER UAT Supabase projects remain untouched.
 - The application uses a backend-independent LearningStore contract; Neon is selected by `NEON_DATABASE_URL`.
-- The previous Supabase adapter is retained only as a legacy development fallback and is not the production recommendation.
+- Obsolete Supabase persistence code has been removed from the LUMINA runtime path; Neon is now the single configured durable backend while the generic LearningStore contract preserves future portability.
 - The Neon schema covers learning attempts, mistakes, reviews, and learner profile state.
 - Portable backup/restore now reads from and writes to the active persistence store, allowing migration between temporary session storage and Neon without losing learning evidence.
 - Production should use Neon's pooled PostgreSQL connection string with SSL enabled.
+
+
+---
+
+## 44. Master v1.5 change note
+
+Persistence implementation consolidation:
+- Neon PostgreSQL is now the single selected production persistence backend for LUMINA NOUR.
+- The canonical runtime adapter is `NeonLearningStore` and the canonical schema is `neon/lumina_schema.sql`.
+- Duplicate/legacy Supabase persistence runtime files and duplicate PostgreSQL adapter/schema paths were removed to avoid configuration ambiguity.
+- Runtime selection uses `NEON_DATABASE_URL` + `NOUR_LEARNER_KEY`; when they are absent, the app safely falls back to session-only prototype storage.
+- The Neon connection must remain server-side and use SSL; hosted production should prefer the Neon pooled connection string.
+- Activation still requires a dedicated Neon account/project connection and applying the prepared schema before the production merge.

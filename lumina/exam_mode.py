@@ -4,6 +4,7 @@ import streamlit as st
 
 from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS
 from lumina.persistence.session_store import get_learning_store
+from lumina.learning.rewards import apply_success_reward
 
 
 def _pick_checks(lessons, limit: int = 5):
@@ -89,6 +90,12 @@ def render_exam_mode() -> None:
             if correct:
                 store.resolve_mistake(lesson.id, check.id)
                 store.complete_review(lesson.id, check.id)
+                apply_success_reward(
+                    module_id=subject_id,
+                    lesson_id=lesson.id,
+                    evidence_id=f"exam:{check.id}",
+                    activity_type="exam",
+                )
             else:
                 store.record_mistake(
                     {

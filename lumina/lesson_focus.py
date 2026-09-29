@@ -13,5 +13,5 @@ def render_lesson_focus() -> None:
         st.warning("تعذر فتح الدرس المحدد.")
         return
 
-    st.markdown('<div class="section-title">🎯 Focus Lesson</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🎯 الدرس المختار</div>', unsafe_allow_html=True)
     render_verified_lesson(lesson, module_id=module_id)

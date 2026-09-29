@@ -1,7 +1,7 @@
 import streamlit as st
 
 from lumina.ai_service import GeminiService
-from lumina.curriculum.catalog import SCIENCE_T1
+from lumina.curriculum.catalog import SCIENCE_T1, SCIENCE_T2
 from lumina.curriculum.science_unit1 import SCIENCE_UNIT1_LESSONS
 from lumina.curriculum.science_unit2 import SCIENCE_UNIT2_LESSONS
 from lumina.curriculum.science_unit3 import SCIENCE_UNIT3_LESSONS
@@ -17,36 +17,41 @@ def render_science_world(ai: GeminiService) -> None:
         unsafe_allow_html=True,
     )
 
-    source = SCIENCE_T1
-    st.caption(f"Trusted source: {source.display_name}")
+    source = st.selectbox(
+        "Choose term",
+        [SCIENCE_T1, SCIENCE_T2],
+        format_func=lambda item: item.term,
+        key="school_science_term",
+    )
+    st.caption(f"Trusted source: {source.display_name} · {source.term}")
     unit_title = st.selectbox(
         "Choose unit",
         [unit.title for unit in source.units],
-        key="school_science_unit",
+        key=f"school_science_unit_{source.id}",
     )
 
-    if unit_title == "Force and Motion":
+    if source.id == "science_prep3_t1" and unit_title == "Force and Motion":
         render_verified_unit(
             "Unit 1 · Force and Motion",
             SCIENCE_UNIT1_LESSONS,
             "science_u1_lesson",
             module_id="science",
         )
-    elif unit_title == "Light Energy (Mirrors and Lenses)":
+    elif source.id == "science_prep3_t1" and unit_title == "Light Energy (Mirrors and Lenses)":
         render_verified_unit(
             "Unit 2 · Light Energy (Mirrors and Lenses)",
             SCIENCE_UNIT2_LESSONS,
             "science_u2_lesson",
             module_id="science",
         )
-    elif unit_title == "The Universe and the Solar System":
+    elif source.id == "science_prep3_t1" and unit_title == "The Universe and the Solar System":
         render_verified_unit(
             "Unit 3 · The Universe and the Solar System",
             SCIENCE_UNIT3_LESSONS,
             "science_u3_lesson",
             module_id="science",
         )
-    elif unit_title == "Reproduction and Species Continuity":
+    elif source.id == "science_prep3_t1" and unit_title == "Reproduction and Species Continuity":
         render_verified_unit(
             "Unit 4 · Reproduction and Species Continuity",
             SCIENCE_UNIT4_LESSONS,
@@ -54,4 +59,7 @@ def render_science_world(ai: GeminiService) -> None:
             module_id="science",
         )
     else:
-        st.info("This unit is inventoried and will be converted into verified lesson data next.")
+        st.info(
+            "This unit is inventoried from the trusted source. "
+            "Its verified lesson data will be connected progressively without inventing content."
+        )

@@ -8,6 +8,8 @@ class LessonCheck:
     prompt: str
     expected_points: Tuple[str, ...]
     hint: str
+    options: Tuple[str, ...] = field(default_factory=tuple)
+    correct_index: int | None = None
 
 
 @dataclass(frozen=True)

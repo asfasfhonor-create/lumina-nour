@@ -1,5 +1,7 @@
 import streamlit as st
 
+from lumina.context_help import render_context_help
+
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import RELIGION_T1
 from lumina.curriculum.religion_unit1 import RELIGION_U1_LESSONS
@@ -11,6 +13,7 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 def render_religion_world(ai: GeminiService) -> None:
     st.markdown('<div class="section-title">🕌 Religion Journey</div>', unsafe_allow_html=True)
+    render_context_help("religion", label="💬 قوليلي العالم ده بيعمل إيه")
     st.markdown(
         '<div class="mission"><b>فهم + قيمة + تطبيق.</b><br>'
         '<span class="muted">نحافظ على نص ومقاصد كتاب التربية الدينية، ونربط الفهم بالسلوك اليومي.</span></div>',

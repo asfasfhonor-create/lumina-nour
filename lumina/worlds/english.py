@@ -1,6 +1,8 @@
 import streamlit as st
 
 from lumina.ai_service import GeminiService
+from lumina.curriculum.catalog import ENGLISH_T1
+from lumina.curriculum.grounding import build_grounded_pdf, curriculum_prompt
 
 
 def render_english_world(ai: GeminiService) -> None:
@@ -14,20 +16,67 @@ def render_english_world(ai: GeminiService) -> None:
     school_tab, real_tab = st.tabs(["📘 School English", "🚀 Real English"])
 
     with school_tab:
-        _render_school_track()
+        _render_school_track(ai)
 
     with real_tab:
         _render_real_english(ai)
 
 
-def _render_school_track() -> None:
+def _render_school_track(ai: GeminiService) -> None:
+    source = ENGLISH_T1
     st.markdown(
-        '<div class="track-card"><b>School English</b><br>'
-        '<span class="muted">This track will be connected to Nour\'s indexed curriculum source before it is allowed to answer curriculum questions. '
-        'We will not pretend generic AI knowledge is the school book.</span></div>',
+        '<div class="track-card"><b>School English · Curriculum Grounded</b><br>'
+        '<span class="muted">The school track uses the trusted curriculum source and refuses to invent missing curriculum content.</span></div>',
         unsafe_allow_html=True,
     )
-    st.info("Curriculum-grounded School English is waiting for the curriculum retrieval layer. The source book is already inventoried.")
+
+    st.caption(f"Trusted source: {source.display_name}")
+    unit_title = st.selectbox(
+        "Choose unit / review",
+        [unit.title for unit in source.units],
+        key="school_english_unit",
+    )
+
+    st.markdown("**Source map**")
+    for unit in source.units:
+        prefix = "→" if unit.title == unit_title else "•"
+        st.write(f"{prefix} {unit.title}")
+
+    uploaded = st.file_uploader(
+        "Load the trusted school English book for this session",
+        type=["pdf"],
+        key="school_english_source_pdf",
+        help=(
+            "This is temporary until the permanent curriculum storage/retrieval layer is connected. "
+            f"Expected source: {source.filename}"
+        ),
+    )
+
+    if not uploaded:
+        st.info(
+            "The curriculum map is loaded, but the app runtime does not yet have permanent access "
+            "to the trusted PDF bytes. Upload the trusted book here for a grounded session, or use "
+            "Real English without the school source."
+        )
+        return
+
+    if uploaded.name != source.filename:
+        st.warning(
+            "The filename is different from the inventoried trusted source. "
+            "LUMINA will treat it as temporary material and will not silently promote it to the trusted curriculum library."
+        )
+
+    grounded = build_grounded_pdf(source, uploaded.read())
+    question = st.text_input(
+        "Ask about this unit",
+        key="school_english_question",
+        placeholder="Explain the main idea, vocabulary, grammar, or give me a short practice...",
+    )
+
+    if st.button("Teach me from the book", key="school_english_teach") and question and _need_ai(ai):
+        prompt = curriculum_prompt(source, question, unit_title=unit_title)
+        with st.spinner("Reading the trusted school source..."):
+            st.markdown(ai.generate([grounded.part, prompt]))
 
 
 def _render_real_english(ai: GeminiService) -> None:

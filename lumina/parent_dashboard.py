@@ -169,10 +169,10 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
         f"started: {total_started} · progress is based on evidence, not button clicks."
     )
 
-    _render_backup_tools()
+    _render_backup_tools(store)
 
 
-def _render_backup_tools() -> None:
+def _render_backup_tools(store) -> None:
     st.markdown("### Backup / Restore")
     st.caption(
         "Portable safety copy. When Neon is active, the database remains the primary source of truth. "
@@ -181,7 +181,7 @@ def _render_backup_tools() -> None:
 
     st.download_button(
         "Download learning backup",
-        data=export_learning_backup(),
+        data=export_learning_backup(store),
         file_name="lumina_nour_learning_backup.json",
         mime="application/json",
         key="download_learning_backup",
@@ -193,7 +193,7 @@ def _render_backup_tools() -> None:
         key="restore_learning_backup_file",
     )
     if uploaded and st.button("Restore this backup", key="restore_learning_backup_button"):
-        ok, message = restore_learning_backup(uploaded.getvalue().decode("utf-8"))
+        ok, message = restore_learning_backup(uploaded.getvalue().decode("utf-8"), store)
         if ok:
             st.success(message)
             st.rerun()

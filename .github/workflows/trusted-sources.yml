@@ -21,7 +21,16 @@ jobs:
       - name: Validate trusted-source model
         run: |
           python - <<'PY'
-          from lumina.curriculum.trusted_sources import SourceUpload, TRUSTED, build_trusted_record, NEON_OBJECT_STORAGE, TRUSTED_SOURCE_BUCKET
+          from lumina.curriculum.trusted_sources import (
+    SourceUpload,
+    TRUSTED,
+    build_trusted_record,
+    NEON_OBJECT_STORAGE,
+    TRUSTED_SOURCE_BUCKET,
+    SOURCE_ROLE_OFFICIAL,
+    SOURCE_ROLE_SUPPLEMENTARY,
+    source_role_priority,
+)
 
           upload = SourceUpload(
               filename="../Science.pdf",
@@ -41,8 +50,16 @@ jobs:
               term_label="T1",
               storage_provider="test-provider",
               storage_key="sources/science.pdf",
+              source_role=SOURCE_ROLE_SUPPLEMENTARY,
+              publisher="El Moasser",
+              edition_label="2026",
           )
           assert record.trust_status == TRUSTED
+          assert record.source_role == SOURCE_ROLE_SUPPLEMENTARY
+          assert record.priority == source_role_priority(SOURCE_ROLE_SUPPLEMENTARY)
+          assert record.metadata["publisher"] == "El Moasser"
+          assert record.metadata["edition_label"] == "2026"
+          assert source_role_priority(SOURCE_ROLE_OFFICIAL) > record.priority
           assert record.source_id.startswith("src_")
           assert record.sha256 == upload.digest
           assert record.size_bytes == len(upload.data)
@@ -103,4 +120,20 @@ jobs:
 
           assert StorageConfig.from_mapping({}) is None
           print("Trusted source storage adapter OK")
+          PY
+
+      - name: Validate curriculum source hierarchy
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.catalog import get_sources
+          from lumina.curriculum.models import SOURCE_ROLE_OFFICIAL, SOURCE_ROLE_SUPPLIED
+
+          science = get_sources("science")
+          math = get_sources("math")
+          ict = get_sources("ict")
+          assert science and all(source.source_role == SOURCE_ROLE_OFFICIAL for source in science)
+          assert math and all(source.source_role == SOURCE_ROLE_OFFICIAL for source in math)
+          assert ict and ict[0].source_role == SOURCE_ROLE_SUPPLIED
+          assert science[0].priority > ict[0].priority
+          print("Curriculum source hierarchy OK")
           PY

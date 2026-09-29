@@ -1,5 +1,7 @@
 import streamlit as st
 
+from lumina.context_help import render_context_help
+
 from lumina.curriculum.mapped_curriculum import SUBJECT_LABELS
 from lumina.curriculum.search import lesson_by_id
 from lumina.learning.rewards import apply_success_reward
@@ -16,6 +18,7 @@ def render_review_center() -> None:
     reviews = store.get_reviews("due")
 
     st.markdown('<div class="section-title">📝 Mistake Notebook & Review</div>', unsafe_allow_html=True)
+    render_context_help("review_center")
     st.markdown(
         '<div class="mission"><b>الغلط هنا معلومة مفيدة، مش عقوبة.</b><br>'
         '<span class="muted">بنرجع للحاجات اللي محتاجة مراجعة ونقفلها لما يظهر فهم جديد.</span></div>',

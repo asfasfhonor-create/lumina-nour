@@ -48,14 +48,17 @@ def persist_profile_state() -> None:
 
 
 def verify_persistence_after_hydration() -> None:
-    """Verify durable storage once per session after profile hydration succeeds."""
+    """Verify durable storage at most once per session after profile hydration."""
     if st.session_state.get("persistence_verified", False):
+        return
+    if st.session_state.get("persistence_verification_attempted", False):
         return
 
     status = persistence_status()
     if not status.get("durable"):
         return
 
+    st.session_state.persistence_verification_attempted = True
     store = get_learning_store()
     try:
         st.session_state.persistence_verified = bool(store.health_check())

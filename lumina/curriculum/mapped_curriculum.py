@@ -4,6 +4,7 @@ from lumina.curriculum.arabic_unit1 import ARABIC_U1_LESSONS
 from lumina.curriculum.arabic_unit2 import ARABIC_U2_LESSONS
 from lumina.curriculum.arabic_unit3 import ARABIC_U3_LESSONS
 from lumina.curriculum.english_curriculum import ENGLISH_UNIT_LESSONS
+from lumina.curriculum.english_reviews import REVIEW1, REVIEW2
 from lumina.curriculum.ict_chapter1 import ICT_CHAPTER1_LESSONS
 from lumina.curriculum.ict_chapter2 import ICT_CHAPTER2_LESSONS
 from lumina.curriculum.ict_chapter3 import ICT_CHAPTER3_LESSONS
@@ -39,8 +40,14 @@ MAPPED_CURRICULUM = OrderedDict(
         (
             "english",
             OrderedDict(
-                (f"Term 1 · {title}", lessons)
-                for title, lessons in ENGLISH_UNIT_LESSONS.items()
+                list(
+                    (f"Term 1 · {title}", lessons)
+                    for title, lessons in ENGLISH_UNIT_LESSONS.items()
+                )
+                + [
+                    ("Term 1 · Review 1", (REVIEW1,)),
+                    ("Term 1 · Review 2", (REVIEW2,)),
+                ]
             ),
         ),
         (

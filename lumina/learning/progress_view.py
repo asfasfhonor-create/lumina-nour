@@ -9,6 +9,7 @@ from lumina.learning.progress import (
     mastery_label,
 )
 from lumina.persistence.session_store import get_learning_store
+from lumina.learning.evidence_cache import group_by_lesson
 
 
 def render_learning_brain_summary(lesson_ids: list[str] | None = None) -> None:
@@ -17,6 +18,8 @@ def render_learning_brain_summary(lesson_ids: list[str] | None = None) -> None:
     attempts = store.get_attempts()
     mistakes = store.get_mistakes(unresolved_only=True)
     due_reviews = store.get_reviews("due")
+    attempts_by_lesson = group_by_lesson(attempts)
+    mistakes_by_lesson = group_by_lesson(mistakes)
 
     st.markdown('<div class="section-title">🧠 Learning Brain</div>', unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
@@ -30,8 +33,8 @@ def render_learning_brain_summary(lesson_ids: list[str] | None = None) -> None:
     if lesson_ids:
         states = []
         for lesson_id in lesson_ids:
-            lesson_attempts = [a for a in attempts if a.get("lesson_id") == lesson_id]
-            lesson_mistakes = [m for m in store.get_mistakes(lesson_id) if not m.get("resolved", False)]
+            lesson_attempts = attempts_by_lesson.get(lesson_id, [])
+            lesson_mistakes = mistakes_by_lesson.get(lesson_id, [])
             states.append(derive_mastery(lesson_attempts, lesson_mistakes).state)
 
         counts = {

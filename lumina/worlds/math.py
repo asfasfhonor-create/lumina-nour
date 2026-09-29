@@ -19,23 +19,23 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_math_world(ai: GeminiService) -> None:
-    st.markdown('<div class="section-title">➗ Math Quest</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">➗ تحدّي الرياضيات · Math Quest</div>', unsafe_allow_html=True)
     render_context_help("math", label="💬 قوليلي العالم ده بيعمل إيه")
     st.markdown(
-        '<div class="mission"><b>Understand the pattern before using the rule.</b><br>'
-        '<span class="muted">Math Quest follows Nour\'s supplied curriculum and keeps notation and reasoning visible.</span></div>',
+        '<div class="mission"><b>افهمي الفكرة الأول، وبعدها استخدمي القاعدة.</b><br>'
+        '<span class="muted">بنمشي مع منهج نور، ونوضح خطوات التفكير والرموز الرياضية من غير قفزات.</span></div>',
         unsafe_allow_html=True,
     )
 
     source = st.selectbox(
-        "Choose term",
+        "اختاري الترم",
         [MATH_T1, MATH_T2],
         format_func=lambda item: item.term,
         key="school_math_term",
     )
-    st.caption(f"Trusted source: {source.display_name} · {source.term}")
+    st.caption(f"المصدر: {source.display_name} · {source.term}")
     unit_title = st.selectbox(
-        "Choose unit",
+        "اختاري الوحدة",
         [unit.title for unit in source.units],
         key=f"school_math_unit_{source.id}",
     )
@@ -112,8 +112,8 @@ def render_math_world(ai: GeminiService) -> None:
         )
     else:
         st.info(
-            "This unit is inventoried from the trusted source. "
-            "Its verified lesson data will be connected progressively without inventing content."
+            "الوحدة موجودة في المصدر المعتمد، "
+            "وسيتم ربط دروسها الموثقة تدريجيًا بدون إضافة محتوى غير موجود."
         )
 
     render_temporary_source_session(

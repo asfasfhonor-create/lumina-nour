@@ -11,7 +11,7 @@ from lumina.learning.progress import LEARNING, MASTERED, NEEDS_REVIEW, NOT_START
 from lumina.learning.evidence_cache import group_by_lesson
 
 
-def _pick_checks(lessons, store, limit: int = 5):
+def _pick_checks(lessons, store, limit: int = 5, max_difficulty: int = 1):
     """Build a source-grounded adaptive exam set without inventing questions.
 
     Priority is weak/in-progress learning first, then unseen material, then
@@ -40,13 +40,21 @@ def _pick_checks(lessons, store, limit: int = 5):
 
     picked = []
     for _, _, lesson in ranked:
-        if lesson.checks:
-            picked.append((lesson, lesson.checks[0]))
+        eligible = [
+            check for check in lesson.checks
+            if int(getattr(check, "difficulty", 1)) <= max_difficulty
+        ]
+        if eligible:
+            picked.append((lesson, eligible[0]))
             if len(picked) >= limit:
                 return picked
 
     for _, _, lesson in ranked:
-        for check in lesson.checks[1:]:
+        eligible = [
+            check for check in lesson.checks
+            if int(getattr(check, "difficulty", 1)) <= max_difficulty
+        ]
+        for check in eligible[1:]:
             picked.append((lesson, check))
             if len(picked) >= limit:
                 return picked
@@ -58,9 +66,9 @@ def render_exam_mode() -> None:
     st.markdown('<div class="section-title">🧪 وضع الاختبار</div>', unsafe_allow_html=True)
     render_context_help("exam_mode")
     st.markdown(
-        '<div class="mission"><b>اختبار من المحتوى الموثق فقط.</b><br>'
-        '<span class="muted">الأسئلة هنا تأتي من خرائط الدروس المأخوذة من المصادر، '
-        'والنتيجة تساعد البرنامج يفهم نقاط القوة والحاجات اللي محتاجة مراجعة.</span></div>',
+        '<div class="mission"><b>تدريب من المحتوى الموثق فقط.</b><br>'
+        '<span class="muted">ابدئي بهدوء، وزوّدي المستوى فقط لما تكوني جاهزة. '
+        'الغلط هنا بيساعد LUMINA يعرف يشرح إيه بطريقة أبسط.</span></div>',
         unsafe_allow_html=True,
     )
 
@@ -77,8 +85,31 @@ def render_exam_mode() -> None:
         key="exam_unit",
     )
     lessons = units[unit_title]
+    practice_mode = st.radio(
+        "اختاري شكل التدريب",
+        [
+            "مراجعة هادية · 3 أسئلة",
+            "تدريب متدرج · 5 أسئلة",
+            "تحدّي اختياري · 5 أسئلة",
+        ],
+        index=0,
+        key="exam_practice_mode",
+        help="ابدئي بالمراجعة الهادية. مفيش داعي للتحدّي إلا لما تحسي إنك جاهزة.",
+    )
+    mode_config = {
+        "مراجعة هادية · 3 أسئلة": (3, 1),
+        "تدريب متدرج · 5 أسئلة": (5, 2),
+        "تحدّي اختياري · 5 أسئلة": (5, 3),
+    }
+    limit, max_difficulty = mode_config[practice_mode]
+
     store = get_learning_store()
-    checks = _pick_checks(lessons, store, limit=5)
+    checks = _pick_checks(
+        lessons,
+        store,
+        limit=limit,
+        max_difficulty=max_difficulty,
+    )
 
     if not checks:
         st.info("لا توجد أسئلة موثقة لهذا الجزء حتى الآن.")
@@ -100,7 +131,7 @@ def render_exam_mode() -> None:
         if choice is not None:
             answers[f"{lesson.id}:{check.id}"] = list(check.options).index(choice)
 
-    if st.button("سلّمي الاختبار", key=f"exam_submit_{subject_id}_{unit_title}"):
+    if st.button("شوفي نتيجتي", key=f"exam_submit_{subject_id}_{unit_title}"):
         if len(answers) != len(checks):
             st.warning("جاوبي على كل الأسئلة الأول.")
             return

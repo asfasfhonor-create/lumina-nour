@@ -19,7 +19,7 @@ def render_temporary_source_session(
     st.markdown("---")
     st.caption("📎 اسألي من كتاب أو مذكرة في الجلسة الحالية")
     uploaded = st.file_uploader(
-        "حمّلي نسخة الكتاب الموثوق لهذه الجلسة",
+        "حمّلي الكتاب أو المذكرة لهذه الجلسة",
         type=["pdf"],
         key=f"{key_prefix}_trusted_source_pdf",
         help=(
@@ -32,8 +32,8 @@ def render_temporary_source_session(
 
     if uploaded.name != source.filename:
         st.warning(
-            "اسم الملف مختلف عن المصدر الموثق المسجل. "
-            "سيُعامل كملف مؤقت ولن يُضاف تلقائيًا للمكتبة الموثوقة."
+            "اسم الملف مختلف عن المصدر المسجل. "
+            "هنستخدمه في الجلسة الحالية فقط، ومش هيتحفظ تلقائيًا كمصدر دائم."
         )
 
     question = st.text_input(
@@ -59,5 +59,5 @@ def render_temporary_source_session(
             st.markdown(ai.generate([grounded.part, prompt]))
         st.caption(
             f"المصدر المستخدم الآن: {source.display_name} · "
-            "لا يتم حفظ الملف أو اعتباره مصدرًا دائمًا تلقائيًا."
+            "الملف يُستخدم في الجلسة الحالية فقط ولا يُحفظ تلقائيًا كمصدر دائم."
         )

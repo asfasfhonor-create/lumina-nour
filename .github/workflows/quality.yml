@@ -17,4 +17,15 @@ jobs:
         with:
           python-version: "3.11"
       - name: Compile Python
-        run: python -m py_compile app.py lumina/__init__.py lumina/module_registry.py
+        run: python -m compileall -q app.py lumina
+      - name: Validate module registry
+        run: |
+          python - <<'PY'
+          from lumina.module_registry import get_module, get_school_subjects
+
+          subjects = get_school_subjects()
+          assert len(subjects) == 7
+          assert get_module("ai") is not None
+          assert len({module.id for module in subjects}) == len(subjects)
+          print("Module registry OK")
+          PY

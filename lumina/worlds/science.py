@@ -1,5 +1,7 @@
 import streamlit as st
 
+from lumina.context_help import render_context_help
+
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import SCIENCE_T1, SCIENCE_T2
 from lumina.curriculum.science_unit1 import SCIENCE_UNIT1_LESSONS
@@ -15,6 +17,7 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 def render_science_world(ai: GeminiService) -> None:
     st.markdown('<div class="section-title">🔬 Science Lab</div>', unsafe_allow_html=True)
+    render_context_help("science", label="💬 قوليلي العالم ده بيعمل إيه")
     st.markdown(
         '<div class="mission"><b>Observe → Understand → Predict → Apply</b><br>'
         '<span class="muted">Science is built from Nour\'s supplied curriculum source, with reasoning before memorization.</span></div>',

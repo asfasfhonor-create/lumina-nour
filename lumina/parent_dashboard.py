@@ -367,9 +367,10 @@ def _render_trusted_sources() -> None:
     )
 
     if uploaded_files:
-        st.caption(
-            f"تم اختيار **{len(uploaded_files)}** ملف. "
-            "LUMINA هيصنّف كتب المعاصر المعروفة تلقائيًا، وتقدر تحفظهم كلهم بضغطة واحدة."
+        st.info(
+            f"تم اختيار **{len(uploaded_files)}** ملف للرفع فقط — "
+            "لسه ما اتحفظوش في المصادر الدائمة. "
+            "بعد اكتمال التحميل اضغط زر «اعتماد وحفظ كل الملفات»."
         )
 
         batch_profiles = []
@@ -429,7 +430,10 @@ def _render_trusted_sources() -> None:
                     failed.append(f"{uploaded.name}: تعذر الحفظ")
 
             if created_count:
-                st.success(f"تم حفظ واعتماد {created_count} مصدر بشكل دائم ✅")
+                st.success(
+                    f"تم حفظ واعتماد {created_count} مصدر بشكل دائم ✅ "
+                    "دلوقتي الملفات موجودة في مكتبة LUMINA الدائمة."
+                )
             if duplicate_count:
                 st.info(f"{duplicate_count} ملف كان محفوظ بالفعل وتم منع التكرار.")
             if failed:
@@ -444,6 +448,7 @@ def _render_trusted_sources() -> None:
         return
 
     if sources:
+        st.success(f"المصادر المحفوظة والمعتمدة حاليًا: {len(sources)}")
         st.markdown("#### المصادر المعتمدة حاليًا")
         for source in sources:
             with st.container(border=True):

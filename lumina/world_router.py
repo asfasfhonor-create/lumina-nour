@@ -14,6 +14,7 @@ from lumina.exam_mode import render_exam_mode
 from lumina.daily_mission import render_daily_mission_world
 from lumina.weekly_plan import render_weekly_plan
 from lumina.curriculum_search import render_curriculum_search
+from lumina.lesson_focus import render_lesson_focus
 from lumina.parent_dashboard import render_parent_dashboard
 
 
@@ -61,6 +62,10 @@ def render_active_world(ai: GeminiService, parent_pin: str | None = None) -> boo
 
     if module_id == "curriculum_search":
         render_curriculum_search(ai)
+        return True
+
+    if module_id == "lesson_focus":
+        render_lesson_focus()
         return True
 
     renderer = WORLD_RENDERERS.get(module_id)

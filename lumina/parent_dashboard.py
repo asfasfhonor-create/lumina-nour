@@ -6,6 +6,7 @@ from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABEL
 from lumina.curriculum.coverage import SOURCE_COVERAGE
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.persistence.session_store import get_learning_store, persistence_status
+from lumina.persistence.base import PersistenceError
 from lumina.persistence.backup import export_learning_backup, restore_learning_backup
 from lumina.learning.evidence_cache import group_by_lesson
 
@@ -46,7 +47,7 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
                     st.success("اتصال قاعدة البيانات يعمل الآن.")
                 else:
                     st.warning("اختبار الاتصال لم ينجح.")
-            except Exception as exc:
+            except PersistenceError as exc:
                 st.error(str(exc))
     elif status["mode"] == "session_fallback":
         st.warning("Cloud persistence is unavailable in this session. Download a backup before closing.")

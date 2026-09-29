@@ -3,6 +3,8 @@ import streamlit as st
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import ENGLISH_T1
 from lumina.curriculum.grounding import build_grounded_pdf, curriculum_prompt
+from lumina.curriculum.english_unit1 import ENGLISH_U1_L1
+from lumina.session_state import get_learning_attempts, record_learning_attempt
 
 
 def render_english_world(ai: GeminiService) -> None:
@@ -42,41 +44,39 @@ def _render_school_track(ai: GeminiService) -> None:
         prefix = "→" if unit.title == unit_title else "•"
         st.write(f"{prefix} {unit.title}")
 
+    if unit_title == "Personal Identity":
+        _render_verified_personal_identity_lesson()
+
+    st.markdown("---")
+    st.caption("Advanced source session")
     uploaded = st.file_uploader(
         "Load the trusted school English book for this session",
         type=["pdf"],
         key="school_english_source_pdf",
         help=(
-            "This is temporary until the permanent curriculum storage/retrieval layer is connected. "
+            "Optional advanced source session until permanent document storage is connected. "
             f"Expected source: {source.filename}"
         ),
     )
 
-    if not uploaded:
-        st.info(
-            "The curriculum map is loaded, but the app runtime does not yet have permanent access "
-            "to the trusted PDF bytes. Upload the trusted book here for a grounded session, or use "
-            "Real English without the school source."
+    if uploaded:
+        if uploaded.name != source.filename:
+            st.warning(
+                "The filename is different from the inventoried trusted source. "
+                "LUMINA will treat it as temporary material and will not silently promote it to the trusted curriculum library."
+            )
+
+        grounded = build_grounded_pdf(source, uploaded.read())
+        question = st.text_input(
+            "Ask anything from the loaded book",
+            key="school_english_question",
+            placeholder="Explain the main idea, vocabulary, grammar, or give me a short practice...",
         )
-        return
 
-    if uploaded.name != source.filename:
-        st.warning(
-            "The filename is different from the inventoried trusted source. "
-            "LUMINA will treat it as temporary material and will not silently promote it to the trusted curriculum library."
-        )
-
-    grounded = build_grounded_pdf(source, uploaded.read())
-    question = st.text_input(
-        "Ask about this unit",
-        key="school_english_question",
-        placeholder="Explain the main idea, vocabulary, grammar, or give me a short practice...",
-    )
-
-    if st.button("Teach me from the book", key="school_english_teach") and question and _need_ai(ai):
-        prompt = curriculum_prompt(source, question, unit_title=unit_title)
-        with st.spinner("Reading the trusted school source..."):
-            st.markdown(ai.generate([grounded.part, prompt]))
+        if st.button("Teach me from the book", key="school_english_teach") and question and _need_ai(ai):
+            prompt = curriculum_prompt(source, question, unit_title=unit_title)
+            with st.spinner("Reading the trusted school source..."):
+                st.markdown(ai.generate([grounded.part, prompt]))
 
 
 def _render_real_english(ai: GeminiService) -> None:
@@ -181,3 +181,53 @@ Include exactly:
 - brief Arabic support only for difficult meaning.
 Keep it concise and practical."""
         st.markdown(ai.generate(prompt))
+
+
+def _render_verified_personal_identity_lesson() -> None:
+    lesson = ENGLISH_U1_L1
+    st.markdown(f"### Lesson 1 · {lesson.title}")
+    st.caption(f"Verified curriculum extract · {lesson.source_pages}")
+
+    with st.expander("What you will learn", expanded=True):
+        for objective in lesson.objectives:
+            st.write(f"• {objective}")
+
+    st.markdown("**Key words**")
+    st.write(" · ".join(lesson.key_terms))
+
+    st.markdown("**Core idea from the lesson**")
+    for point in lesson.evidence_summary:
+        st.write(f"• {point}")
+
+    check = lesson.checks[0]
+    st.markdown("#### Quick understanding check")
+    answer = st.radio(
+        check.prompt,
+        list(check.options),
+        index=None,
+        key=f"lesson_check_{lesson.id}_{check.id}",
+    )
+
+    if st.button("Check my thinking", key=f"lesson_check_button_{lesson.id}_{check.id}") and answer:
+        selected_index = list(check.options).index(answer)
+        correct = selected_index == check.correct_index
+        record_learning_attempt(
+            {
+                "lesson_id": lesson.id,
+                "check_id": check.id,
+                "answer": answer,
+                "correct": correct,
+                "source_pages": lesson.source_pages,
+            }
+        )
+        if correct:
+            st.success("Good thinking — this matches the lesson's main idea.")
+            st.info("This counts as learning evidence, not full mastery yet. We'll need more than one successful check before marking the concept mastered.")
+        else:
+            st.warning("Not yet. Try the hint, then answer again.")
+            st.info(f"Hint: {check.hint}")
+
+    attempts = get_learning_attempts(lesson.id)
+    if attempts:
+        correct_count = sum(1 for attempt in attempts if attempt.get("correct"))
+        st.caption(f"Session evidence: {correct_count} successful check(s) from {len(attempts)} attempt(s).")

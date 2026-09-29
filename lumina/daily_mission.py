@@ -31,12 +31,12 @@ def render_daily_mission_world() -> None:
         reason = mission.reason
     else:
         module_id = get_module_for_lesson_id(lesson.id)
-        reason = "Continue today's selected mission"
+        reason = "كمّلي مهمة اليوم من المكان اللي وقفتي عنده"
 
     if lesson is None or module_id is None:
         st.warning("تعذر تحديد مهمة اليوم. ارجعي للصفحة الرئيسية وجربي مرة أخرى.")
         return
 
     st.markdown('<div class="section-title">🎯 مهمة اليوم</div>', unsafe_allow_html=True)
-    st.caption(f"{reason} · {lesson.source_pages}")
+    st.caption(f"{reason} · المصدر: {lesson.source_pages}")
     render_verified_lesson(lesson, module_id=module_id)

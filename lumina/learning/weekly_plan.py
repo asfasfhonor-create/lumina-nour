@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 
 from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS
 from lumina.learning.progress import NOT_STARTED, derive_mastery
@@ -61,8 +62,12 @@ def build_weekly_plan(store, limit: int = 5) -> tuple[WeeklyPlanItem, ...]:
                     queue.append(lesson)
         subject_queues[module_id] = queue
 
+    subject_ids = list(MAPPED_CURRICULUM)
+    rotation = date.today().isocalendar().week % len(subject_ids)
+    subject_ids = subject_ids[rotation:] + subject_ids[:rotation]
+
     while len(items) < limit and any(subject_queues.values()):
-        for module_id in MAPPED_CURRICULUM:
+        for module_id in subject_ids:
             queue = subject_queues.get(module_id, [])
             if not queue:
                 continue

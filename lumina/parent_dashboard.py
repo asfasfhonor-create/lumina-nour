@@ -216,6 +216,17 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
         )
         if profile.get("support_note"):
             st.caption(profile["support_note"])
+
+        skill_scores = profile.get("skill_scores") or {}
+        if skill_scores:
+            st.markdown("**تفصيل المهارات المبدئي**")
+            for skill, values in skill_scores.items():
+                correct_count = int(values.get("correct", 0))
+                total_count = int(values.get("total", 0))
+                st.write(f"• **{skill}** — {correct_count}/{total_count}")
+            st.caption(
+                "دي صورة مبدئية فقط، وهتتطور مع أدلة من القراءة والكتابة والمحادثة والتدريبات الفعلية."
+            )
     else:
         st.caption("لسه ما اتعملش اختبار تحديد المستوى لـ Real English.")
 

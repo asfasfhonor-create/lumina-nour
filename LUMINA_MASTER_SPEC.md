@@ -1,6 +1,6 @@
 # LUMINA / NOUR'S WORLD — MASTER SPECIFICATION
 
-**Status:** Master v1.2 — APPROVED IMPLEMENTATION AUTHORITY  
+**Status:** Master v1.3 — APPROVED IMPLEMENTATION AUTHORITY  
 **Date:** 2026-09-29  
 **Product owner:** Mohamed  
 **Learner:** Nour  
@@ -1083,3 +1083,18 @@ Verified development-branch state:
 - The persistence contract remains backend-independent; current session storage/manual backup is a temporary adapter, not the final durable database.
 
 Outstanding high-priority work remains durable persistence, fine-grained source retrieval for arbitrary curriculum questions, live/mobile regression testing, real-photo asset integration, deeper adaptive mastery, and source-backed coverage for any school terms not yet supplied.
+
+
+---
+
+## 42. Master v1.3 change note
+
+This revision records additional verified implementation progress:
+
+- Nour's real photo is now integrated as a repository asset and shown in the home hero.
+- An optional whole-app PIN gate is implemented in addition to the separate Parent Dashboard protection.
+- A durable persistence schema and backend adapter are prepared for a dedicated LUMINA Supabase project. Existing accounting Supabase projects remain untouched.
+- The persistence contract now covers attempts, mistakes, reviews, and learner profile state (XP, streak, badges, English profile, rewarded evidence).
+- Learner profile state can hydrate automatically when a durable backend is configured.
+- A cross-subject Curriculum Search now searches the 144 structured learning blocks and can ask the AI to explain only from the verified mapped evidence, explicitly refusing to invent unsupported details.
+- Durable persistence activation still requires a dedicated LUMINA backend/project and server-side secrets before production release.

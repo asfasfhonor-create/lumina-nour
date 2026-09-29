@@ -1285,7 +1285,7 @@ jobs:
           assert "nour-photo-glow" in theme
           assert "width:190px" in theme
           assert "filter:none" in theme
-          assert "nour_avatar_parts" in home
+          assert "nour_avatar_parts_v2" in home
           assert "object-fit:cover" in theme
           assert '[data-testid="stToolbar"]' in theme
           assert 'toolbarMode = "viewer"' in config
@@ -1310,9 +1310,12 @@ jobs:
           from pathlib import Path
           from PIL import Image
 
-          parts = sorted(Path("assets/nour_avatar_parts").glob("*.txt"))
-          assert len(parts) == 2, parts
+          parts_dir = Path("assets/nour_avatar_parts_v2")
+          names = ("00a.txt", "00b.txt", "02.txt", "03.txt", "04.txt", "05.txt", "06.txt", "07.txt")
+          parts = [parts_dir / name for name in names]
+          assert all(part.exists() for part in parts), parts
           payload = "".join(part.read_text(encoding="utf-8").strip() for part in parts)
+          assert len(payload) == 25416, len(payload)
           raw = base64.b64decode(payload, validate=True)
           image = Image.open(io.BytesIO(raw))
           image.verify()

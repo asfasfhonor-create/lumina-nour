@@ -6,6 +6,7 @@ from lumina.curriculum.religion_unit1 import RELIGION_U1_LESSONS
 from lumina.curriculum.religion_unit2 import RELIGION_U2_LESSONS
 from lumina.curriculum.religion_unit3 import RELIGION_U3_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
+from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_religion_world(ai: GeminiService) -> None:
@@ -30,3 +31,10 @@ def render_religion_world(ai: GeminiService) -> None:
         render_verified_unit("الوحدة الثانية · الإسلام دين وحياة", RELIGION_U2_LESSONS, "religion_u2_lesson", module_id="religion")
     elif unit_title == "تحمل المسئولية في الإسلام":
         render_verified_unit("الوحدة الثالثة · تحمل المسئولية في الإسلام", RELIGION_U3_LESSONS, "religion_u3_lesson", module_id="religion")
+    render_temporary_source_session(
+        ai,
+        source,
+        section_title=unit_title,
+        key_prefix="religion_source_session",
+    )
+

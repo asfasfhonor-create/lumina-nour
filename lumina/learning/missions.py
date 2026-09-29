@@ -8,7 +8,7 @@ from lumina.curriculum.mapped_curriculum import (
     SUBJECT_LABELS,
     all_mapped_lessons,
 )
-from lumina.learning.progress import NOT_STARTED, derive_mastery
+from lumina.learning.progress import LEARNING, MASTERED, NEEDS_REVIEW, NOT_STARTED, derive_mastery
 from lumina.learning.evidence_cache import snapshot_learning_evidence
 
 
@@ -52,7 +52,13 @@ def choose_mission(store) -> MissionRecommendation | None:
     attempts_by_lesson = evidence["attempts_by_lesson"]
     mistakes_by_lesson = evidence["mistakes_by_lesson"]
 
-    candidates = []
+    by_state: dict[str, list[tuple[str, object]]] = {
+        NEEDS_REVIEW: [],
+        LEARNING: [],
+        NOT_STARTED: [],
+        MASTERED: [],
+    }
+
     for module_id, units in MAPPED_CURRICULUM.items():
         for lessons in units.values():
             for lesson in lessons:
@@ -60,23 +66,29 @@ def choose_mission(store) -> MissionRecommendation | None:
                     attempts_by_lesson.get(lesson.id, []),
                     mistakes_by_lesson.get(lesson.id, []),
                 ).state
-                if state == NOT_STARTED:
-                    candidates.append((module_id, lesson))
+                by_state.setdefault(state, []).append((module_id, lesson))
 
-    if not candidates:
-        all_lessons = all_mapped_lessons()
-        if not all_lessons:
-            return None
-        lesson = all_lessons[date.today().toordinal() % len(all_lessons)]
-        module_id = next(
-            sid
-            for sid, units in MAPPED_CURRICULUM.items()
-            if any(lesson in lessons for lessons in units.values())
-        )
-        reason = "Keep mastery fresh"
-    else:
-        module_id, lesson = candidates[date.today().toordinal() % len(candidates)]
-        reason = "Next mapped lesson to explore"
+    priority = (
+        (NEEDS_REVIEW, "Needs another look before moving on"),
+        (LEARNING, "Continue an in-progress lesson"),
+        (NOT_STARTED, "Next mapped lesson to explore"),
+        (MASTERED, "Keep mastery fresh"),
+    )
+
+    chosen = None
+    reason = ""
+    ordinal = date.today().toordinal()
+    for state, state_reason in priority:
+        candidates = by_state.get(state, [])
+        if candidates:
+            chosen = candidates[ordinal % len(candidates)]
+            reason = state_reason
+            break
+
+    if chosen is None:
+        return None
+
+    module_id, lesson = chosen
 
     return MissionRecommendation(
         module_id=module_id,

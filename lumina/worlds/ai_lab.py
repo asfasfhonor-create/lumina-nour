@@ -4,22 +4,22 @@ from lumina.ai_service import GeminiService
 
 
 def render_ai_world(ai: GeminiService) -> None:
-    st.markdown('<div class="section-title">🤖 AI Lab</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🤖 عالم الذكاء الاصطناعي</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="mission"><b>Create → Experiment → Verify → Reflect</b><br>'
+        '<div class="mission"><b>جرّبي → تحققي → قارني → استنتجي</b><br>'
         '<span class="muted">هنا نور تتعلم تستخدم AI بعقلها: تسأل أحسن، تراجع الإجابات، وتكتشف الكلام غير الموثوق.</span></div>',
         unsafe_allow_html=True,
     )
 
     mode = st.radio(
         "اختاري تحدي",
-        ["Prompt Challenge", "AI Detective", "Fact Checker"],
+        ["تحدّي كتابة Prompt", "محقق الذكاء الاصطناعي", "التحقق من معلومة"],
         key="ai_lab_mode",
     )
 
-    if mode == "Prompt Challenge":
+    if mode == "تحدّي كتابة Prompt":
         _prompt_challenge(ai)
-    elif mode == "AI Detective":
+    elif mode == "محقق الذكاء الاصطناعي":
         _ai_detective(ai)
     else:
         _fact_checker(ai)
@@ -27,7 +27,7 @@ def render_ai_world(ai: GeminiService) -> None:
 
 def _need_ai(ai: GeminiService) -> bool:
     if not ai.available:
-        st.warning("التحدي يحتاج Gemini API Key.")
+        st.warning("التحدي الذكي ده لسه مش مفعّل. تقدري تكمّلي باقي أجزاء البرنامج عادي.")
         return False
     return True
 

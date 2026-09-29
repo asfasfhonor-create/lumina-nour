@@ -67,3 +67,36 @@ jobs:
               assert check.correct_index in (0, 1, 2)
           print("English Unit 1 lesson contracts OK")
           PY
+
+      - name: Validate mastery rules
+        run: |
+          python - <<'PY'
+          from lumina.learning.progress import (
+              LEARNING,
+              MASTERED,
+              NEEDS_REVIEW,
+              NOT_STARTED,
+              derive_mastery,
+          )
+
+          assert derive_mastery([]).state == NOT_STARTED
+
+          wrong = [{"check_id": "a", "correct": False}]
+          mistakes = [{"check_id": "a", "resolved": False}]
+          assert derive_mastery(wrong, mistakes).state == NEEDS_REVIEW
+
+          repeated = [
+              {"check_id": "a", "evidence_id": "a", "correct": True},
+              {"check_id": "a", "evidence_id": "a", "correct": True},
+              {"check_id": "a", "evidence_id": "a", "correct": True},
+          ]
+          assert derive_mastery(repeated).state == LEARNING
+
+          varied = [
+              {"check_id": "a", "evidence_id": "a", "correct": True},
+              {"check_id": "b", "evidence_id": "b", "correct": True},
+              {"check_id": "a", "evidence_id": "a", "correct": True},
+          ]
+          assert derive_mastery(varied).state == MASTERED
+          print("Mastery rules OK")
+          PY

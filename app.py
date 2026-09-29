@@ -31,18 +31,13 @@ hydrate_profile_state()
 verify_persistence_after_hydration()
 
 api_key = st.secrets.get("GEMINI_API_KEY", None)
-if not api_key:
-    api_key = st.sidebar.text_input("Gemini API Key", type="password")
-    if not api_key:
-        st.info("الأدوات الذكية تحتاج Gemini API Key. Nour's World نفسها تعمل بدون المفتاح.")
-
 ai = GeminiService(api_key)
 parent_pin = st.secrets.get("PARENT_PIN", None)
 
 persistence_warning = st.session_state.get("persistence_warning")
 if persistence_warning:
     st.warning(persistence_warning)
-    st.caption("الحفظ السحابي متوقف لهذه الجلسة؛ لا تغلقي الجلسة قبل تنزيل Backup من Parent Dashboard.")
+    st.caption("الحفظ التلقائي متوقف مؤقتًا في هذه الجلسة. يفضّل عدم إغلاق الصفحة قبل حفظ نسخة احتياطية من لوحة وليّ الأمر.")
 
 try:
     if not render_active_world(ai, parent_pin=parent_pin, app_pin_configured=bool(app_pin)):
@@ -50,22 +45,17 @@ try:
         render_quick_access(ai)
 except AIServiceError as exc:
     st.warning(str(exc))
-    st.caption("المحاولة لم تُسجل كنجاح أو Mastery بسبب فشل خدمة الذكاء الاصطناعي.")
+    st.caption("لم يتم تسجيل هذه المحاولة ضمن التقدّم لأن الأداة الذكية لم تُكمل عملها.")
 except PersistenceError as exc:
     st.session_state.persistence_disabled_for_session = True
     st.session_state.persistence_warning = str(exc)
     st.warning(str(exc))
-    st.caption("تم التحويل مؤقتًا للحفظ داخل الجلسة الحالية حتى لا يتوقف البرنامج.")
+    st.caption("سيستمر البرنامج مؤقتًا داخل هذه الجلسة، لكن يُفضّل عدم إغلاق الصفحة حتى يعود الحفظ التلقائي.")
 
 storage = persistence_status()
 if storage["durable"] and st.session_state.get("persistence_verified", False):
-    storage_note = "الحفظ الدائم متحقق ويعمل"
+    st.caption("✨ LUMINA · عالم نور · التقدّم محفوظ تلقائيًا")
 elif storage["durable"]:
-    storage_note = "الحفظ الدائم مهيأ لكنه غير متحقق"
+    st.caption("✨ LUMINA · عالم نور · جارٍ التحقق من الحفظ التلقائي")
 else:
-    storage_note = "الحفظ الدائم غير مفعل"
-
-st.caption(
-    f"LUMINA · built for Nour ✨ | Development branch · "
-    f"{storage_note} · {storage['label']}"
-)
+    st.caption("✨ LUMINA · عالم نور")

@@ -16,6 +16,10 @@ def initialize_session_state() -> None:
         "review_queue": [],
         "parent_unlocked": False,
         "english_profile": {},
+        "rewarded_evidence": [],
+        "learning_days": [],
+        "badges": [],
+        "daily_mission_lesson_id": None,
     }
     for key, value in defaults.items():
         if key not in st.session_state:

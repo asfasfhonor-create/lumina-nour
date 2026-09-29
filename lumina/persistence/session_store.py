@@ -90,6 +90,21 @@ class SessionLearningStore(LearningStore):
             return reviews
         return [review for review in reviews if review.get("status") == status]
 
+    def get_profile_state(self) -> dict:
+        keys = (
+            "xp",
+            "streak",
+            "badges",
+            "learning_days",
+            "rewarded_evidence",
+            "english_profile",
+        )
+        return {key: st.session_state.get(key) for key in keys}
+
+    def save_profile_state(self, state: dict) -> None:
+        for key, value in state.items():
+            st.session_state[key] = value
+
 
 _SESSION_STORE = SessionLearningStore()
 _REMOTE_STORE: LearningStore | None = None

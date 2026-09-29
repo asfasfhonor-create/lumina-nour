@@ -1558,3 +1558,45 @@ jobs:
           assert "activity_type=\"ai_evidence_verification\"" in source
           print("AI Lab evidence rules OK")
           PY
+
+      - name: Validate adaptive Real English profile
+        run: |
+          python - <<'PY'
+          from lumina.learning.english_profile import (
+              BASELINE_ITEMS,
+              score_baseline,
+              support_level,
+              support_instruction,
+          )
+
+          perfect = {item["id"]: item["correct_index"] for item in BASELINE_ITEMS}
+          result = score_baseline(perfect)
+          assert result.correct == len(BASELINE_ITEMS)
+          assert result.skill_scores["Vocabulary"]["correct"] == 1
+          assert result.skill_scores["Grammar"]["total"] == 2
+          assert support_level({"broad_band": "Foundation"}) == "high"
+          assert support_level({"broad_band": "Developing"}) == "medium"
+          assert support_level({"broad_band": "Independent-start"}) == "light"
+          assert "Arabic" in support_instruction({"broad_band": "Foundation"})
+          print("Adaptive Real English profile OK")
+          PY
+
+      - name: Validate Real English activity coverage
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("lumina/worlds/english.py").read_text(encoding="utf-8")
+          for label in (
+              "تحديد نقطة البداية",
+              "قراءة وفهم",
+              "كتابة قصيرة",
+              "محادثة واقعية",
+              "كلمات في سياق",
+          ):
+              assert label in source, label
+
+          assert "Reading Detective" in source
+          assert "support_instruction(profile)" in source
+          print("Real English activity coverage OK")
+          PY

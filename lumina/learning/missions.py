@@ -86,3 +86,8 @@ def choose_mission(store) -> MissionRecommendation | None:
 def get_lesson_by_id(lesson_id: str):
     item = _lesson_index().get(lesson_id)
     return item[1] if item else None
+
+
+def get_module_for_lesson_id(lesson_id: str) -> str | None:
+    item = _lesson_index().get(lesson_id)
+    return item[0] if item else None

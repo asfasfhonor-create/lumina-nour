@@ -3,6 +3,7 @@ import streamlit as st
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.learning.progress_view import render_learning_brain_summary
 from lumina.persistence.session_store import get_learning_store
+from lumina.learning.rewards import apply_success_reward
 
 
 def render_verified_unit(
@@ -72,7 +73,15 @@ def render_verified_lesson(lesson, *, module_id: str) -> None:
             if correct:
                 store.resolve_mistake(lesson.id, check.id)
                 store.complete_review(lesson.id, check.id)
+                earned_xp = apply_success_reward(
+                    module_id=module_id,
+                    lesson_id=lesson.id,
+                    evidence_id=check.id,
+                    activity_type="lesson",
+                )
                 st.success("Good thinking — this matches the lesson.")
+                if earned_xp:
+                    st.caption(f"+{earned_xp} XP for new demonstrated learning evidence.")
             else:
                 store.record_mistake(
                     {

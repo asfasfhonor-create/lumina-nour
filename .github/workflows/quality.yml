@@ -808,3 +808,16 @@ jobs:
           assert callable(lumina.parent_dashboard.render_parent_dashboard)
           print("Parent weak-point navigation imports OK")
           PY
+
+      - name: Validate persistence status helper
+        run: |
+          python - <<'PY'
+          import streamlit as st
+          from lumina.persistence.session_store import persistence_status
+
+          st.session_state.persistence_disabled_for_session = True
+          status = persistence_status()
+          assert status["mode"] == "session_fallback"
+          assert status["durable"] is False
+          print("Persistence status helper OK")
+          PY

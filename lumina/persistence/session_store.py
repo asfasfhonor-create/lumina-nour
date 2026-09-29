@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import streamlit as st
 
 from lumina.persistence.base import LearningStore
+from lumina.persistence.neon_store import NeonLearningStore
 from lumina.persistence.supabase_store import SupabaseLearningStore
 
 
@@ -113,12 +114,22 @@ _REMOTE_STORE: LearningStore | None = None
 def get_learning_store() -> LearningStore:
     global _REMOTE_STORE
 
+    learner_key = st.secrets.get("NOUR_LEARNER_KEY", None)
+    neon_database_url = st.secrets.get("NEON_DATABASE_URL", None)
+
+    if neon_database_url and learner_key:
+        if _REMOTE_STORE is None or not isinstance(_REMOTE_STORE, NeonLearningStore):
+            _REMOTE_STORE = NeonLearningStore(
+                database_url=str(neon_database_url),
+                learner_key=str(learner_key),
+            )
+        return _REMOTE_STORE
+
+    # Legacy fallback retained only to avoid breaking older development secrets.
     url = st.secrets.get("SUPABASE_URL", None)
     api_key = st.secrets.get("SUPABASE_SECRET_KEY", None)
-    learner_key = st.secrets.get("NOUR_LEARNER_KEY", None)
-
     if url and api_key and learner_key:
-        if _REMOTE_STORE is None:
+        if _REMOTE_STORE is None or not isinstance(_REMOTE_STORE, SupabaseLearningStore):
             _REMOTE_STORE = SupabaseLearningStore(
                 url=str(url),
                 api_key=str(api_key),

@@ -4,6 +4,7 @@ from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import ENGLISH_T1
 from lumina.curriculum.grounding import build_grounded_pdf, curriculum_prompt
 from lumina.curriculum.english_unit1 import UNIT1_LESSONS
+from lumina.curriculum.english_unit2 import UNIT2_LESSONS
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.learning.progress_view import render_learning_brain_summary
 from lumina.session_state import (
@@ -56,7 +57,13 @@ def _render_school_track(ai: GeminiService) -> None:
         st.write(f"{prefix} {unit.title}")
 
     if unit_title == "Personal Identity":
-        _render_verified_personal_identity_unit()
+        _render_verified_unit("Unit 1 · Personal Identity", UNIT1_LESSONS, "english_u1_lesson")
+    elif unit_title == "Communication with Family and Friends":
+        _render_verified_unit(
+            "Unit 2 · Communication with Family and Friends",
+            UNIT2_LESSONS,
+            "english_u2_lesson",
+        )
 
     st.markdown("---")
     st.caption("Advanced source session")
@@ -194,16 +201,16 @@ Keep it concise and practical."""
         st.markdown(ai.generate(prompt))
 
 
-def _render_verified_personal_identity_unit() -> None:
-    st.markdown("### Unit 1 · Personal Identity")
+def _render_verified_unit(title: str, lessons, select_key: str) -> None:
+    st.markdown(f"### {title}")
     st.caption("Verified from the supplied English curriculum source.")
-    render_learning_brain_summary([lesson.id for lesson in UNIT1_LESSONS])
+    render_learning_brain_summary([lesson.id for lesson in lessons])
 
     lesson = st.selectbox(
         "Choose lesson",
-        UNIT1_LESSONS,
+        lessons,
         format_func=lambda item: item.title,
-        key="english_u1_lesson",
+        key=select_key,
     )
     _render_verified_lesson(lesson)
 

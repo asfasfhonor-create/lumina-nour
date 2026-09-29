@@ -1,5 +1,6 @@
 import streamlit as st
 from lumina.ai_service import AIServiceError, GeminiService
+from lumina.persistence.base import PersistenceError
 from lumina.access_control import require_app_access
 from lumina.config import APP_ICON, APP_INITIAL_SIDEBAR_STATE, APP_LAYOUT, APP_TITLE
 from lumina.home import render_home_foundation
@@ -36,6 +37,11 @@ if not api_key:
 ai = GeminiService(api_key)
 parent_pin = st.secrets.get("PARENT_PIN", None)
 
+persistence_warning = st.session_state.get("persistence_warning")
+if persistence_warning:
+    st.warning(persistence_warning)
+    st.caption("الحفظ السحابي متوقف لهذه الجلسة؛ لا تغلقي الجلسة قبل تنزيل Backup من Parent Dashboard.")
+
 try:
     if not render_active_world(ai, parent_pin=parent_pin):
         render_home_foundation()
@@ -43,5 +49,10 @@ try:
 except AIServiceError as exc:
     st.warning(str(exc))
     st.caption("المحاولة لم تُسجل كنجاح أو Mastery بسبب فشل خدمة الذكاء الاصطناعي.")
+except PersistenceError as exc:
+    st.session_state.persistence_disabled_for_session = True
+    st.session_state.persistence_warning = str(exc)
+    st.warning(str(exc))
+    st.caption("تم التحويل مؤقتًا للحفظ داخل الجلسة الحالية حتى لا يتوقف البرنامج.")
 
 st.caption("LUMINA · built for Nour ✨ | Development branch · التقدم الحالي تجريبي حتى تفعيل الحفظ الدائم")

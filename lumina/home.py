@@ -8,6 +8,7 @@ from lumina.module_registry import get_module, get_school_subjects
 from lumina.session_state import current_level
 from lumina.persistence.profile_state import persist_profile_state
 from lumina.learning.missions import get_lesson_by_id, get_module_for_lesson_id
+from lumina.context_help import help_text, render_home_help
 
 
 def render_home_foundation() -> None:
@@ -53,29 +54,31 @@ def render_home_foundation() -> None:
     _render_learning_worlds()
 
     st.markdown("---")
-    if st.button("🔎 ابحثي في المنهج", key="open_curriculum_search", use_container_width=True):
+    if st.button("🔎 ابحثي في المنهج", key="open_curriculum_search", use_container_width=True, help=help_text("curriculum_search")):
         st.session_state.active_world = "curriculum_search"
         st.rerun()
 
     top_left, top_right = st.columns(2)
     with top_left:
-        if st.button("📅 خطتي", key="open_weekly_plan", use_container_width=True):
+        if st.button("📅 خطتي", key="open_weekly_plan", use_container_width=True, help=help_text("weekly_plan")):
             st.session_state.active_world = "weekly"
             st.rerun()
     with top_right:
-        if st.button("🧪 Exam Mode", key="open_exam_mode", use_container_width=True):
+        if st.button("🧪 Exam Mode", key="open_exam_mode", use_container_width=True, help=help_text("exam_mode")):
             st.session_state.active_world = "exam"
             st.rerun()
 
     bottom_left, bottom_right = st.columns(2)
     with bottom_left:
-        if st.button("📝 مراجعاتي", key="open_review_center", use_container_width=True):
+        if st.button("📝 مراجعاتي", key="open_review_center", use_container_width=True, help=help_text("review_center")):
             st.session_state.active_world = "review"
             st.rerun()
     with bottom_right:
         if st.button("👨‍👧 Parent Dashboard", key="open_parent_dashboard", use_container_width=True):
             st.session_state.active_world = "parent"
             st.rerun()
+
+    render_home_help()
 
 
 def _render_daily_mission() -> None:
@@ -146,7 +149,7 @@ def _render_learning_worlds() -> None:
                     "religion": "ادخلي Religion Journey",
                 }
                 label = labels[module.id]
-                if st.button(label, key=f"open_world_{module.id}"):
+                if st.button(label, key=f"open_world_{module.id}", help=help_text(module.id)):
                     st.session_state.active_world = module.id
                     st.rerun()
             else:
@@ -168,6 +171,6 @@ def _render_learning_worlds() -> None:
             '<span class="muted">نتعلم نسأل صح، نراجع الإجابات، ونبحث عن الدليل بدل الثقة العمياء.</span></div>',
             unsafe_allow_html=True,
         )
-        if st.button("ادخلي AI Lab", key="open_world_ai"):
+        if st.button("ادخلي AI Lab", key="open_world_ai", help=help_text("ai")):
             st.session_state.active_world = "ai"
             st.rerun()

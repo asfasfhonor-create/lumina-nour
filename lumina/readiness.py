@@ -20,6 +20,7 @@ def build_release_readiness(
     app_pin_configured: bool,
     parent_pin_configured: bool,
     storage_status: dict | None = None,
+    storage_verified: bool = False,
 ) -> tuple[ReadinessItem, ...]:
     storage = storage_status if storage_status is not None else persistence_status()
     mapped_count = len(all_mapped_lessons())
@@ -40,8 +41,16 @@ def build_release_readiness(
         ReadinessItem(
             key="storage",
             label="Durable learning storage",
-            ready=bool(storage["durable"]),
-            detail=storage["label"],
+            ready=bool(storage["durable"] and storage_verified),
+            detail=(
+                f"{storage['label']} · verified"
+                if storage["durable"] and storage_verified
+                else (
+                    f"{storage['label']} · configured, not verified"
+                    if storage["durable"]
+                    else storage["label"]
+                )
+            ),
         ),
         ReadinessItem(
             key="parent_pin",

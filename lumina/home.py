@@ -13,9 +13,10 @@ from lumina.context_help import help_text, render_home_help
 
 
 def _load_nour_photo_b64() -> str:
-    parts_dir = Path("assets/nour_avatar_parts")
-    parts = sorted(parts_dir.glob("*.txt"))
-    if not parts:
+    parts_dir = Path("assets/nour_avatar_parts_v2")
+    ordered_names = ("00a.txt", "00b.txt", "02.txt", "03.txt", "04.txt", "05.txt", "06.txt", "07.txt")
+    parts = [parts_dir / name for name in ordered_names]
+    if not all(part.exists() for part in parts):
         return ""
     return "".join(part.read_text(encoding="utf-8").strip() for part in parts)
 

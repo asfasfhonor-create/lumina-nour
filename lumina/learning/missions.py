@@ -45,7 +45,7 @@ def choose_mission(store) -> MissionRecommendation | None:
                 lesson_id=lesson.id,
                 lesson_title=lesson.title,
                 source_pages=lesson.source_pages,
-                reason="Review due from a previous mistake",
+                reason="مراجعة خفيفة لنقطة اتلخبطت قبل كده",
             )
 
     evidence = snapshot_learning_evidence(store)
@@ -69,10 +69,10 @@ def choose_mission(store) -> MissionRecommendation | None:
                 by_state.setdefault(state, []).append((module_id, lesson))
 
     priority = (
-        (NEEDS_REVIEW, "Needs another look before moving on"),
-        (LEARNING, "Continue an in-progress lesson"),
-        (NOT_STARTED, "Next mapped lesson to explore"),
-        (MASTERED, "Keep mastery fresh"),
+        (NEEDS_REVIEW, "نفهم نقطة صغيرة أكتر قبل ما نكمل"),
+        (LEARNING, "نكمل درس بدأناه خطوة صغيرة"),
+        (NOT_STARTED, "نكتشف فكرة جديدة بهدوء"),
+        (MASTERED, "تحدّي خفيف يحافظ على الفهم"),
     )
 
     chosen = None

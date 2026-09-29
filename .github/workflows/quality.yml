@@ -973,3 +973,24 @@ jobs:
           assert optional["parent_pin"].ready is False
           print("Optional readiness checks are non-blocking")
           PY
+
+      - name: Validate review evidence cannot inflate mastery
+        run: |
+          python - <<'PY'
+          from lumina.learning.progress import LEARNING, MASTERED, derive_mastery
+
+          same_check_across_contexts = [
+              {"check_id": "a", "evidence_id": "a", "correct": True},
+              {"check_id": "a", "evidence_id": "review:a", "correct": True},
+              {"check_id": "a", "evidence_id": "exam:a", "correct": True},
+          ]
+          snapshot = derive_mastery(same_check_across_contexts)
+          assert snapshot.state == LEARNING
+          assert snapshot.distinct_evidence == 1
+
+          truly_varied = same_check_across_contexts + [
+              {"check_id": "b", "evidence_id": "b", "correct": True},
+          ]
+          assert derive_mastery(truly_varied).state == MASTERED
+          print("Review evidence cannot inflate mastery")
+          PY

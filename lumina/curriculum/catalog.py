@@ -39,6 +39,25 @@ SCIENCE_T1 = CurriculumSource(
     ),
 )
 
+SCIENCE_T2 = CurriculumSource(
+    id="science_prep3_t2",
+    subject_id="science",
+    title="Science and Life — Third Preparatory",
+    filename="العلوم باللغة الانجليزية-كتاب الطالب-0d9bc9e8.pdf",
+    term="Term 2",
+    language="English",
+    extraction_mode="page_image",
+    units=(
+        CurriculumUnit("t2_u1", "Chemical Reactions", ("Chemical Reactions", "Rate of the Chemical Reaction")),
+        CurriculumUnit(
+            "t2_u2",
+            "Electric Energy and Radioactivity",
+            ("Physical Properties of the Electric Current", "The Electric Current and Cells", "Radioactivity and Nuclear Energy"),
+        ),
+        CurriculumUnit("t2_u3", "Genetics", ("The Main Principles of Heredity",)),
+    ),
+)
+
 MATH_T1 = CurriculumSource(
     id="math_prep3_t1",
     subject_id="math",
@@ -53,6 +72,61 @@ MATH_T1 = CurriculumSource(
         CurriculumUnit("u3", "Statistics", ("Collecting Data", "Dispersion")),
         CurriculumUnit("u4", "Trigonometry"),
         CurriculumUnit("u5", "Coordinate Geometry"),
+    ),
+)
+
+MATH_T2 = CurriculumSource(
+    id="math_prep3_t2",
+    subject_id="math",
+    title="Mathematics — Third Preparatory",
+    filename="الرياضيات باللغة الانجليزية-كتاب الطالب-334a9f66.pdf",
+    term="Term 2",
+    language="English",
+    extraction_mode="mixed",
+    units=(
+        CurriculumUnit(
+            "t2_u1",
+            "Equations",
+            (
+                "Solving two equations of first degrees in two variables Graphically and Algebraically",
+                "Solving an equation of second degree in one unknown Graphically and Algebraically",
+                "Solving two equations in two variables, one of them is of the first degree and the other is of the second degree",
+            ),
+        ),
+        CurriculumUnit(
+            "t2_u2",
+            "Algebraic Rational Functions and the operations on them",
+            (
+                "Set of zeroes of a polynomial function",
+                "Algebraic rational function",
+                "Equality of two Algebraic fractions",
+                "Operations on Algebraic fractions",
+            ),
+        ),
+        CurriculumUnit("t2_u3", "Probability", ("Operations on events", "Complementary event and the difference between two events")),
+        CurriculumUnit(
+            "t2_u4",
+            "The Circle",
+            (
+                "Basic Definitions and Concepts",
+                "Positions of a point, a Straight Line and a Circle with Respect to a Circle",
+                "Identifying the Circle",
+                "The Relation Between the Chords of a Circle and its Center",
+            ),
+        ),
+        CurriculumUnit(
+            "t2_u5",
+            "Angles and Arcs in the circle",
+            (
+                "Central Angle and Measuring Arcs",
+                "The relation between the Inscribed and central angles subtended by the same arc",
+                "Inscribed Angles Subtended by the Same Arc",
+                "Cyclic Quadrilaterals",
+                "Properties of Cyclic Quadrilaterals",
+                "The relation between the tangents of a circle",
+                "Angle of Tangency",
+            ),
+        ),
     ),
 )
 
@@ -122,7 +196,9 @@ ICT_T2 = CurriculumSource(
 SOURCES: Tuple[CurriculumSource, ...] = (
     ENGLISH_T1,
     SCIENCE_T1,
+    SCIENCE_T2,
     MATH_T1,
+    MATH_T2,
     ARABIC_T1,
     SOCIAL_T1,
     RELIGION_T1,

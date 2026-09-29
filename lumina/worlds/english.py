@@ -17,7 +17,7 @@ def render_english_world(ai: GeminiService) -> None:
     render_context_help("english", label="💬 قوليلي العالم ده بيعمل إيه")
     st.markdown(
         '<div class="mission"><b>مساران، وهدف واحد: English أقوى.</b><br>'
-        '<span class="muted">School English ماشي مع منهج نور، وReal English يطوّر مستواها الحقيقي أبعد من حدود المنهج.</span></div>',
+        '<span class="muted">منهج المدرسة يمشي مع كتاب نور، وReal English يطوّر استخدامها الحقيقي للغة أبعد من حدود المنهج.</span></div>',
         unsafe_allow_html=True,
     )
 
@@ -33,7 +33,7 @@ def render_english_world(ai: GeminiService) -> None:
 def _render_school_track(ai: GeminiService) -> None:
     source = ENGLISH_T1
     st.markdown(
-        '<div class="track-card"><b>School English · من كتاب نور</b><br>'
+        '<div class="track-card"><b>منهج المدرسة · School English</b><br>'
         '<span class="muted">المسار المدرسي يعتمد على المصدر المعتمد، وما يضيفش محتوى منهجي غير موجود.</span></div>',
         unsafe_allow_html=True,
     )
@@ -87,32 +87,32 @@ def _render_school_track(ai: GeminiService) -> None:
 def _render_real_english(ai: GeminiService) -> None:
     st.markdown(
         '<div class="track-card"><b>Real English</b><br>'
-        '<span class="muted">Practice real communication, get focused feedback, and gradually reduce Arabic help as Nour improves.</span></div>',
+        '<span class="muted">تدريب عملي على التواصل، مع ملاحظات قصيرة وتقليل المساعدة بالعربي تدريجيًا مع تحسن المستوى.</span></div>',
         unsafe_allow_html=True,
     )
 
     mode = st.radio(
-        "Choose a mission",
-        ["Level Snapshot", "Writing Snapshot", "Real-life Conversation", "Vocabulary in Context"],
+        "اختاري تدريب",
+        ["تحديد نقطة البداية", "كتابة قصيرة", "محادثة واقعية", "كلمات في سياق"],
         horizontal=False,
         key="real_english_mode",
     )
 
-    if mode == "Level Snapshot":
+    if mode == "تحديد نقطة البداية":
         _level_snapshot()
-    elif mode == "Writing Snapshot":
+    elif mode == "كتابة قصيرة":
         _writing_snapshot(ai)
-    elif mode == "Real-life Conversation":
+    elif mode == "محادثة واقعية":
         _conversation_mission(ai)
     else:
         _vocabulary_mission(ai)
 
 
 def _level_snapshot() -> None:
-    st.markdown("### Real English · Level Snapshot")
+    st.markdown("### Real English · نقطة البداية")
     st.caption(
-        "Quick starting-point check only — not a formal CEFR certificate. "
-        "It helps LUMINA decide how much support and challenge to use."
+        "اختبار بداية سريع فقط، مش شهادة مستوى رسمية. "
+        "بيساعد LUMINA يحدد قد إيه تحتاجي مساعدة وقد إيه نزوّد التحدي."
     )
 
     answers = {}
@@ -126,7 +126,7 @@ def _level_snapshot() -> None:
         if choice is not None:
             answers[item["id"]] = list(item["options"]).index(choice)
 
-    if st.button("Show my starting point", key="english_baseline_submit"):
+    if st.button("اعرضي نقطة البداية", key="english_baseline_submit"):
         if len(answers) != len(BASELINE_ITEMS):
             st.warning("كمّلي كل الأسئلة الأول عشان الصورة تكون مفيدة.")
             return
@@ -139,35 +139,35 @@ def _level_snapshot() -> None:
             "support_note": result.note,
         }
         persist_profile_state()
-        st.success(f"Starting band: {result.broad_band} · {result.correct}/{result.total}")
+        st.success(f"نقطة البداية: {result.broad_band} · {result.correct}/{result.total}")
         st.write(result.note)
         st.info(
-            "ده مجرد Starting Point. المستوى الحقيقي هيتحدث من الكتابة، القراءة، "
+            "دي مجرد نقطة بداية. المستوى الحقيقي هيتحدث من الكتابة، القراءة، "
             "المحادثة، والاستماع مع الوقت — مش من اختبار واحد."
         )
 
     profile = st.session_state.get("english_profile", {})
     if profile:
         st.caption(
-            f"Current Real English profile: {profile.get('broad_band', 'Not set')} · "
-            f"baseline {profile.get('baseline_correct', 0)}/{profile.get('baseline_total', 0)}"
+            f"مستوى Real English الحالي: {profile.get('broad_band', 'لسه متحددش')} · "
+            f"اختبار البداية {profile.get('baseline_correct', 0)}/{profile.get('baseline_total', 0)}"
         )
 
 def _need_ai(ai: GeminiService) -> bool:
     if not ai.available:
-        st.warning("Gemini API Key is required for this mission.")
+        st.warning("التدريب الذكي ده مش مفعّل حاليًا. باقي Real English شغال عادي.")
         return False
     return True
 
 
 def _writing_snapshot(ai: GeminiService) -> None:
-    st.caption("This is a learning snapshot, not a formal CEFR certificate.")
+    st.caption("ده تدريب لتحديد المستوى، مش شهادة CEFR رسمية.")
     writing = st.text_area(
-        "Write 4–6 sentences about yourself, your day, or something you like.",
+        "اكتبي 4–6 جمل بالإنجليزي عن نفسك أو يومك أو حاجة بتحبيها.",
         key="english_world_writing",
         placeholder="My name is Nour. I like...",
     )
-    if st.button("Check my English", key="english_world_check") and writing and _need_ai(ai):
+    if st.button("راجعي كتابتي", key="english_world_check") and writing and _need_ai(ai):
         prompt = f"""You are Nour's English coach. She is an Egyptian third-prep language-school student, but this track is designed to improve her English beyond her school grade.
 
 Her writing:
@@ -218,11 +218,11 @@ Rules:
 
 def _vocabulary_mission(ai: GeminiService) -> None:
     topic = st.selectbox(
-        "Topic",
+        "اختاري موضوع",
         ["Daily life", "Friends", "Technology", "Stories", "Travel", "School"],
         key="english_world_vocab_topic",
     )
-    if st.button("Give me a vocabulary mission", key="english_world_vocab_go") and _need_ai(ai):
+    if st.button("ابدئي تحدّي الكلمات", key="english_world_vocab_go") and _need_ai(ai):
         prompt = f"""Create a tiny vocabulary mission for Nour about: {topic}.
 She is improving real English beyond her school grade.
 

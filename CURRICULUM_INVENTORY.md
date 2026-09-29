@@ -1,4 +1,4 @@
-# LUMINA — CURRICULUM INVENTORY (PRE-MASTER)
+# LUMINA — CURRICULUM INVENTORY
 
 Date: 2026-09-29
 Scope: current Project Sources supplied for Nour. This inventory records what the files themselves show. It does not fill missing curriculum information from memory or generic web knowledge.
@@ -97,7 +97,7 @@ The source includes a curriculum map connecting lessons with concepts/knowledge,
 Architecture implication:
 Social Studies should support geography/history structure, maps/visual evidence, cause-and-effect, comparison, inference, chronology, and source-based thinking where the book requires them.
 
-### 5. Mathematics in English — Student Book, First Term
+### 5. Mathematics in English — Student Book (Term 1 + bundled Term 2)
 File: الرياضيات باللغة الانجليزية-كتاب الطالب-334a9f66.pdf
 Pages: 178
 Format observation: mixed/legacy text extraction; page images are the safer source for contents and notation.
@@ -133,13 +133,40 @@ Coordinate Geometry
 
 The book also provides a mathematical-notation reference.
 
+The same supplied PDF continues after the first-term material with an explicit **Second Term** section. Verified second-term contents shown in the file:
+- Algebra — Unit 1: Equations
+  - Solving two equations of first degrees in two variables Graphically and Algebraically
+  - Solving an equation of second degree in one unknown Graphically and Algebraically
+  - Solving two equations in two variables, one first degree and one second degree
+- Algebra — Unit 2: Algebraic Rational Functions and the operations on them
+  - Set of zeroes of a polynomial function
+  - Algebraic rational function
+  - Equality of two algebraic fractions
+  - Operations on algebraic fractions
+- Probability — Unit 3: Probability
+  - Operations on events
+  - Complementary event and the difference between two events
+- Geometry — Unit 4: The Circle
+  - Basic Definitions and Concepts
+  - Positions of a point, a Straight Line and a Circle with Respect to a Circle
+  - Identifying the Circle
+  - The Relation Between the Chords of a Circle and its Center
+- Geometry — Unit 5: Angles and Arcs in the circle
+  - Central Angle and Measuring Arcs
+  - The relation between the Inscribed and central angles subtended by the same arc
+  - Inscribed Angles Subtended by the Same Arc
+  - Cyclic Quadrilaterals
+  - Properties of Cyclic Quadrilaterals
+  - The relation between the tangents of a circle
+  - Angle of Tangency
+
 Source metadata caution:
-The cover identifies Ministry curriculum development and 2025–2026, while internal pages also contain older printing/revision strings. Preserve this metadata rather than silently resolving the discrepancy.
+The cover identifies Ministry curriculum development and 2025–2026, while internal pages also contain older printing/revision strings. Preserve this metadata rather than silently resolving the discrepancy. The file must now be treated as containing separate term-scoped curriculum sources rather than assuming it is first-term-only.
 
 Architecture implication:
 Math ingestion must preserve formulas, notation, diagrams, worked examples, and page images; plain extracted text alone is insufficient.
 
-### 6. Science in English — First Term
+### 6. Science in English — Student Book (Term 1 + bundled Term 2)
 File: العلوم باللغة الانجليزية-كتاب الطالب-0d9bc9e8.pdf
 Pages: 148
 Format observation: image/page based in the current parser; page-image retrieval works.
@@ -165,8 +192,22 @@ Contents:
 
 The introduction explicitly emphasizes scientific/technological thinking, scientific methodology, observation, analysis, concluding, self-learning, teamwork, negotiation, and practical/life skills.
 
+The same supplied PDF continues after first-term Unit 4 with an explicit **Second Term** section. Verified second-term contents shown in the file:
+- Unit 1: Chemical Reactions
+  - Lesson 1: Chemical Reactions
+  - Lesson 2: Rate of the Chemical Reaction
+  - Science, Technology and Society
+- Unit 2: Electric Energy and Radioactivity
+  - Lesson 1: Physical Properties of the Electric Current
+  - Lesson 2: The Electric Current and Cells
+  - Lesson 3: Radioactivity and Nuclear Energy
+  - Science, Technology and Society
+- Unit 3: Genetics
+  - Lesson 1: The Main Principles of Heredity
+  - Science, Technology and Society
+
 Architecture implication:
-Science learning should be concept + experiment/observation + reasoning + application, with diagrams/images/formulas preserved from the source.
+Science learning should be concept + experiment/observation + reasoning + application, with diagrams/images/formulas preserved from the source. Term 1 and Term 2 must be modeled separately even when they share one physical PDF file.
 
 ### 7. Computer / ICT — Second Semester
 File: computer_3prep_scond_term_english.pdf
@@ -238,7 +279,7 @@ Subject-specific extensions:
 
 ## Pre-master readiness
 
-The seven supplied subject areas have now been inventoried sufficiently to design the Master architecture without inventing their structure.
+The seven supplied subject areas are inventoried, and later page-level verification showed that the supplied Math and Science PDFs each bundle both Term 1 and Term 2 material in one physical file. The catalog therefore models those term scopes separately.
 
 Still intentionally deferred:
 - Full page-by-page indexing.

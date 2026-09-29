@@ -1,12 +1,12 @@
 # LUMINA / NOUR'S WORLD — MASTER SPECIFICATION
 
-**Status:** Master v1.0 — implementation authority after approval  
+**Status:** Master v1.0 — APPROVED IMPLEMENTATION AUTHORITY  
 **Date:** 2026-09-29  
 **Product owner:** Mohamed  
 **Learner:** Nour  
 **Repository:** `mohamed-hamuda/lumina-nour`
 
-> This is the single governing specification for LUMINA. Earlier requirement, audit, inventory, resume, and implementation documents remain useful history/evidence, but where they conflict with this Master, this Master governs after Mohamed approves it.
+> This is the single governing specification for LUMINA. Earlier requirement, audit, inventory, resume, and implementation documents remain useful history/evidence, but where they conflict with this Master, this Master governs. Mohamed approved proceeding with this Master on 2026-09-29.
 
 ---
 
@@ -833,6 +833,28 @@ Still required:
 - robust error handling;
 - access protection;
 - full mobile/browser regression testing.
+
+---
+
+## 32. Final audit reconciliation
+
+The Master has been cross-checked against the pre-master audit, curriculum inventory, implementation plan, and current feature-branch app.
+
+Reconciliation decisions:
+- All seven subject worlds are retained.
+- School English and Real English are explicitly separate tracks sharing one learner profile.
+- AI literacy remains a core learning pillar, not only an AI backend feature.
+- Future Skills Framework is a mandatory architectural requirement.
+- Permanent upload supports both temporary material and intentionally trusted/indexed sources.
+- Image/page-aware curriculum handling is mandatory because the supplied corpus is mixed.
+- Existing Quick Access capabilities are protected from silent regression.
+- Prototype XP/streak/daily mission must not be mistaken for final evidence-based gamification.
+- ICT's supplied VB.NET material remains separate from Python enrichment.
+- Current app is still monolithic and must be modularized before large feature expansion.
+- The earlier implementation plan's wording about waiting for curriculum uploads is superseded: the initial seven-subject source inventory is now available and inventoried.
+- No production/main merge is implied by Master approval; implementation remains on the development branch until the quality gate and explicit production approval.
+
+No unresolved requirement discovered in the final audit blocks Phase 1 implementation. Technical choices intentionally left configurable in Section 37 remain decisions to be made at the appropriate phase.
 
 ---
 

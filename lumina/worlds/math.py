@@ -46,6 +46,7 @@ def render_math_world(ai: GeminiService) -> None:
             MATH_UNIT1_LESSONS,
             "math_u1_lesson",
             module_id="math",
+            ai=ai,
         )
     elif source.id == "math_prep3_t1" and unit_title == "Ratio, Proportion, Direct Variation and Inverse Variation":
         render_verified_unit(
@@ -53,6 +54,7 @@ def render_math_world(ai: GeminiService) -> None:
             MATH_UNIT2_LESSONS,
             "math_u2_lesson",
             module_id="math",
+            ai=ai,
         )
     elif source.id == "math_prep3_t1" and unit_title == "Statistics":
         render_verified_unit(
@@ -60,6 +62,7 @@ def render_math_world(ai: GeminiService) -> None:
             MATH_UNIT3_LESSONS,
             "math_u3_lesson",
             module_id="math",
+            ai=ai,
         )
     elif source.id == "math_prep3_t1" and unit_title == "Trigonometry":
         render_verified_unit(
@@ -67,6 +70,7 @@ def render_math_world(ai: GeminiService) -> None:
             MATH_UNIT4_LESSONS,
             "math_u4_lesson",
             module_id="math",
+            ai=ai,
         )
     elif source.id == "math_prep3_t1" and unit_title == "Coordinate Geometry":
         render_verified_unit(
@@ -74,6 +78,7 @@ def render_math_world(ai: GeminiService) -> None:
             MATH_UNIT5_LESSONS,
             "math_u5_lesson",
             module_id="math",
+            ai=ai,
         )
     elif source.id == "math_prep3_t2" and unit_title == "Equations":
         render_verified_unit(
@@ -81,6 +86,7 @@ def render_math_world(ai: GeminiService) -> None:
             MATH_T2_UNIT1_LESSONS,
             "math_t2_u1_lesson",
             module_id="math",
+            ai=ai,
         )
     elif source.id == "math_prep3_t2" and unit_title == "Algebraic Rational Functions and the operations on them":
         render_verified_unit(
@@ -88,6 +94,7 @@ def render_math_world(ai: GeminiService) -> None:
             MATH_T2_UNIT2_LESSONS,
             "math_t2_u2_lesson",
             module_id="math",
+            ai=ai,
         )
     elif source.id == "math_prep3_t2" and unit_title == "Probability":
         render_verified_unit(
@@ -95,6 +102,7 @@ def render_math_world(ai: GeminiService) -> None:
             MATH_T2_UNIT3_LESSONS,
             "math_t2_u3_lesson",
             module_id="math",
+            ai=ai,
         )
     elif source.id == "math_prep3_t2" and unit_title == "The Circle":
         render_verified_unit(
@@ -102,6 +110,7 @@ def render_math_world(ai: GeminiService) -> None:
             MATH_T2_UNIT4_LESSONS,
             "math_t2_u4_lesson",
             module_id="math",
+            ai=ai,
         )
     elif source.id == "math_prep3_t2" and unit_title == "Angles and Arcs in the circle":
         render_verified_unit(
@@ -109,6 +118,7 @@ def render_math_world(ai: GeminiService) -> None:
             MATH_T2_UNIT5_LESSONS,
             "math_t2_u5_lesson",
             module_id="math",
+            ai=ai,
         )
     else:
         st.info(

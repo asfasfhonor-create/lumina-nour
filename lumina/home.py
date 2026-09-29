@@ -39,6 +39,10 @@ def render_home_foundation() -> None:
             unsafe_allow_html=True,
         )
 
+    badges = st.session_state.get("badges", [])
+    if badges:
+        st.caption("🏅 Badges: " + " · ".join(badges))
+
     _render_daily_mission()
     _render_learning_worlds()
 

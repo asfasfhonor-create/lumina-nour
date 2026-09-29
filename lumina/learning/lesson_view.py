@@ -10,6 +10,7 @@ from lumina.learning.scaffolding import (
     mission_theme,
     support_depth,
 )
+from lumina.curriculum.permanent_source_learning import render_permanent_source_booster
 
 
 def render_verified_unit(
@@ -18,6 +19,7 @@ def render_verified_unit(
     select_key: str,
     *,
     module_id: str,
+    ai=None,
 ) -> None:
     st.markdown(f"### {title}")
     st.caption("محتوى موثّق من مصدر المنهج.")
@@ -29,7 +31,7 @@ def render_verified_unit(
         format_func=lambda item: item.title,
         key=select_key,
     )
-    render_verified_lesson(lesson, module_id=module_id)
+    render_verified_lesson(lesson, module_id=module_id, ai=ai)
 
 
 def _pick_check(checks, attempts, mistakes):
@@ -74,7 +76,7 @@ def _render_concept_support(lesson, depth: int) -> None:
     st.caption("اقري الفكرة، وبعدها اختاري بإيدك. مفيش خصم على المحاولة.")
 
 
-def render_verified_lesson(lesson, *, module_id: str) -> None:
+def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
     store = get_learning_store()
     attempts = store.get_attempts(lesson.id)
     mistakes = store.get_mistakes(lesson.id)
@@ -105,6 +107,14 @@ def render_verified_lesson(lesson, *, module_id: str) -> None:
             st.markdown("**أفكار إضافية من المصدر**")
             for point in lesson.evidence_summary[2:]:
                 st.write(f"• {point}")
+
+    if ai is not None:
+        render_permanent_source_booster(
+            ai,
+            subject_id=module_id,
+            lesson_title=lesson.title,
+            stage_label=stage.label,
+        )
 
     checks = eligible_checks(lesson, stage)
     check = _pick_check(checks, attempts, mistakes)

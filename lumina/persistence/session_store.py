@@ -98,6 +98,7 @@ class SessionLearningStore(LearningStore):
             "learning_days",
             "rewarded_evidence",
             "english_profile",
+            "ai_profile",
             "daily_mission_lesson_id",
             "daily_mission_date",
         )

@@ -6,7 +6,7 @@ import streamlit as st
 
 from lumina.persistence.base import LearningStore
 from lumina.persistence.neon_store import NeonLearningStore
-from lumina.persistence.supabase_store import SupabaseLearningStore
+from lumina.persistence.postgres_store import PostgresLearningStore
 
 
 def _now_iso() -> str:

@@ -1190,7 +1190,7 @@ jobs:
           from streamlit.testing.v1 import AppTest
 
           flows = [
-              ("📅 خطتي", "خطتي"),
+              ("📅 خطتي", "الخطة الأسبوعية"),
               ("🧪 Exam Mode", "Exam"),
               ("📝 مراجعاتي", "Mistake Notebook"),
               ("👨‍👧 Parent Dashboard", "Parent Dashboard"),
@@ -1222,3 +1222,44 @@ jobs:
           print("Weekly, exam, review, and parent flows open and return successfully")
           PY
           rm -f .streamlit/secrets.toml
+
+      - name: Validate friendly contextual help system
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lumina.context_help import HELP_TEXTS, help_text
+
+          required = [
+              "curriculum_search",
+              "weekly_plan",
+              "exam_mode",
+              "review_center",
+              "daily_mission",
+              "english",
+              "science",
+              "math",
+              "arabic",
+              "social",
+              "religion",
+              "ict",
+              "ai",
+              "mastery",
+              "xp",
+              "streak",
+          ]
+          for key in required:
+              assert key in HELP_TEXTS, key
+              assert len(help_text(key)) >= 20, key
+
+          home = Path("lumina/home.py").read_text(encoding="utf-8")
+          assert "render_home_help()" in home
+          assert 'help=help_text("exam_mode")' in home
+          assert 'help=help_text(module.id)' in home
+
+          worlds = ["english", "science", "math", "arabic", "social", "religion", "ict"]
+          for world in worlds:
+              text = Path(f"lumina/worlds/{world}.py").read_text(encoding="utf-8")
+              assert f'render_context_help("{world}"' in text, world
+
+          print("Friendly contextual help is wired across Nour's main experience")
+          PY

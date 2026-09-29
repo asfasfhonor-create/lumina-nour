@@ -30,13 +30,13 @@ def render_ict_world(ai: GeminiService) -> None:
     )
 
     if chapter_title == "Data":
-        render_verified_unit("Chapter I · Data", ICT_CHAPTER1_LESSONS, "ict_c1_lesson", module_id="ict")
+        render_verified_unit("Chapter I · Data", ICT_CHAPTER1_LESSONS, "ict_c1_lesson", module_id="ict", ai=ai)
     elif chapter_title == "Branching":
-        render_verified_unit("Chapter II · Branching", ICT_CHAPTER2_LESSONS, "ict_c2_lesson", module_id="ict")
+        render_verified_unit("Chapter II · Branching", ICT_CHAPTER2_LESSONS, "ict_c2_lesson", module_id="ict", ai=ai)
     elif chapter_title == "Looping & Procedures":
-        render_verified_unit("Chapter III · Looping & Procedures", ICT_CHAPTER3_LESSONS, "ict_c3_lesson", module_id="ict")
+        render_verified_unit("Chapter III · Looping & Procedures", ICT_CHAPTER3_LESSONS, "ict_c3_lesson", module_id="ict", ai=ai)
     elif chapter_title == "Cyber bullying":
-        render_verified_unit("Chapter IV · Cyber bullying", ICT_CHAPTER4_LESSONS, "ict_c4_lesson", module_id="ict")
+        render_verified_unit("Chapter IV · Cyber bullying", ICT_CHAPTER4_LESSONS, "ict_c4_lesson", module_id="ict", ai=ai)
     render_temporary_source_session(
         ai,
         source,

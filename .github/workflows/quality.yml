@@ -28,6 +28,9 @@ jobs:
           import lumina.worlds.science
           import lumina.worlds.math
           import lumina.worlds.ict
+          import lumina.worlds.arabic
+          import lumina.worlds.social
+          import lumina.worlds.religion
           import lumina.parent_dashboard
           import lumina.persistence.session_store
           print("Import smoke test OK")
@@ -217,4 +220,27 @@ jobs:
               assert lesson.checks
               assert lesson.source_pages
           print("ICT Chapter 1 lesson contracts OK")
+          PY
+
+      - name: Validate Arabic Social Religion foundations
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.arabic_unit1 import ARABIC_UNIT1_LESSONS
+          from lumina.curriculum.social_unit1 import SOCIAL_UNIT1_LESSONS
+          from lumina.curriculum.religion_unit1 import RELIGION_UNIT1_LESSONS
+
+          assert len(ARABIC_UNIT1_LESSONS) == 1
+          assert ARABIC_UNIT1_LESSONS[0].title == "آداب التعامل مع الوالدين"
+          assert len(SOCIAL_UNIT1_LESSONS) == 1
+          assert SOCIAL_UNIT1_LESSONS[0].title == "موقع ومظاهر سطح قارات العالم الجديد"
+          assert len(RELIGION_UNIT1_LESSONS) == 1
+          assert RELIGION_UNIT1_LESSONS[0].title == "من أسماء الله الحسنى: الغفور"
+          for lesson in (
+              ARABIC_UNIT1_LESSONS[0],
+              SOCIAL_UNIT1_LESSONS[0],
+              RELIGION_UNIT1_LESSONS[0],
+          ):
+              assert lesson.checks
+              assert lesson.source_pages
+          print("Arabic, Social, Religion foundations OK")
           PY

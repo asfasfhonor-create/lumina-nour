@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 import streamlit as st
 
 from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS, all_mapped_lessons
+from lumina.curriculum.coverage import SOURCE_COVERAGE
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.persistence.session_store import get_learning_store
 from lumina.persistence.backup import export_learning_backup, restore_learning_backup
@@ -97,6 +98,14 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
             st.caption(profile["support_note"])
     else:
         st.caption("No Real English baseline completed yet.")
+
+    st.markdown("### Trusted source coverage")
+    st.caption("LUMINA لا يفترض Term غير موجود في المصادر الموثوقة.")
+    for subject_id, coverage in SOURCE_COVERAGE.items():
+        st.write(
+            f"**{SUBJECT_LABELS.get(subject_id, subject_id)}** — "
+            + ", ".join(coverage.supplied_terms)
+        )
 
     st.markdown("### Curriculum progress — all subjects")
     total_started = 0

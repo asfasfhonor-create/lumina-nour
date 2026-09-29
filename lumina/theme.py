@@ -26,17 +26,17 @@ header[data-testid="stHeader"],
   display:none !important;
 }
 .hero { background:linear-gradient(135deg,rgba(255,118,172,.16),rgba(116,185,255,.12)); border:1px solid rgba(255,255,255,.15); border-radius:26px; padding:20px; margin-bottom:14px; box-shadow:0 16px 50px rgba(0,0,0,.22); }
-.nour-photo-wrap { position:relative; width:154px; margin:0 auto 12px; text-align:center; }
+.nour-photo-wrap { position:relative; width:118px; margin:0 auto 10px; text-align:center; }
 .nour-photo-glow {
-  width:154px; height:188px; border-radius:30px; padding:4px;
+  width:118px; height:148px; border-radius:24px; padding:3px;
   background:linear-gradient(145deg,#ff8fc1,#b9a7ff 48%,#7ed6ff);
-  box-shadow:0 14px 38px rgba(126,214,255,.20),0 8px 28px rgba(255,143,193,.18);
+  box-shadow:0 10px 28px rgba(126,214,255,.16),0 7px 22px rgba(255,143,193,.14);
   overflow:hidden;
 }
 .nour-photo-glow img {
   display:block; width:100%; height:100%; object-fit:cover;
-  object-position:center 36%; border-radius:26px;
-  filter:brightness(1.06) contrast(1.04) saturate(1.04);
+  object-position:center center; border-radius:21px;
+  filter:none; image-rendering:auto;
 }
 .nour-photo-wrap::before,
 .nour-photo-wrap::after {
@@ -68,9 +68,9 @@ div[data-testid="stTabs"] button { font-weight:800; }
 @media (max-width:640px){
   .block-container{padding-left:.8rem;padding-right:.8rem;padding-top:.55rem}
   .brand{font-size:1.62rem}.hello{font-size:1.12rem}.stat{min-height:78px;padding:9px}
-  .nour-photo-wrap{width:132px;margin-bottom:8px}
-  .nour-photo-glow{width:132px;height:160px;border-radius:26px}
-  .nour-photo-glow img{border-radius:22px;object-position:center 34%}
+  .nour-photo-wrap{width:104px;margin-bottom:8px}
+  .nour-photo-glow{width:104px;height:132px;border-radius:22px}
+  .nour-photo-glow img{border-radius:19px;object-position:center center}
   .nour-photo-badge{font-size:.64rem;padding:4px 9px}
 }
 </style>

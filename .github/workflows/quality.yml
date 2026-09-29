@@ -887,10 +887,16 @@ jobs:
               ai_available=True,
               app_pin_configured=False,
               parent_pin_configured=True,
+              storage_status={
+                  "mode": "neon",
+                  "durable": True,
+                  "label": "Neon PostgreSQL",
+              },
           )
           by_key = {item.key: item for item in items}
           assert by_key["curriculum"].ready is True
           assert by_key["ai"].ready is True
+          assert by_key["storage"].ready is True
           assert by_key["parent_pin"].ready is True
           assert by_key["app_pin"].ready is False
           print("Release readiness diagnostics OK")

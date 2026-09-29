@@ -1089,3 +1089,40 @@ jobs:
           assert "temporary upload, not permanent storage" in source
           print("Page-aware curriculum source sessions wired across all school worlds")
           PY
+
+      - name: Streamlit AppTest home and navigation smoke
+        run: |
+          mkdir -p .streamlit
+          cat > .streamlit/secrets.toml <<'EOF'
+          GEMINI_API_KEY = ""
+          NOUR_APP_PIN = ""
+          PARENT_PIN = ""
+          NEON_DATABASE_URL = ""
+          NOUR_LEARNER_KEY = ""
+          EOF
+          python - <<'PY'
+          from streamlit.testing.v1 import AppTest
+
+          at = AppTest.from_file("app.py", default_timeout=20)
+          at.run()
+          assert not at.exception, at.exception
+          labels = [button.label for button in at.button]
+          for expected in [
+              "🔎 ابحثي في المنهج",
+              "📅 خطتي",
+              "🧪 Exam Mode",
+              "📝 مراجعاتي",
+              "👨‍👧 Parent Dashboard",
+              "ادخلي English Adventure",
+              "ادخلي Science Lab",
+              "ادخلي Math Quest",
+          ]:
+              assert expected in labels, (expected, labels)
+
+          next(button for button in at.button if button.label == "🔎 ابحثي في المنهج").click()
+          at.run()
+          assert not at.exception, at.exception
+          assert any("Curriculum" in markdown.value or "المنهج" in markdown.value for markdown in at.markdown)
+          print("Streamlit AppTest home/navigation smoke OK")
+          PY
+          rm -f .streamlit/secrets.toml

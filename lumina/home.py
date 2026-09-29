@@ -10,7 +10,7 @@ from lumina.session_state import current_level
 
 def render_home_foundation() -> None:
     """Render the current Nour's World foundation without owning learning business logic."""
-    photo_col, hero_col = st.columns([1, 4], vertical_alignment="center")
+    photo_col, hero_col = st.columns([1, 4])
     with photo_col:
         st.image("assets/nour_avatar.jpg", width=92)
     with hero_col:

@@ -513,11 +513,11 @@ jobs:
       - name: Validate durable persistence adapter imports
         run: |
           python - <<'PY'
-          from lumina.persistence.postgres_store import PostgresLearningStore
+          from lumina.persistence.neon_store import NeonLearningStore
           from lumina.persistence.session_store import get_learning_store
-          assert PostgresLearningStore.__name__ == "PostgresLearningStore"
+          assert NeonLearningStore.__name__ == "NeonLearningStore"
           assert callable(get_learning_store)
-          print("Neon/PostgreSQL persistence adapter imports OK")
+          print("Neon persistence adapter imports OK")
           PY
 
       - name: Validate curriculum search
@@ -544,7 +544,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
-          sql = Path("postgres/neon_schema.sql").read_text(encoding="utf-8")
+          sql = Path("neon/lumina_schema.sql").read_text(encoding="utf-8")
           for table in (
               "lumina_learning_attempts",
               "lumina_mistakes",

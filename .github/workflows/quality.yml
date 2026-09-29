@@ -649,3 +649,16 @@ jobs:
           assert callable(lumina.review_center.render_review_center)
           print("Direct review retry imports OK")
           PY
+
+      - name: Validate focused lesson navigation
+        run: |
+          python - <<'PY'
+          import lumina.lesson_focus
+          from lumina.learning.missions import get_lesson_by_id, get_module_for_lesson_id
+
+          lesson = get_lesson_by_id("math_t2_u5_l1")
+          assert lesson is not None
+          assert get_module_for_lesson_id(lesson.id) == "math"
+          assert callable(lumina.lesson_focus.render_lesson_focus)
+          print("Focused lesson navigation OK")
+          PY

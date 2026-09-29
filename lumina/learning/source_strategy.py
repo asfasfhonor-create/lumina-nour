@@ -83,3 +83,18 @@ def correction_references(sources: list[dict]) -> list[dict]:
         for source in sources
         if source.get("active") and source_policy(source.get("metadata")).correction_reference
     ]
+
+
+def choose_practice_source(sources: list[dict]) -> dict | None:
+    preferred = ("assessment_revision", "revision_exam", "main_book")
+    for resource_use in preferred:
+        for source in sources:
+            policy = source_policy(source.get("metadata"))
+            if (
+                source.get("active")
+                and policy.learner_visible
+                and policy.practice
+                and policy.resource_use == resource_use
+            ):
+                return source
+    return None

@@ -109,7 +109,7 @@ def render_verified_lesson(lesson, *, module_id: str) -> None:
                         "source_pages": lesson.source_pages,
                     }
                 )
-                st.warning("مش لسه. استخدمي التلميح وجربي مرة تانية.")
+                st.warning("لسه محتاجة محاولة تانية. استخدمي التلميح وجربي من جديد.")
                 st.info(f"تلميح: {check.hint}")
 
     attempts = store.get_attempts(lesson.id)

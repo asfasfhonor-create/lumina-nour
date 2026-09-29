@@ -5,9 +5,7 @@ from lumina.curriculum.catalog import ENGLISH_T1
 from lumina.curriculum.grounding import build_grounded_pdf, curriculum_prompt
 from lumina.curriculum.english_curriculum import get_english_lessons
 from lumina.curriculum.english_reviews import get_review
-from lumina.learning.progress import derive_mastery, mastery_label
-from lumina.learning.progress_view import render_learning_brain_summary
-from lumina.persistence.session_store import get_learning_store
+from lumina.learning.lesson_view import render_verified_unit
 
 
 def render_english_world(ai: GeminiService) -> None:
@@ -57,15 +55,21 @@ def _render_school_track(ai: GeminiService) -> None:
             "Design Thinking": 5,
             "Why Do We Like Stories?": 6,
         }[unit_title]
-        _render_verified_unit(
+        render_verified_unit(
             f"Unit {unit_number} · {unit_title}",
             lessons,
             f"english_u{unit_number}_lesson",
+            module_id="english",
         )
     elif unit_title in {"Review 1", "Review 2"}:
         review = get_review(unit_title)
         if review:
-            _render_verified_unit(unit_title, (review,), f"english_{review.unit_id}_lesson")
+            render_verified_unit(
+                unit_title,
+                (review,),
+                f"english_{review.unit_id}_lesson",
+                module_id="english",
+            )
 
     st.markdown("---")
     st.caption("Advanced source session")
@@ -203,108 +207,3 @@ Keep it concise and practical."""
         st.markdown(ai.generate(prompt))
 
 
-def _render_verified_unit(title: str, lessons, select_key: str) -> None:
-    st.markdown(f"### {title}")
-    st.caption("Verified from the supplied English curriculum source.")
-    render_learning_brain_summary([lesson.id for lesson in lessons])
-
-    lesson = st.selectbox(
-        "Choose lesson",
-        lessons,
-        format_func=lambda item: item.title,
-        key=select_key,
-    )
-    _render_verified_lesson(lesson)
-
-
-def _render_verified_lesson(lesson) -> None:
-    store = get_learning_store()
-    st.markdown(f"### {lesson.title}")
-    st.caption(f"Verified curriculum extract · {lesson.source_pages}")
-
-    with st.expander("What you will learn", expanded=True):
-        for objective in lesson.objectives:
-            st.write(f"• {objective}")
-
-    st.markdown("**Key words / language**")
-    st.write(" · ".join(lesson.key_terms))
-
-    st.markdown("**Core ideas from the lesson**")
-    for point in lesson.evidence_summary:
-        st.write(f"• {point}")
-
-    st.markdown("#### Quick understanding checks")
-    for check in lesson.checks:
-        answer = st.radio(
-            check.prompt,
-            list(check.options),
-            index=None,
-            key=f"lesson_check_{lesson.id}_{check.id}",
-        )
-
-        if st.button("Check my thinking", key=f"lesson_check_button_{lesson.id}_{check.id}") and answer:
-            selected_index = list(check.options).index(answer)
-            correct = selected_index == check.correct_index
-            attempt = {
-                "module_id": "english",
-                "unit_id": lesson.unit_id,
-                "lesson_id": lesson.id,
-                "check_id": check.id,
-                "evidence_id": check.id,
-                "answer": answer,
-                "correct": correct,
-                "source_pages": lesson.source_pages,
-            }
-            store.record_attempt(attempt)
-
-            if correct:
-                store.resolve_mistake(lesson.id, check.id)
-                store.complete_review(lesson.id, check.id)
-                st.success("Good thinking — this matches the lesson.")
-            else:
-                store.record_mistake(
-                    {
-                        "module_id": "english",
-                        "unit_id": lesson.unit_id,
-                        "lesson_id": lesson.id,
-                        "lesson_title": lesson.title,
-                        "check_id": check.id,
-                        "question": check.prompt,
-                        "answer": answer,
-                        "mistake_type": "concept_understanding",
-                        "hint": check.hint,
-                        "source_pages": lesson.source_pages,
-                        "resolved": False,
-                    }
-                )
-                store.queue_review(
-                    {
-                        "module_id": "english",
-                        "lesson_id": lesson.id,
-                        "lesson_title": lesson.title,
-                        "check_id": check.id,
-                        "status": "due",
-                        "reason": "incorrect_understanding_check",
-                        "source_pages": lesson.source_pages,
-                    }
-                )
-                st.warning("Not yet. Use the hint, then try again.")
-                st.info(f"Hint: {check.hint}")
-
-    attempts = store.get_attempts(lesson.id)
-    mistakes = store.get_mistakes(lesson.id)
-    mastery = derive_mastery(attempts, mistakes)
-    st.caption(
-        f"Mastery: {mastery_label(mastery.state)} · "
-        f"{mastery.correct_attempts}/{mastery.attempts} successful attempt(s) · "
-        f"{mastery.distinct_evidence} distinct evidence item(s) · "
-        f"{mastery.unresolved_mistakes} unresolved mistake(s)"
-    )
-
-    due_reviews = [
-        review
-        for review in store.get_reviews("due")
-        if review.get("lesson_id") == lesson.id
-    ]
-    if due_reviews:
-        st.warning("Review due: this lesson has something worth revisiting before moving on.")

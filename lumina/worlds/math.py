@@ -7,6 +7,11 @@ from lumina.curriculum.math_unit2 import MATH_UNIT2_LESSONS
 from lumina.curriculum.math_unit3 import MATH_UNIT3_LESSONS
 from lumina.curriculum.math_unit4 import MATH_UNIT4_LESSONS
 from lumina.curriculum.math_unit5 import MATH_UNIT5_LESSONS
+from lumina.curriculum.math_t2_unit1 import MATH_T2_UNIT1_LESSONS
+from lumina.curriculum.math_t2_unit2 import MATH_T2_UNIT2_LESSONS
+from lumina.curriculum.math_t2_unit3 import MATH_T2_UNIT3_LESSONS
+from lumina.curriculum.math_t2_unit4 import MATH_T2_UNIT4_LESSONS
+from lumina.curriculum.math_t2_unit5 import MATH_T2_UNIT5_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
 
 
@@ -64,6 +69,41 @@ def render_math_world(ai: GeminiService) -> None:
             "Unit 5 · Coordinate Geometry",
             MATH_UNIT5_LESSONS,
             "math_u5_lesson",
+            module_id="math",
+        )
+    elif source.id == "math_prep3_t2" and unit_title == "Equations":
+        render_verified_unit(
+            "Term 2 · Unit 1 · Equations",
+            MATH_T2_UNIT1_LESSONS,
+            "math_t2_u1_lesson",
+            module_id="math",
+        )
+    elif source.id == "math_prep3_t2" and unit_title == "Algebraic Rational Functions and the operations on them":
+        render_verified_unit(
+            "Term 2 · Unit 2 · Algebraic Rational Functions",
+            MATH_T2_UNIT2_LESSONS,
+            "math_t2_u2_lesson",
+            module_id="math",
+        )
+    elif source.id == "math_prep3_t2" and unit_title == "Probability":
+        render_verified_unit(
+            "Term 2 · Unit 3 · Probability",
+            MATH_T2_UNIT3_LESSONS,
+            "math_t2_u3_lesson",
+            module_id="math",
+        )
+    elif source.id == "math_prep3_t2" and unit_title == "The Circle":
+        render_verified_unit(
+            "Term 2 · Unit 4 · The Circle",
+            MATH_T2_UNIT4_LESSONS,
+            "math_t2_u4_lesson",
+            module_id="math",
+        )
+    elif source.id == "math_prep3_t2" and unit_title == "Angles and Arcs in the circle":
+        render_verified_unit(
+            "Term 2 · Unit 5 · Angles and Arcs in the Circle",
+            MATH_T2_UNIT5_LESSONS,
+            "math_t2_u5_lesson",
             module_id="math",
         )
     else:

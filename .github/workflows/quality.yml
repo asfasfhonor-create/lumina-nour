@@ -29,3 +29,19 @@ jobs:
           assert len({module.id for module in subjects}) == len(subjects)
           print("Module registry OK")
           PY
+      - name: Validate curriculum catalog
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.catalog import ENGLISH_T1, SOURCES, get_sources
+
+          assert len(SOURCES) == 7
+          assert len(get_sources("english")) == 1
+          assert ENGLISH_T1.filename == "English_language_prep3_t1.pdf"
+          assert [unit.title for unit in ENGLISH_T1.units][:3] == [
+              "Personal Identity",
+              "Communication with Family and Friends",
+              "Artificial Intelligence",
+          ]
+          assert len({source.id for source in SOURCES}) == len(SOURCES)
+          print("Curriculum catalog OK")
+          PY

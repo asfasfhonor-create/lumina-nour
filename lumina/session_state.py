@@ -15,6 +15,7 @@ def initialize_session_state() -> None:
         "mistake_notebook": [],
         "review_queue": [],
         "parent_unlocked": False,
+        "app_unlocked": False,
         "english_profile": {},
         "rewarded_evidence": [],
         "learning_days": [],

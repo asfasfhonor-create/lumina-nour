@@ -7,16 +7,16 @@ from lumina.ai_service import GeminiService
 
 def _need_ai(ai: GeminiService) -> bool:
     if not ai.available:
-        st.warning("فعّلي Gemini API Key أولاً لتشغيل الأداة.")
+        st.warning("الأداة الذكية دي لسه مش مفعّلة. باقي البرنامج شغال عادي.")
         return False
     return True
 
 
 def render_quick_access(ai: GeminiService) -> None:
     """Render preserved utility tools while the structured learning worlds are rebuilt."""
-    st.markdown('<div class="section-title">⚡ Quick Access · أدواتك الحالية</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">⚡ أدوات سريعة</div>', unsafe_allow_html=True)
 
-    tabs = st.tabs(["📄 PDF", "💬 AI Buddy", "📸 مسألة", "🇬🇧 English", "🗝️ Escape", "💻 Python", "🎯 أهدافي"])
+    tabs = st.tabs(["📄 ملف PDF", "💬 مساعد ذكي", "📸 حل مسألة", "🇬🇧 English", "🗝️ مغامرة", "💻 Python", "🎯 أهدافي"])
 
     with tabs[0]:
         _render_pdf_tool(ai)
@@ -36,7 +36,7 @@ def render_quick_access(ai: GeminiService) -> None:
 
 def _render_pdf_tool(ai: GeminiService) -> None:
     st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-    st.subheader("رفيقة المنهج والـ PDF")
+    st.subheader("اسألي من ملف أو مذكرة")
     uploaded_pdf = st.file_uploader("ارفعي كتابًا أو مذكرة PDF", type=["pdf"], key="pdf")
 
     if uploaded_pdf:
@@ -88,7 +88,7 @@ def _render_pdf_tool(ai: GeminiService) -> None:
 
 def _render_ai_buddy(ai: GeminiService) -> None:
     buddy = st.selectbox(
-        "مين يذاكر معاكي؟",
+        "اختاري أسلوب المساعدة",
         ["أستاذ ألبرت 🔬", "المحقق التاريخي 📜", "صديقتك الملهمة 🌸"],
     )
     prompts = {
@@ -132,7 +132,7 @@ def _render_problem_coach(ai: GeminiService) -> None:
 
 
 def _render_english_helper(ai: GeminiService) -> None:
-    st.subheader("English Adventure")
+    st.subheader("تدريب English")
     assistance = st.select_slider(
         "درجة المساعدة",
         options=["مساعدة كبيرة", "متوسطة", "تحدي"],

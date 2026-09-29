@@ -10,6 +10,9 @@ from lumina.persistence.base import PersistenceError
 from lumina.persistence.backup import export_learning_backup, restore_learning_backup
 from lumina.learning.evidence_cache import group_by_lesson
 from lumina.readiness import build_release_readiness, is_release_ready, release_blockers
+from lumina.curriculum.trusted_sources import SourceUpload, build_trusted_record, NEON_OBJECT_STORAGE
+from lumina.curriculum.trusted_source_storage import StorageConfig, NeonTrustedSourceStorage
+from lumina.persistence.trusted_source_catalog import NeonTrustedSourceCatalog
 
 
 def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = False, app_pin_configured: bool = False) -> None:
@@ -244,7 +247,119 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
         f"started: {total_started} · progress is based on evidence, not button clicks."
     )
 
+    _render_trusted_sources()
     _render_backup_tools(store)
+
+
+
+def _render_trusted_sources() -> None:
+    st.markdown("### المصادر الدائمة")
+    st.caption("أضف كتابًا أو مذكرة مرة واحدة كمصدر معتمد يفضل محفوظ بعد إغلاق البرنامج.")
+
+    database_url = str(st.secrets.get("NEON_DATABASE_URL", "") or "").strip()
+    learner_key = str(st.secrets.get("NOUR_LEARNER_KEY", "") or "").strip()
+    storage_config = StorageConfig.from_mapping(st.secrets)
+
+    if not database_url or not learner_key:
+        st.info("الحفظ الدائم للمصادر غير جاهز لأن إعداد قاعدة البيانات ناقص.")
+        return
+
+    if storage_config is None:
+        st.info("تخزين الملفات الدائم لسه محتاج تفعيل بيانات التخزين الآمنة في إعدادات التطبيق.")
+        return
+
+    storage = NeonTrustedSourceStorage(storage_config)
+    catalog = NeonTrustedSourceCatalog(database_url, learner_key)
+
+    if not storage.health_check():
+        st.warning("تخزين الملفات الدائم غير متاح دلوقتي. جرّب مرة تانية لاحقًا.")
+        return
+
+    uploaded = st.file_uploader(
+        "أضف كتابًا أو مذكرة كمصدر دائم",
+        type=["pdf", "jpg", "jpeg", "png", "webp"],
+        key="parent_trusted_source_upload",
+    )
+
+    if uploaded:
+        display_name = st.text_input(
+            "اسم المصدر داخل البرنامج",
+            value=uploaded.name,
+            key="parent_trusted_source_display_name",
+        )
+        subject_id = st.selectbox(
+            "المادة",
+            list(SUBJECT_LABELS.keys()),
+            format_func=lambda sid: SUBJECT_LABELS.get(sid, sid),
+            key="parent_trusted_source_subject",
+        )
+        term_label = st.text_input(
+            "الترم / الفصل الدراسي",
+            placeholder="مثال: Term 1",
+            key="parent_trusted_source_term",
+        )
+        unit_label = st.text_input(
+            "الوحدة / الفصل — اختياري",
+            key="parent_trusted_source_unit",
+        )
+
+        if st.button("اعتماد وحفظ المصدر", key="parent_trusted_source_save", use_container_width=True):
+            if not term_label.strip():
+                st.warning("اكتب الترم أو الفصل الدراسي الأول.")
+            else:
+                try:
+                    upload = SourceUpload(
+                        filename=uploaded.name,
+                        mime_type=uploaded.type,
+                        data=uploaded.getvalue(),
+                    )
+                    storage_key = storage.put(upload, learner_key=learner_key)
+                    record = build_trusted_record(
+                        upload,
+                        learner_key=learner_key,
+                        display_name=display_name,
+                        subject=subject_id,
+                        term_label=term_label,
+                        unit_label=unit_label or None,
+                        storage_provider=NEON_OBJECT_STORAGE,
+                        storage_key=storage_key,
+                    )
+                    created = catalog.register(record)
+                    if created:
+                        st.success("تم حفظ المصدر واعتماده بشكل دائم ✅")
+                    else:
+                        st.info("المصدر ده محفوظ بالفعل، ومش محتاج نضيف نسخة مكررة.")
+                    st.rerun()
+                except (ValueError, PersistenceError) as exc:
+                    st.error(str(exc))
+                except Exception:
+                    st.error("تعذر حفظ المصدر الدائم الآن. لم يتم اعتماده.")
+
+    try:
+        sources = catalog.list_active()
+    except PersistenceError as exc:
+        st.warning(str(exc))
+        return
+
+    if sources:
+        st.markdown("#### المصادر المعتمدة حاليًا")
+        for source in sources:
+            with st.container(border=True):
+                st.write(
+                    f"**{source['display_name']}** · "
+                    f"{SUBJECT_LABELS.get(source['subject'], source['subject'])} · "
+                    f"{source['term_label']}"
+                )
+                if source.get("unit_label"):
+                    st.caption(f"الوحدة / الفصل: {source['unit_label']}")
+                st.caption(f"الملف: {source['filename']}")
+                if st.button("أرشفة المصدر", key=f"archive_source_{source['source_id']}"):
+                    try:
+                        catalog.archive(source["source_id"])
+                        st.success("تمت أرشفة المصدر بدون حذف سجل التعلّم المرتبط به.")
+                        st.rerun()
+                    except PersistenceError as exc:
+                        st.error(str(exc))
 
 
 def _render_backup_tools(store) -> None:

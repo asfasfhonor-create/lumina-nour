@@ -2,7 +2,7 @@ import streamlit as st
 
 from lumina.curriculum.english_curriculum import ENGLISH_UNIT_LESSONS, all_english_lessons
 from lumina.learning.progress import derive_mastery, mastery_label
-from lumina.session_state import get_learning_attempts, get_mistakes, get_reviews
+from lumina.persistence.session_store import get_learning_store
 
 
 def render_parent_dashboard(parent_pin: str | None) -> None:
@@ -29,9 +29,10 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
         st.session_state.parent_unlocked = False
         st.rerun()
 
-    attempts = get_learning_attempts()
-    mistakes = get_mistakes(unresolved_only=True)
-    reviews = get_reviews("due")
+    store = get_learning_store()
+    attempts = store.get_attempts()
+    mistakes = store.store.get_mistakes(unresolved_only=True)
+    reviews = store.get_reviews("due")
 
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -47,7 +48,7 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
         states = []
         for lesson in lessons:
             lesson_attempts = [a for a in attempts if a.get("lesson_id") == lesson.id]
-            lesson_mistakes = get_mistakes(lesson.id)
+            lesson_mistakes = store.get_mistakes(lesson.id)
             states.append(derive_mastery(lesson_attempts, lesson_mistakes).state)
 
         started = sum(1 for state in states if state != "not_started")
@@ -73,7 +74,7 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
     started_lessons = 0
     states = []
     for lesson in all_english_lessons():
-        snapshot = derive_mastery(get_learning_attempts(lesson.id), get_mistakes(lesson.id))
+        snapshot = derive_mastery(store.get_attempts(lesson.id), store.get_mistakes(lesson.id))
         states.append(snapshot.state)
         if snapshot.state != "not_started":
             started_lessons += 1

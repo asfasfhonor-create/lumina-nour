@@ -105,6 +105,9 @@ class SessionLearningStore(LearningStore):
         for key, value in state.items():
             st.session_state[key] = value
 
+    def health_check(self) -> bool:
+        return True
+
 
 _SESSION_STORE = SessionLearningStore()
 _REMOTE_STORE: LearningStore | None = None

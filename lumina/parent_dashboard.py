@@ -13,7 +13,7 @@ from lumina.readiness import build_release_readiness, is_release_ready, release_
 
 
 def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = False, app_pin_configured: bool = False) -> None:
-    st.markdown('<div class="section-title">👨‍👧 Parent Dashboard</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">👨‍👧 لوحة وليّ الأمر</div>', unsafe_allow_html=True)
 
     if not parent_pin:
         st.info(
@@ -23,8 +23,8 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
         return
 
     if not st.session_state.get("parent_unlocked", False):
-        entered = st.text_input("Parent PIN", type="password", key="parent_pin_input")
-        if st.button("Open Parent Dashboard", key="parent_unlock"):
+        entered = st.text_input("رمز وليّ الأمر", type="password", key="parent_pin_input")
+        if st.button("فتح لوحة وليّ الأمر", key="parent_unlock"):
             if entered == parent_pin:
                 st.session_state.parent_unlocked = True
                 st.rerun()
@@ -32,16 +32,16 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
                 st.error("PIN غير صحيح.")
         return
 
-    if st.button("Lock Parent Dashboard", key="parent_lock"):
+    if st.button("قفل لوحة وليّ الأمر", key="parent_lock"):
         st.session_state.parent_unlocked = False
         st.rerun()
 
     store = get_learning_store()
     status = persistence_status()
 
-    st.markdown("### System status")
+    st.markdown("### حالة النظام")
     if status["durable"]:
-        st.success(f"Durable learning storage: {status['label']}")
+        st.success(f"الحفظ الدائم يعمل: {status['label']}")
         if st.button("اختبر اتصال الحفظ السحابي", key="parent_test_persistence"):
             try:
                 if store.health_check():
@@ -55,11 +55,11 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
                 st.session_state.persistence_verified = False
                 st.error(str(exc))
     elif status["mode"] == "session_fallback":
-        st.warning("Cloud persistence is unavailable in this session. Download a backup before closing.")
+        st.warning("الحفظ السحابي غير متاح في الجلسة الحالية. نزّل نسخة احتياطية قبل الإغلاق.")
     else:
-        st.warning("Durable cloud persistence is not configured yet; progress is session-only.")
+        st.warning("الحفظ الدائم غير مفعّل حاليًا؛ التقدّم محفوظ داخل الجلسة فقط.")
 
-    st.markdown("### Release readiness")
+    st.markdown("### جاهزية النسخة")
     readiness = build_release_readiness(
         ai_available=ai_available,
         app_pin_configured=app_pin_configured,
@@ -68,11 +68,11 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
         storage_verified=bool(st.session_state.get("persistence_verified", False)),
     )
     if is_release_ready(readiness):
-        st.success("Required release checks are ready.")
+        st.success("كل متطلبات النسخة الأساسية جاهزة.")
     else:
         blockers = release_blockers(readiness)
         st.warning(
-            "Required blockers: "
+            "متطلبات لسه محتاجة إكمال: "
             + " · ".join(item.label for item in blockers)
         )
 
@@ -83,7 +83,7 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
             icon = "⚠️"
         else:
             icon = "ℹ️"
-        requirement = "" if item.required else " · optional"
+        requirement = "" if item.required else " · اختياري"
         st.write(f"{icon} **{item.label}** — {item.detail}{requirement}")
 
     attempts = store.get_attempts()
@@ -95,13 +95,13 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
 
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.metric("Learning attempts", len(attempts))
+        st.metric("محاولات التعلّم", len(attempts))
     with c2:
-        st.metric("Mistakes to review", len(mistakes))
+        st.metric("أخطاء للمراجعة", len(mistakes))
     with c3:
-        st.metric("Reviews due", len(reviews))
+        st.metric("مراجعات مستحقة", len(reviews))
 
-    st.markdown("### Weekly learning snapshot")
+    st.markdown("### ملخص آخر 7 أيام")
     cutoff = datetime.now(timezone.utc) - timedelta(days=7)
 
     def _is_recent(item: dict) -> bool:
@@ -127,26 +127,26 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
 
     w1, w2, w3 = st.columns(3)
     with w1:
-        st.metric("Attempts · 7 days", len(recent_attempts))
+        st.metric("المحاولات · 7 أيام", len(recent_attempts))
     with w2:
-        st.metric("Successful · 7 days", recent_correct)
+        st.metric("الإجابات الصحيحة · 7 أيام", recent_correct)
     with w3:
-        st.metric("New mistakes · 7 days", len(recent_mistakes))
+        st.metric("أخطاء جديدة · 7 أيام", len(recent_mistakes))
 
     if active_subjects:
         st.caption(
-            "Subjects active this week: "
+            "المواد النشطة هذا الأسبوع: "
             + " · ".join(SUBJECT_LABELS.get(sid, sid) for sid in active_subjects)
         )
     else:
-        st.caption("No timestamped learning evidence in the last 7 days yet.")
+        st.caption("لسه مفيش نشاط تعلّم مسجل خلال آخر 7 أيام.")
 
     badges = st.session_state.get("badges", [])
     if badges:
-        st.caption("Badges earned: " + " · ".join(badges))
+        st.caption("الشارات المكتسبة: " + " · ".join(badges))
 
     profile = st.session_state.get("english_profile", {})
-    st.markdown("### Real English profile")
+    st.markdown("### مستوى Real English")
     if profile:
         st.write(
             f"Starting band: **{profile.get('broad_band', '—')}** · "
@@ -155,9 +155,9 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
         if profile.get("support_note"):
             st.caption(profile["support_note"])
     else:
-        st.caption("No Real English baseline completed yet.")
+        st.caption("لسه ما اتعملش اختبار تحديد المستوى لـ Real English.")
 
-    st.markdown("### Trusted source coverage")
+    st.markdown("### تغطية المصادر المعتمدة")
     st.caption("LUMINA لا يفترض Term غير موجود في المصادر الموثوقة.")
     for subject_id, coverage in SOURCE_COVERAGE.items():
         st.write(
@@ -165,7 +165,7 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
             + ", ".join(coverage.supplied_terms)
         )
 
-    st.markdown("### Curriculum progress — all subjects")
+    st.markdown("### تقدّم المنهج — كل المواد")
     total_started = 0
     total_mapped = 0
 
@@ -214,7 +214,7 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
                 )
 
     if mistakes:
-        st.markdown("### Current weak points")
+        st.markdown("### نقاط محتاجة مراجعة")
         seen_weak_lessons = set()
         for mistake in mistakes:
             lesson_id = mistake.get("lesson_id")
@@ -248,14 +248,14 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
 
 
 def _render_backup_tools(store) -> None:
-    st.markdown("### Backup / Restore")
+    st.markdown("### النسخة الاحتياطية والاستعادة")
     st.caption(
         "Portable safety copy. When Neon is active, the database remains the primary source of truth. "
         "The backup contains learning progress, never database passwords or API keys."
     )
 
     st.download_button(
-        "Download learning backup",
+        "تنزيل نسخة احتياطية",
         data=export_learning_backup(store),
         file_name="lumina_nour_learning_backup.json",
         mime="application/json",
@@ -263,11 +263,11 @@ def _render_backup_tools(store) -> None:
     )
 
     uploaded = st.file_uploader(
-        "Restore a learning backup",
+        "استعادة نسخة احتياطية",
         type=["json"],
         key="restore_learning_backup_file",
     )
-    if uploaded and st.button("Restore this backup", key="restore_learning_backup_button"):
+    if uploaded and st.button("استعادة هذه النسخة", key="restore_learning_backup_button"):
         ok, message = restore_learning_backup(uploaded.getvalue().decode("utf-8"), store)
         if ok:
             st.success(message)

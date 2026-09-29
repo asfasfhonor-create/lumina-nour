@@ -1,4 +1,6 @@
 from datetime import date
+import base64
+from pathlib import Path
 
 import streamlit as st
 
@@ -13,9 +15,21 @@ from lumina.context_help import help_text, render_home_help
 
 def render_home_foundation() -> None:
     """Render the current Nour's World foundation without owning learning business logic."""
-    photo_col, hero_col = st.columns([1, 4])
+    photo_col, hero_col = st.columns([1.25, 4], vertical_alignment="center")
     with photo_col:
-        st.image("assets/nour_avatar.jpg", width=92)
+        photo_bytes = Path("assets/nour_avatar.jpg").read_bytes()
+        photo_b64 = base64.b64encode(photo_bytes).decode("ascii")
+        st.markdown(
+            f"""
+            <div class="nour-photo-wrap" aria-label="صورة نور">
+              <div class="nour-photo-glow">
+                <img src="data:image/jpeg;base64,{photo_b64}" alt="نور" />
+              </div>
+              <div class="nour-photo-badge">✨ NOUR</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
     with hero_col:
         st.markdown(
         """

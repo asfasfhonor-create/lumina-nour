@@ -1,5 +1,7 @@
 import streamlit as st
 
+from lumina.context_help import render_context_help
+
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import SOCIAL_T1
 from lumina.curriculum.social_unit1 import SOCIAL_U1_LESSONS
@@ -12,6 +14,7 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 def render_social_world(ai: GeminiService) -> None:
     st.markdown('<div class="section-title">🌍 Social Detective</div>', unsafe_allow_html=True)
+    render_context_help("social", label="💬 قوليلي العالم ده بيعمل إيه")
     st.markdown(
         '<div class="mission"><b>خريطة + دليل + استنتاج.</b><br>'
         '<span class="muted">الدراسات هنا تحقيق: نقرأ الخريطة ونربط السبب بالنتيجة بدل الحفظ المنفصل.</span></div>',

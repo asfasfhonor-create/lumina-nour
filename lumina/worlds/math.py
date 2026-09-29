@@ -1,5 +1,7 @@
 import streamlit as st
 
+from lumina.context_help import render_context_help
+
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import MATH_T1, MATH_T2
 from lumina.curriculum.math_unit1 import MATH_UNIT1_LESSONS
@@ -18,6 +20,7 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 def render_math_world(ai: GeminiService) -> None:
     st.markdown('<div class="section-title">➗ Math Quest</div>', unsafe_allow_html=True)
+    render_context_help("math", label="💬 قوليلي العالم ده بيعمل إيه")
     st.markdown(
         '<div class="mission"><b>Understand the pattern before using the rule.</b><br>'
         '<span class="muted">Math Quest follows Nour\'s supplied curriculum and keeps notation and reasoning visible.</span></div>',

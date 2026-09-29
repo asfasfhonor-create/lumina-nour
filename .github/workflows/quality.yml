@@ -45,3 +45,17 @@ jobs:
           assert len({source.id for source in SOURCES}) == len(SOURCES)
           print("Curriculum catalog OK")
           PY
+
+      - name: Validate first curriculum lesson
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.english_unit1 import ENGLISH_U1_L1
+
+          assert ENGLISH_U1_L1.title == "Beyond My Looks"
+          assert ENGLISH_U1_L1.source_pages == "Book pages 14–15"
+          assert ENGLISH_U1_L1.checks
+          check = ENGLISH_U1_L1.checks[0]
+          assert len(check.options) == 3
+          assert check.correct_index == 1
+          print("English lesson contract OK")
+          PY

@@ -1,6 +1,6 @@
 # LUMINA / NOUR'S WORLD — MASTER SPECIFICATION
 
-**Status:** Master v1.1 — APPROVED IMPLEMENTATION AUTHORITY  
+**Status:** Master v1.2 — APPROVED IMPLEMENTATION AUTHORITY  
 **Date:** 2026-09-29  
 **Product owner:** Mohamed  
 **Learner:** Nour  
@@ -1063,3 +1063,23 @@ This revision does not change the product mission. It records verified implement
 - English Term 1, Science Term 1, and Math Term 1 have progressed from inventory-only status to structured verified lesson mappings in the development branch.
 
 All architectural principles and acceptance criteria from v1.0 remain in force.
+
+
+---
+
+## 41. Master v1.2 change note
+
+This revision records implementation progress without changing the governing product mission or acceptance criteria.
+
+Verified development-branch state:
+- A cross-subject mapped curriculum registry now contains 142 structured learning blocks across all seven supplied subject areas, excluding two additional structured English review blocks.
+- English Term 1 is mapped across six units; Science and Math are mapped across both verified terms contained in their supplied PDFs; Arabic, Social Studies, and Religion are mapped for the supplied Term 1; ICT is mapped for the supplied Second Semester.
+- Missing terms are not invented. A subject/term becomes curriculum-authoritative only when a trusted source supports it.
+- A reusable all-subject Exam Mode now creates learning evidence and routes mistakes into review.
+- Daily Mission selection now prioritizes due review and otherwise chooses from not-started mapped learning content.
+- XP, streak, and badges are tied to new demonstrated learning evidence rather than simple button clicks.
+- Parent Dashboard now aggregates all mapped subjects and includes a seven-day evidence snapshot.
+- Learning attempts, mistakes, and review records now carry timestamps in the current persistence adapter.
+- The persistence contract remains backend-independent; current session storage/manual backup is a temporary adapter, not the final durable database.
+
+Outstanding high-priority work remains durable persistence, fine-grained source retrieval for arbitrary curriculum questions, live/mobile regression testing, real-photo asset integration, deeper adaptive mastery, and source-backed coverage for any school terms not yet supplied.

@@ -5,6 +5,7 @@ from lumina.context_help import render_context_help
 from lumina.curriculum.mapped_curriculum import SUBJECT_LABELS
 from lumina.curriculum.search import lesson_by_id
 from lumina.learning.rewards import apply_success_reward
+from lumina.learning.scaffolding import support_depth
 from lumina.persistence.session_store import get_learning_store
 
 
@@ -44,6 +45,7 @@ def render_review_center() -> None:
                 st.write(f"**السؤال:** {mistake.get('question', '—')}")
                 st.write(f"**إجابتك السابقة:** {mistake.get('answer', '—')}")
                 st.info(f"تلميح: {mistake.get('hint', 'راجعي الفكرة مرة أخرى.')}")
+                st.caption("الغلط هنا مش بيتحسب ضدك؛ بنستخدمه علشان نعرف نشرح الفكرة بطريقة أبسط.")
                 if mistake.get("source_pages"):
                     st.caption(f"المصدر: {mistake['source_pages']}")
 
@@ -74,6 +76,13 @@ def render_review_center() -> None:
             with st.container(border=True):
                 st.markdown(f"**{subject} · {lesson.title}**")
                 st.caption(f"المصدر: {lesson.source_pages}")
+                previous_attempts = store.get_attempts(lesson.id)
+                depth = support_depth(previous_attempts, check.id)
+                if depth >= 1 and lesson.evidence_summary:
+                    st.info("نفك الفكرة الأول: " + lesson.evidence_summary[0])
+                if depth >= 2 and len(lesson.evidence_summary) > 1:
+                    st.write("• " + lesson.evidence_summary[1])
+
                 answer = st.radio(
                     check.prompt,
                     list(check.options),
@@ -135,5 +144,7 @@ def render_review_center() -> None:
                                 "resolved": False,
                             }
                         )
-                        st.warning("لسه محتاجة محاولة كمان. استخدمي التلميح وجربي مرة أخرى.")
+                        st.warning("ولا يهمك — نرجع خطوة صغيرة ونفهمها، وبعدها نجرب تاني.")
                         st.info(f"تلميح: {check.hint}")
+                        if lesson.evidence_summary:
+                            st.write("الفكرة الأساسية من المصدر: " + lesson.evidence_summary[0])

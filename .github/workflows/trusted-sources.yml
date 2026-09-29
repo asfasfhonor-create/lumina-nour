@@ -22,15 +22,15 @@ jobs:
         run: |
           python - <<'PY'
           from lumina.curriculum.trusted_sources import (
-    SourceUpload,
-    TRUSTED,
-    build_trusted_record,
-    NEON_OBJECT_STORAGE,
-    TRUSTED_SOURCE_BUCKET,
-    SOURCE_ROLE_OFFICIAL,
-    SOURCE_ROLE_SUPPLEMENTARY,
-    source_role_priority,
-)
+              SourceUpload,
+              TRUSTED,
+              build_trusted_record,
+              NEON_OBJECT_STORAGE,
+              TRUSTED_SOURCE_BUCKET,
+              SOURCE_ROLE_OFFICIAL,
+              SOURCE_ROLE_SUPPLEMENTARY,
+              source_role_priority,
+          )
 
           upload = SourceUpload(
               filename="../Science.pdf",

@@ -39,7 +39,15 @@ def render_home_foundation() -> None:
     _render_learning_worlds()
 
     st.markdown("---")
-    if st.button("👨‍👧 Parent Dashboard", key="open_parent_dashboard"):
+    c_review, c_parent = st.columns(2)
+    with c_review:
+        if st.button("📝 مراجعاتي", key="open_review_center"):
+            st.session_state.active_world = "review"
+            st.rerun()
+    with c_parent:
+        if st.button("👨‍👧 Parent Dashboard", key="open_parent_dashboard"):
+            st.session_state.active_world = "parent"
+            st.rerun()
         st.session_state.active_world = "parent"
         st.rerun()
 
@@ -117,8 +125,10 @@ def _render_learning_worlds() -> None:
             unsafe_allow_html=True,
         )
         st.markdown(
-            '<div class="mission"><b>قريبًا: AI Detective + Prompt Challenges + Creative Builder</b><br>'
-            '<span class="muted">مش الهدف ناخد الإجابة من الـ AI؛ الهدف نتعلم نسأله صح، '
-            'نراجعه، نكتشف أخطاءه ونصنع به حاجات جديدة.</span></div>',
+            '<div class="mission"><b>AI Detective + Prompt Challenges + Fact Checker</b><br>'
+            '<span class="muted">نتعلم نسأل صح، نراجع الإجابات، ونبحث عن الدليل بدل الثقة العمياء.</span></div>',
             unsafe_allow_html=True,
         )
+        if st.button("ادخلي AI Lab", key="open_world_ai"):
+            st.session_state.active_world = "ai"
+            st.rerun()

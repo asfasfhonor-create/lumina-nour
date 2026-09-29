@@ -8,14 +8,15 @@ from lumina.learning.progress import (
     derive_mastery,
     mastery_label,
 )
-from lumina.session_state import get_learning_attempts, get_mistakes, get_reviews
+from lumina.persistence.session_store import get_learning_store
 
 
 def render_learning_brain_summary(lesson_ids: list[str] | None = None) -> None:
     """Render a compact evidence summary from the current persistence adapter."""
-    attempts = get_learning_attempts()
-    mistakes = get_mistakes(unresolved_only=True)
-    due_reviews = get_reviews("due")
+    store = get_learning_store()
+    attempts = store.get_attempts()
+    mistakes = store.store.get_mistakes(unresolved_only=True)
+    due_reviews = store.get_reviews("due")
 
     st.markdown('<div class="section-title">🧠 Learning Brain</div>', unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
@@ -30,7 +31,7 @@ def render_learning_brain_summary(lesson_ids: list[str] | None = None) -> None:
         states = []
         for lesson_id in lesson_ids:
             lesson_attempts = [a for a in attempts if a.get("lesson_id") == lesson_id]
-            lesson_mistakes = [m for m in get_mistakes(lesson_id) if not m.get("resolved", False)]
+            lesson_mistakes = [m for m in store.get_mistakes(lesson_id) if not m.get("resolved", False)]
             states.append(derive_mastery(lesson_attempts, lesson_mistakes).state)
 
         counts = {

@@ -1,0 +1,69 @@
+-- LUMINA NOUR durable PostgreSQL persistence.
+-- Designed for a dedicated Neon PostgreSQL project.
+-- Run with a server-side connection string. Never expose credentials in the browser.
+
+create table if not exists lumina_learning_attempts (
+    id bigserial primary key,
+    learner_key text not null,
+    module_id text,
+    unit_id text,
+    lesson_id text not null,
+    check_id text,
+    evidence_id text,
+    answer text,
+    correct boolean,
+    source_pages text,
+    activity_type text,
+    created_at timestamptz not null default now()
+);
+
+create index if not exists lumina_attempts_learner_lesson_idx
+    on lumina_learning_attempts (learner_key, lesson_id, created_at);
+
+create table if not exists lumina_mistakes (
+    id bigserial primary key,
+    learner_key text not null,
+    module_id text,
+    unit_id text,
+    lesson_id text not null,
+    lesson_title text,
+    check_id text not null,
+    question text,
+    answer text,
+    mistake_type text,
+    hint text,
+    source_pages text,
+    resolved boolean not null default false,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+    resolved_at timestamptz,
+    unique (learner_key, lesson_id, check_id)
+);
+
+create index if not exists lumina_mistakes_learner_idx
+    on lumina_mistakes (learner_key, resolved, updated_at);
+
+create table if not exists lumina_reviews (
+    id bigserial primary key,
+    learner_key text not null,
+    module_id text,
+    lesson_id text not null,
+    lesson_title text,
+    check_id text not null,
+    status text not null default 'due',
+    reason text,
+    source_pages text,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+    completed_at timestamptz,
+    unique (learner_key, lesson_id, check_id)
+);
+
+create index if not exists lumina_reviews_learner_status_idx
+    on lumina_reviews (learner_key, status, updated_at);
+
+create table if not exists lumina_profile_state (
+    learner_key text primary key,
+    state jsonb not null default '{}'::jsonb,
+    updated_at timestamptz not null default now()
+);

@@ -1072,7 +1072,7 @@ All architectural principles and acceptance criteria from v1.0 remain in force.
 This revision records implementation progress without changing the governing product mission or acceptance criteria.
 
 Verified development-branch state:
-- A cross-subject mapped curriculum registry now contains 142 structured learning blocks across all seven supplied subject areas, excluding two additional structured English review blocks.
+- A cross-subject mapped curriculum registry now contains 144 structured learning blocks across all seven supplied subject areas, including two structured English review blocks.
 - English Term 1 is mapped across six units; Science and Math are mapped across both verified terms contained in their supplied PDFs; Arabic, Social Studies, and Religion are mapped for the supplied Term 1; ICT is mapped for the supplied Second Semester.
 - Missing terms are not invented. A subject/term becomes curriculum-authoritative only when a trusted source supports it.
 - A reusable all-subject Exam Mode now creates learning evidence and routes mistakes into review.

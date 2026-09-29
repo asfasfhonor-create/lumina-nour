@@ -19,25 +19,22 @@ from lumina.persistence.trusted_source_catalog import NeonTrustedSourceCatalog
 def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = False, app_pin_configured: bool = False) -> None:
     st.markdown('<div class="section-title">👨‍👧 لوحة وليّ الأمر</div>', unsafe_allow_html=True)
 
-    if not parent_pin:
-        st.info(
-            "لوحة وليّ الأمر مقفولة حاليًا. فعّل رمز وليّ الأمر من إعدادات التطبيق قبل استخدامها."
-        )
-        return
+    if parent_pin:
+        if not st.session_state.get("parent_unlocked", False):
+            entered = st.text_input("رمز وليّ الأمر", type="password", key="parent_pin_input")
+            if st.button("فتح لوحة وليّ الأمر", key="parent_unlock"):
+                if entered == parent_pin:
+                    st.session_state.parent_unlocked = True
+                    st.rerun()
+                else:
+                    st.error("الرمز غير صحيح.")
+            return
 
-    if not st.session_state.get("parent_unlocked", False):
-        entered = st.text_input("رمز وليّ الأمر", type="password", key="parent_pin_input")
-        if st.button("فتح لوحة وليّ الأمر", key="parent_unlock"):
-            if entered == parent_pin:
-                st.session_state.parent_unlocked = True
-                st.rerun()
-            else:
-                st.error("الرمز غير صحيح.")
-        return
-
-    if st.button("قفل لوحة وليّ الأمر", key="parent_lock"):
-        st.session_state.parent_unlocked = False
-        st.rerun()
+        if st.button("قفل لوحة وليّ الأمر", key="parent_lock"):
+            st.session_state.parent_unlocked = False
+            st.rerun()
+    else:
+        st.warning("حماية لوحة وليّ الأمر برمز دخول غير مفعّلة حاليًا. تقدر تستخدم اللوحة الآن، ويفضل تفعيل الرمز قبل الاعتماد النهائي.")
 
     store = get_learning_store()
     status = persistence_status()

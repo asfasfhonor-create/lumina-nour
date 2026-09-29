@@ -1,6 +1,13 @@
 import streamlit as st
 
+from lumina.curriculum.mapped_curriculum import SUBJECT_LABELS
+from lumina.curriculum.search import lesson_by_id
+from lumina.learning.rewards import apply_success_reward
 from lumina.persistence.session_store import get_learning_store
+
+
+def _find_check(lesson, check_id: str):
+    return next((check for check in lesson.checks if check.id == check_id), None)
 
 
 def render_review_center() -> None:
@@ -28,20 +35,102 @@ def render_review_center() -> None:
     if mistakes:
         st.markdown("### Mistake Notebook")
         for mistake in mistakes:
-            with st.expander(mistake.get("lesson_title", mistake.get("lesson_id", "Lesson"))):
+            subject = SUBJECT_LABELS.get(mistake.get("module_id"), mistake.get("module_id", ""))
+            title = mistake.get("lesson_title", mistake.get("lesson_id", "Lesson"))
+            with st.expander(f"{subject} · {title}"):
                 st.write(f"**Question:** {mistake.get('question', '—')}")
-                st.write(f"**Your answer:** {mistake.get('answer', '—')}")
+                st.write(f"**Your previous answer:** {mistake.get('answer', '—')}")
                 st.info(f"Hint: {mistake.get('hint', 'راجعي الفكرة مرة أخرى.')}")
                 if mistake.get("source_pages"):
                     st.caption(f"Source: {mistake['source_pages']}")
 
     if reviews:
         st.markdown("### Review Queue")
+        st.caption("راجعي السؤال هنا مباشرة بدل ما تدوري على الدرس من جديد.")
+
         seen = set()
         for review in reviews:
             key = (review.get("lesson_id"), review.get("check_id"))
             if key in seen:
                 continue
             seen.add(key)
-            st.write(f"• {review.get('lesson_title', review.get('lesson_id'))}")
-        st.caption("افتحي الدرس نفسه وجربي السؤال مرة أخرى؛ الإجابة الصحيحة الجديدة تغلق المراجعة تلقائيًا.")
+
+            lesson = lesson_by_id(review.get("lesson_id"))
+            if lesson is None:
+                st.warning(f"تعذر العثور على الدرس: {review.get('lesson_title', review.get('lesson_id'))}")
+                continue
+
+            check = _find_check(lesson, review.get("check_id"))
+            if check is None:
+                st.warning(f"تعذر العثور على سؤال المراجعة داخل: {lesson.title}")
+                continue
+
+            module_id = review.get("module_id") or "review"
+            subject = SUBJECT_LABELS.get(module_id, module_id)
+
+            with st.container(border=True):
+                st.markdown(f"**{subject} · {lesson.title}**")
+                st.caption(f"Source: {lesson.source_pages}")
+                answer = st.radio(
+                    check.prompt,
+                    list(check.options),
+                    index=None,
+                    key=f"review_retry_{lesson.id}_{check.id}",
+                )
+
+                if st.button(
+                    "راجعت وجربت تاني",
+                    key=f"review_retry_button_{lesson.id}_{check.id}",
+                ):
+                    if answer is None:
+                        st.warning("اختاري إجابة الأول.")
+                        continue
+
+                    selected_index = list(check.options).index(answer)
+                    correct = selected_index == check.correct_index
+
+                    store.record_attempt(
+                        {
+                            "module_id": module_id,
+                            "unit_id": lesson.unit_id,
+                            "lesson_id": lesson.id,
+                            "check_id": check.id,
+                            "evidence_id": f"review:{check.id}",
+                            "answer": answer,
+                            "correct": correct,
+                            "source_pages": lesson.source_pages,
+                            "activity_type": "review",
+                        }
+                    )
+
+                    if correct:
+                        store.resolve_mistake(lesson.id, check.id)
+                        store.complete_review(lesson.id, check.id)
+                        earned_xp = apply_success_reward(
+                            module_id=module_id,
+                            lesson_id=lesson.id,
+                            evidence_id=f"review:{check.id}",
+                            activity_type="review",
+                        )
+                        st.success("تمام — المراجعة اتقفلت لأنك أظهرتِ فهم جديد.")
+                        if earned_xp:
+                            st.caption(f"+{earned_xp} XP for successful review evidence.")
+                        st.rerun()
+                    else:
+                        store.record_mistake(
+                            {
+                                "module_id": module_id,
+                                "unit_id": lesson.unit_id,
+                                "lesson_id": lesson.id,
+                                "lesson_title": lesson.title,
+                                "check_id": check.id,
+                                "question": check.prompt,
+                                "answer": answer,
+                                "mistake_type": "review_retry",
+                                "hint": check.hint,
+                                "source_pages": lesson.source_pages,
+                                "resolved": False,
+                            }
+                        )
+                        st.warning("لسه محتاجة محاولة كمان. استخدمي الـHint وجربي مرة أخرى.")
+                        st.info(f"Hint: {check.hint}")

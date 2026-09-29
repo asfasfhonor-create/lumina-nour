@@ -11,8 +11,12 @@ Configure only in Streamlit secrets. Never commit real values.
 - `PARENT_PIN` — optional Parent Dashboard PIN.
 - `NEON_DATABASE_URL` — pooled Neon PostgreSQL connection string for the dedicated LUMINA NOUR database.
 - `NOUR_LEARNER_KEY` — stable internal learner key for Nour.
+- `AWS_ENDPOINT_URL_S3` — Neon Object Storage endpoint for the LUMINA main branch.
+- `AWS_ACCESS_KEY_ID` — branch-scoped Neon storage credential id.
+- `AWS_SECRET_ACCESS_KEY` — branch-scoped Neon storage credential secret.
+- `AWS_REGION` — `eu-central-1` for the current LUMINA deployment.
 
-The Neon connection string must remain server-side and use SSL. Prefer the pooled connection string from Neon for hosted app traffic.
+The Neon connection string and storage credentials must remain server-side in Streamlit Secrets and must never be committed to GitHub.
 
 ## Database activation
 
@@ -21,7 +25,10 @@ The Neon connection string must remain server-side and use SSL. Prefer the poole
 3. Copy the **pooled** PostgreSQL connection string with SSL enabled.
 4. Add `NEON_DATABASE_URL` and `NOUR_LEARNER_KEY` to Streamlit secrets.
 5. Launch the app and verify that attempts, mistakes, reviews, XP, streak, badges, and English profile survive a fresh browser session.
-6. Export a portable backup from Parent Dashboard and verify that it contains remote learning evidence but no secrets.
+6. Configure the Neon Object Storage credential in Streamlit Secrets.
+7. Verify the private `lumina-trusted-sources` bucket is reachable from the deployed app.
+8. Upload one trusted PDF through Parent Dashboard, close/reopen, and verify its metadata remains available.
+9. Export a portable backup from Parent Dashboard and verify that it contains remote learning evidence but no secrets.
 
 ## Curriculum checks
 
@@ -82,4 +89,10 @@ Do not merge the development PR until:
   - `lumina_profile_state`
   - `lumina_trusted_sources`
 - Direct production database write/read/delete smoke test: passed.
-- Remaining live gate: configure `NEON_DATABASE_URL` and `NOUR_LEARNER_KEY` in the actual Streamlit deployment secrets, then verify close/reopen persistence through the deployed app.
+- `NEON_DATABASE_URL` and `NOUR_LEARNER_KEY` are configured in Streamlit and live persistence has been verified from a fresh session.
+- Production learner profile row for `nour` has been observed in Neon.
+- Private Neon Object Storage bucket created: `lumina-trusted-sources`.
+- Object storage is enabled in Frankfurt / `eu-central-1`.
+- Branch-scoped storage credential created for Streamlit runtime use.
+- Remaining storage gate: place the storage credential values in Streamlit Secrets and run one real trusted-file upload/reopen test.
+- Remaining release gates: latest-commit live visual verification, deployed end-to-end learning transaction, mobile/browser visual smoke, and explicit Mohamed approval before merge.

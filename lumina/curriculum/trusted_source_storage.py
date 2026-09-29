@@ -76,6 +76,24 @@ class NeonTrustedSourceStorage:
             ) from exc
         return key
 
+    def get_bytes(self, storage_key: str) -> bytes:
+        key = (storage_key or "").strip()
+        if not key:
+            raise TrustedSourceStorageError("storage_key is required.")
+        try:
+            response = self.client.get_object(
+                Bucket=self.config.bucket,
+                Key=key,
+            )
+            data = response["Body"].read()
+        except Exception as exc:
+            raise TrustedSourceStorageError(
+                "تعذر قراءة المصدر الدائم الآن."
+            ) from exc
+        if not data:
+            raise TrustedSourceStorageError("المصدر الدائم فارغ.")
+        return data
+
     def health_check(self) -> bool:
         try:
             self.client.head_bucket(Bucket=self.config.bucket)

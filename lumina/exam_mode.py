@@ -5,15 +5,50 @@ import streamlit as st
 from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS
 from lumina.persistence.session_store import get_learning_store
 from lumina.learning.rewards import apply_success_reward
+from lumina.learning.progress import LEARNING, MASTERED, NEEDS_REVIEW, NOT_STARTED, derive_mastery
+from lumina.learning.evidence_cache import group_by_lesson
 
 
-def _pick_checks(lessons, limit: int = 5):
+def _pick_checks(lessons, store, limit: int = 5):
+    """Build a source-grounded adaptive exam set without inventing questions.
+
+    Priority is weak/in-progress learning first, then unseen material, then
+    mastered material for spaced reinforcement. We prefer one check per lesson
+    before taking a second check from the same lesson.
+    """
+    attempts_by_lesson = group_by_lesson(store.get_attempts())
+    mistakes_by_lesson = group_by_lesson(store.get_mistakes())
+
+    priority = {
+        NEEDS_REVIEW: 0,
+        LEARNING: 1,
+        NOT_STARTED: 2,
+        MASTERED: 3,
+    }
+
+    ranked = []
+    for curriculum_index, lesson in enumerate(lessons):
+        state = derive_mastery(
+            attempts_by_lesson.get(lesson.id, []),
+            mistakes_by_lesson.get(lesson.id, []),
+        ).state
+        ranked.append((priority.get(state, 9), curriculum_index, lesson))
+
+    ranked.sort(key=lambda item: (item[0], item[1]))
+
     picked = []
-    for lesson in lessons:
-        for check in lesson.checks:
+    for _, _, lesson in ranked:
+        if lesson.checks:
+            picked.append((lesson, lesson.checks[0]))
+            if len(picked) >= limit:
+                return picked
+
+    for _, _, lesson in ranked:
+        for check in lesson.checks[1:]:
             picked.append((lesson, check))
             if len(picked) >= limit:
                 return picked
+
     return picked
 
 
@@ -39,13 +74,17 @@ def render_exam_mode() -> None:
         key="exam_unit",
     )
     lessons = units[unit_title]
-    checks = _pick_checks(lessons, limit=5)
+    store = get_learning_store()
+    checks = _pick_checks(lessons, store, limit=5)
 
     if not checks:
         st.info("لا توجد أسئلة موثقة لهذا الجزء حتى الآن.")
         return
 
-    st.caption(f"{len(checks)} سؤال · من {unit_title}")
+    st.caption(
+        f"{len(checks)} سؤال · من {unit_title} · "
+        "Adaptive set: نقاط الضعف والتعلم الجاري أولًا"
+    )
 
     answers: dict[str, int] = {}
     for idx, (lesson, check) in enumerate(checks, start=1):
@@ -63,7 +102,6 @@ def render_exam_mode() -> None:
             st.warning("جاوبي على كل الأسئلة الأول.")
             return
 
-        store = get_learning_store()
         score = 0
         results = []
 

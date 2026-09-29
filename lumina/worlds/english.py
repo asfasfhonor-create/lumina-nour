@@ -12,6 +12,7 @@ from lumina.learning.english_profile import (
     BASELINE_ITEMS,
     score_baseline,
     support_instruction,
+    recommended_focus,
 )
 from lumina.persistence.profile_state import persist_profile_state
 
@@ -95,6 +96,10 @@ def _render_real_english(ai: GeminiService) -> None:
         '<span class="muted">تدريب عملي على التواصل، مع ملاحظات قصيرة وتقليل المساعدة بالعربي تدريجيًا مع تحسن المستوى.</span></div>',
         unsafe_allow_html=True,
     )
+
+    profile = st.session_state.get("english_profile", {})
+    focus_label, focus_reason = recommended_focus(profile)
+    st.info(f"🎯 اقتراح LUMINA النهارده: **{focus_label}** — {focus_reason}")
 
     mode = st.radio(
         "اختاري تدريب",

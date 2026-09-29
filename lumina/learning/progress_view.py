@@ -21,14 +21,14 @@ def render_learning_brain_summary(lesson_ids: list[str] | None = None) -> None:
     attempts_by_lesson = group_by_lesson(attempts)
     mistakes_by_lesson = group_by_lesson(mistakes)
 
-    st.markdown('<div class="section-title">🧠 Learning Brain</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🧠 خريطة التعلّم</div>', unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.metric("Attempts", len(attempts))
+        st.metric("المحاولات", len(attempts))
     with c2:
-        st.metric("Mistakes to review", len(mistakes))
+        st.metric("أخطاء للمراجعة", len(mistakes))
     with c3:
-        st.metric("Reviews due", len(due_reviews))
+        st.metric("مراجعات مستحقة", len(due_reviews))
 
     if lesson_ids:
         states = []
@@ -52,6 +52,6 @@ def render_learning_brain_summary(lesson_ids: list[str] | None = None) -> None:
         )
 
     if due_reviews:
-        with st.expander("What needs review?", expanded=False):
+        with st.expander("إيه اللي محتاج مراجعة؟", expanded=False):
             for review in due_reviews:
                 st.write(f"• {review.get('lesson_title', review.get('lesson_id'))}")

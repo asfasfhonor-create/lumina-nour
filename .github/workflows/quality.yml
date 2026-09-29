@@ -636,3 +636,16 @@ jobs:
           else:
               raise SystemExit(f"Streamlit health check failed: {last_error}")
           PY
+
+      - name: Validate direct review retry imports
+        run: |
+          python - <<'PY'
+          import lumina.review_center
+          from lumina.curriculum.search import lesson_by_id
+
+          lesson = lesson_by_id("science_t2_u2_l1")
+          assert lesson is not None
+          assert lesson.checks
+          assert callable(lumina.review_center.render_review_center)
+          print("Direct review retry imports OK")
+          PY

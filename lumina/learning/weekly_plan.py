@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS
-from lumina.learning.progress import NOT_STARTED, derive_mastery
+from lumina.learning.progress import LEARNING, NEEDS_REVIEW, NOT_STARTED, derive_mastery
 from lumina.learning.evidence_cache import snapshot_learning_evidence
 
 
@@ -52,42 +52,53 @@ def build_weekly_plan(store, limit: int = 5) -> tuple[WeeklyPlanItem, ...]:
     attempts_by_lesson = evidence["attempts_by_lesson"]
     mistakes_by_lesson = evidence["mistakes_by_lesson"]
 
-    subject_queues: dict[str, list] = {}
-    for module_id, units in MAPPED_CURRICULUM.items():
-        queue = []
-        for lessons in units.values():
-            for lesson in lessons:
-                if lesson.id in seen_lessons:
-                    continue
-                state = derive_mastery(
-                    attempts_by_lesson.get(lesson.id, []),
-                    mistakes_by_lesson.get(lesson.id, []),
-                ).state
-                if state == NOT_STARTED:
-                    queue.append(lesson)
-        subject_queues[module_id] = queue
-
     subject_ids = list(MAPPED_CURRICULUM)
     rotation = date.today().isocalendar().week % len(subject_ids)
     subject_ids = subject_ids[rotation:] + subject_ids[:rotation]
 
-    while len(items) < limit and any(subject_queues.values()):
-        for module_id in subject_ids:
-            queue = subject_queues.get(module_id, [])
-            if not queue:
-                continue
-            lesson = queue.pop(0)
-            items.append(
-                WeeklyPlanItem(
-                    module_id=module_id,
-                    subject_label=SUBJECT_LABELS.get(module_id, module_id),
-                    lesson_id=lesson.id,
-                    lesson_title=lesson.title,
-                    source_pages=lesson.source_pages,
-                    reason="New mapped learning",
+    priority_states = (
+        (NEEDS_REVIEW, "Needs reinforcement"),
+        (LEARNING, "Continue in-progress learning"),
+        (NOT_STARTED, "New mapped learning"),
+    )
+
+    for target_state, reason in priority_states:
+        subject_queues: dict[str, list] = {}
+        for module_id, units in MAPPED_CURRICULUM.items():
+            queue = []
+            for lessons in units.values():
+                for lesson in lessons:
+                    if lesson.id in seen_lessons:
+                        continue
+                    state = derive_mastery(
+                        attempts_by_lesson.get(lesson.id, []),
+                        mistakes_by_lesson.get(lesson.id, []),
+                    ).state
+                    if state == target_state:
+                        queue.append(lesson)
+            subject_queues[module_id] = queue
+
+        while len(items) < limit and any(subject_queues.values()):
+            for module_id in subject_ids:
+                queue = subject_queues.get(module_id, [])
+                if not queue:
+                    continue
+                lesson = queue.pop(0)
+                items.append(
+                    WeeklyPlanItem(
+                        module_id=module_id,
+                        subject_label=SUBJECT_LABELS.get(module_id, module_id),
+                        lesson_id=lesson.id,
+                        lesson_title=lesson.title,
+                        source_pages=lesson.source_pages,
+                        reason=reason,
+                    )
                 )
-            )
-            if len(items) >= limit:
-                break
+                seen_lessons.add(lesson.id)
+                if len(items) >= limit:
+                    break
+
+        if len(items) >= limit:
+            break
 
     return tuple(items)

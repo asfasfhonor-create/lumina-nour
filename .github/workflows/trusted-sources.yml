@@ -73,3 +73,32 @@ jobs:
           assert "storage_key" in sql
           print("Trusted source schema OK")
           PY
+
+      - name: Validate trusted source storage adapter
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.trusted_source_storage import StorageConfig, NeonTrustedSourceStorage
+          from lumina.curriculum.trusted_sources import SourceUpload, TRUSTED_SOURCE_BUCKET
+
+          config = StorageConfig.from_mapping({
+              "AWS_ENDPOINT_URL_S3": "https://example.invalid",
+              "AWS_ACCESS_KEY_ID": "nak_live_test",
+              "AWS_SECRET_ACCESS_KEY": "nsk_live_test",
+              "AWS_REGION": "eu-central-1",
+          })
+          assert config is not None
+          assert config.bucket == TRUSTED_SOURCE_BUCKET
+
+          storage = NeonTrustedSourceStorage(config)
+          upload = SourceUpload(
+              filename="../Science Notes.pdf",
+              mime_type="application/pdf",
+              data=b"%PDF-1.7 trusted source fixture",
+          )
+          key = storage.object_key(upload, learner_key="nour")
+          assert key.startswith("nour/")
+          assert key.endswith("/Science Notes.pdf")
+
+          assert StorageConfig.from_mapping({}) is None
+          print("Trusted source storage adapter OK")
+          PY

@@ -113,6 +113,9 @@ _REMOTE_STORE: LearningStore | None = None
 def get_learning_store() -> LearningStore:
     global _REMOTE_STORE
 
+    if st.session_state.get("persistence_disabled_for_session", False):
+        return _SESSION_STORE
+
     learner_key = st.secrets.get("NOUR_LEARNER_KEY", None)
     neon_database_url = st.secrets.get("NEON_DATABASE_URL", None)
 

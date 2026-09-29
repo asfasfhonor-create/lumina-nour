@@ -1,5 +1,7 @@
 import streamlit as st
 
+from lumina.context_help import render_context_help
+
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import ENGLISH_T1
 from lumina.curriculum.english_curriculum import get_english_lessons
@@ -12,6 +14,7 @@ from lumina.persistence.profile_state import persist_profile_state
 
 def render_english_world(ai: GeminiService) -> None:
     st.markdown('<div class="section-title">🇬🇧 English Adventure</div>', unsafe_allow_html=True)
+    render_context_help("english", label="💬 قوليلي العالم ده بيعمل إيه")
     st.markdown(
         '<div class="mission"><b>Two tracks, one goal: stronger English.</b><br>'
         '<span class="muted">School English follows Nour\'s curriculum. Real English grows her actual language level beyond the school grade.</span></div>',

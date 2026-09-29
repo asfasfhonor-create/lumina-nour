@@ -16,23 +16,23 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_science_world(ai: GeminiService) -> None:
-    st.markdown('<div class="section-title">🔬 Science Lab</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🔬 معمل العلوم · Science Lab</div>', unsafe_allow_html=True)
     render_context_help("science", label="💬 قوليلي العالم ده بيعمل إيه")
     st.markdown(
-        '<div class="mission"><b>Observe → Understand → Predict → Apply</b><br>'
-        '<span class="muted">Science is built from Nour\'s supplied curriculum source, with reasoning before memorization.</span></div>',
+        '<div class="mission"><b>لاحظي → افهمي → توقّعي → طبّقي</b><br>'
+        '<span class="muted">بنشرح من منهج نور نفسه، ونبدأ بالفهم والاستنتاج قبل الحفظ.</span></div>',
         unsafe_allow_html=True,
     )
 
     source = st.selectbox(
-        "Choose term",
+        "اختاري الترم",
         [SCIENCE_T1, SCIENCE_T2],
         format_func=lambda item: item.term,
         key="school_science_term",
     )
-    st.caption(f"Trusted source: {source.display_name} · {source.term}")
+    st.caption(f"المصدر: {source.display_name} · {source.term}")
     unit_title = st.selectbox(
-        "Choose unit",
+        "اختاري الوحدة",
         [unit.title for unit in source.units],
         key=f"school_science_unit_{source.id}",
     )
@@ -88,8 +88,8 @@ def render_science_world(ai: GeminiService) -> None:
         )
     else:
         st.info(
-            "This unit is inventoried from the trusted source. "
-            "Its verified lesson data will be connected progressively without inventing content."
+            "الوحدة موجودة في المصدر المعتمد، "
+            "وسيتم ربط دروسها الموثقة تدريجيًا بدون إضافة محتوى غير موجود."
         )
 
     render_temporary_source_session(

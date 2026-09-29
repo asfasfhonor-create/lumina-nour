@@ -1030,3 +1030,17 @@ jobs:
           assert "daily_mission_date" in daily
           print("Stable daily mission persistence OK")
           PY
+
+      - name: Validate automatic persistence verification
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.persistence.profile_state as profile_state
+
+          assert callable(profile_state.verify_persistence_after_hydration)
+
+          app = Path("app.py").read_text(encoding="utf-8")
+          assert "verify_persistence_after_hydration()" in app
+          assert app.index("hydrate_profile_state()") < app.index("verify_persistence_after_hydration()")
+          print("Automatic persistence verification wiring OK")
+          PY

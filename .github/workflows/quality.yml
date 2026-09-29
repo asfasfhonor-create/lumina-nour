@@ -1061,3 +1061,31 @@ jobs:
           assert 'الحفظ الدائم مهيأ لكنه غير متحقق' in app
           print("Persistence verification is bounded and footer is accurate")
           PY
+
+      - name: Validate page-aware source sessions across school worlds
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.curriculum.source_session as source_session
+
+          assert callable(source_session.render_temporary_source_session)
+
+          worlds = [
+              "english",
+              "science",
+              "math",
+              "arabic",
+              "social",
+              "religion",
+              "ict",
+          ]
+          for world in worlds:
+              text = Path(f"lumina/worlds/{world}.py").read_text(encoding="utf-8")
+              assert "render_temporary_source_session" in text, world
+
+          source = Path("lumina/curriculum/source_session.py").read_text(encoding="utf-8")
+          assert "build_grounded_pdf" in source
+          assert "curriculum_prompt" in source
+          assert "temporary upload, not permanent storage" in source
+          print("Page-aware curriculum source sessions wired across all school worlds")
+          PY

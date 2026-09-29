@@ -9,7 +9,7 @@ from lumina.persistence.session_store import get_learning_store, persistence_sta
 from lumina.persistence.base import PersistenceError
 from lumina.persistence.backup import export_learning_backup, restore_learning_backup
 from lumina.learning.evidence_cache import group_by_lesson
-from lumina.readiness import build_release_readiness
+from lumina.readiness import build_release_readiness, is_release_ready, release_blockers
 
 
 def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = False, app_pin_configured: bool = False) -> None:
@@ -67,9 +67,24 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
         storage_status=status,
         storage_verified=bool(st.session_state.get("persistence_verified", False)),
     )
+    if is_release_ready(readiness):
+        st.success("Required release checks are ready.")
+    else:
+        blockers = release_blockers(readiness)
+        st.warning(
+            "Required blockers: "
+            + " · ".join(item.label for item in blockers)
+        )
+
     for item in readiness:
-        icon = "✅" if item.ready else "⚠️"
-        st.write(f"{icon} **{item.label}** — {item.detail}")
+        if item.ready:
+            icon = "✅"
+        elif item.required:
+            icon = "⚠️"
+        else:
+            icon = "ℹ️"
+        requirement = "" if item.required else " · optional"
+        st.write(f"{icon} **{item.label}** — {item.detail}{requirement}")
 
     attempts = store.get_attempts()
     all_mistakes = store.get_mistakes()

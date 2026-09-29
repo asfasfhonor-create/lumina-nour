@@ -1044,3 +1044,20 @@ jobs:
           assert app.index("hydrate_profile_state()") < app.index("verify_persistence_after_hydration()")
           print("Automatic persistence verification wiring OK")
           PY
+
+      - name: Validate persistence verification only runs once
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          state = Path("lumina/session_state.py").read_text(encoding="utf-8")
+          profile = Path("lumina/persistence/profile_state.py").read_text(encoding="utf-8")
+          app = Path("app.py").read_text(encoding="utf-8")
+
+          assert '"persistence_verification_attempted": False' in state
+          assert 'persistence_verification_attempted' in profile
+          assert 'st.session_state.persistence_verification_attempted = True' in profile
+          assert 'الحفظ الدائم متحقق ويعمل' in app
+          assert 'الحفظ الدائم مهيأ لكنه غير متحقق' in app
+          print("Persistence verification is bounded and footer is accurate")
+          PY

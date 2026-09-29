@@ -509,3 +509,13 @@ jobs:
           assert callable(lumina.access_control.require_app_access)
           print("App access gate import OK")
           PY
+
+      - name: Validate durable persistence adapter imports
+        run: |
+          python - <<'PY'
+          from lumina.persistence.supabase_store import SupabaseLearningStore
+          from lumina.persistence.session_store import get_learning_store
+          assert SupabaseLearningStore.__name__ == "SupabaseLearningStore"
+          assert callable(get_learning_store)
+          print("Durable persistence adapter imports OK")
+          PY

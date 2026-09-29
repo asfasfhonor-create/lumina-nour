@@ -7,16 +7,7 @@ from lumina.curriculum.english_curriculum import get_english_lessons
 from lumina.curriculum.english_reviews import get_review
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.learning.progress_view import render_learning_brain_summary
-from lumina.session_state import (
-    complete_review,
-    get_learning_attempts,
-    get_mistakes,
-    get_reviews,
-    queue_review,
-    record_learning_attempt,
-    record_mistake,
-    resolve_mistake,
-)
+from lumina.persistence.session_store import get_learning_store
 
 
 def render_english_world(ai: GeminiService) -> None:
@@ -227,6 +218,7 @@ def _render_verified_unit(title: str, lessons, select_key: str) -> None:
 
 
 def _render_verified_lesson(lesson) -> None:
+    store = get_learning_store()
     st.markdown(f"### {lesson.title}")
     st.caption(f"Verified curriculum extract · {lesson.source_pages}")
 
@@ -263,14 +255,14 @@ def _render_verified_lesson(lesson) -> None:
                 "correct": correct,
                 "source_pages": lesson.source_pages,
             }
-            record_learning_attempt(attempt)
+            store.record_attempt(attempt)
 
             if correct:
-                resolve_mistake(lesson.id, check.id)
-                complete_review(lesson.id, check.id)
+                store.resolve_mistake(lesson.id, check.id)
+                store.complete_review(lesson.id, check.id)
                 st.success("Good thinking — this matches the lesson.")
             else:
-                record_mistake(
+                store.record_mistake(
                     {
                         "module_id": "english",
                         "unit_id": lesson.unit_id,
@@ -285,7 +277,7 @@ def _render_verified_lesson(lesson) -> None:
                         "resolved": False,
                     }
                 )
-                queue_review(
+                store.queue_review(
                     {
                         "module_id": "english",
                         "lesson_id": lesson.id,
@@ -299,8 +291,8 @@ def _render_verified_lesson(lesson) -> None:
                 st.warning("Not yet. Use the hint, then try again.")
                 st.info(f"Hint: {check.hint}")
 
-    attempts = get_learning_attempts(lesson.id)
-    mistakes = get_mistakes(lesson.id)
+    attempts = store.get_attempts(lesson.id)
+    mistakes = store.get_mistakes(lesson.id)
     mastery = derive_mastery(attempts, mistakes)
     st.caption(
         f"Mastery: {mastery_label(mastery.state)} · "
@@ -311,7 +303,7 @@ def _render_verified_lesson(lesson) -> None:
 
     due_reviews = [
         review
-        for review in get_reviews("due")
+        for review in store.get_reviews("due")
         if review.get("lesson_id") == lesson.id
     ]
     if due_reviews:

@@ -282,7 +282,7 @@ Subject-specific extensions:
 The supplied curriculum has now been converted into a cross-subject structured learning registry on the development branch, while preserving source provenance and term boundaries.
 
 Current mapped learning blocks:
-- English Term 1: 36 lessons across six units, plus separate structured Review 1 and Review 2.
+- English Term 1: 36 lessons across six units, plus Review 1 and Review 2 as two additional structured review blocks.
 - Science: 14 lessons/major lesson blocks across Term 1 and the bundled Term 2 section.
 - Mathematics: 35 lessons across Term 1 and the bundled Term 2 section.
 - Arabic Term 1: 12 integrated lesson blocks across three units. Each block can contain reading/listening plus grammar, spelling, speaking, and writing components according to the book structure.
@@ -290,7 +290,7 @@ Current mapped learning blocks:
 - Islamic Religion Term 1: 21 lessons across three units.
 - ICT supplied Second Semester: 13 lessons across four chapters.
 
-Total registered structured learning blocks: 142, excluding the two separate English review blocks.
+Total registered structured learning blocks: 144, including the two English review blocks.
 
 Important coverage rule:
 A subject is only exposed for the term/semester supported by the supplied trusted source. LUMINA must not invent a missing term. Science and Mathematics are exceptions only because both terms were verified inside the same supplied physical PDF.

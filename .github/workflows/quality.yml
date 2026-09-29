@@ -342,14 +342,14 @@ jobs:
           assert set(MAPPED_CURRICULUM) == {
               "english", "science", "math", "arabic", "social", "religion", "ict"
           }
-          assert counts["english"] == 36
+          assert counts["english"] == 38
           assert counts["science"] == 14
           assert counts["math"] == 35
           assert counts["arabic"] == 12
           assert counts["social"] == 11
           assert counts["religion"] == 21
           assert counts["ict"] == 13
-          assert len(all_mapped_lessons()) == 142
+          assert len(all_mapped_lessons()) == 144
           assert all(lesson.checks for lesson in all_mapped_lessons())
           print("All-subject mapped curriculum registry OK:", counts)
           PY
@@ -427,14 +427,14 @@ jobs:
           import lumina.exam_mode
 
           lessons = all_mapped_lessons()
-          assert len(lessons) == 142
+          assert len(lessons) == 144
           first = lessons[0]
           assert get_lesson_by_id(first.id) is first
           assert get_module_for_lesson_id(first.id) in {
               "english", "science", "math", "arabic", "social", "religion", "ict"
           }
           assert XP_PER_NEW_SUCCESS > 0
-          assert sum(curriculum_counts().values()) == 142
+          assert sum(curriculum_counts().values()) == 144
           print("Mission/reward/import contracts OK")
           PY
 

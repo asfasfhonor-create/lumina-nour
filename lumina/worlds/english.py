@@ -3,7 +3,7 @@ import streamlit as st
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import ENGLISH_T1
 from lumina.curriculum.grounding import build_grounded_pdf, curriculum_prompt
-from lumina.curriculum.english_unit1 import ENGLISH_U1_L1
+from lumina.curriculum.english_unit1 import UNIT1_LESSONS
 from lumina.session_state import get_learning_attempts, record_learning_attempt
 
 
@@ -45,7 +45,7 @@ def _render_school_track(ai: GeminiService) -> None:
         st.write(f"{prefix} {unit.title}")
 
     if unit_title == "Personal Identity":
-        _render_verified_personal_identity_lesson()
+        _render_verified_personal_identity_unit()
 
     st.markdown("---")
     st.caption("Advanced source session")
@@ -183,19 +183,31 @@ Keep it concise and practical."""
         st.markdown(ai.generate(prompt))
 
 
-def _render_verified_personal_identity_lesson() -> None:
-    lesson = ENGLISH_U1_L1
-    st.markdown(f"### Lesson 1 · {lesson.title}")
+def _render_verified_personal_identity_unit() -> None:
+    st.markdown("### Unit 1 · Personal Identity")
+    st.caption("Verified from the supplied English curriculum source.")
+
+    lesson = st.selectbox(
+        "Choose lesson",
+        UNIT1_LESSONS,
+        format_func=lambda item: item.title,
+        key="english_u1_lesson",
+    )
+    _render_verified_lesson(lesson)
+
+
+def _render_verified_lesson(lesson) -> None:
+    st.markdown(f"### {lesson.title}")
     st.caption(f"Verified curriculum extract · {lesson.source_pages}")
 
     with st.expander("What you will learn", expanded=True):
         for objective in lesson.objectives:
             st.write(f"• {objective}")
 
-    st.markdown("**Key words**")
+    st.markdown("**Key words / language**")
     st.write(" · ".join(lesson.key_terms))
 
-    st.markdown("**Core idea from the lesson**")
+    st.markdown("**Core ideas from the lesson**")
     for point in lesson.evidence_summary:
         st.write(f"• {point}")
 
@@ -221,13 +233,19 @@ def _render_verified_personal_identity_lesson() -> None:
             }
         )
         if correct:
-            st.success("Good thinking — this matches the lesson's main idea.")
-            st.info("This counts as learning evidence, not full mastery yet. We'll need more than one successful check before marking the concept mastered.")
+            st.success("Good thinking — this matches the lesson.")
+            st.info(
+                "This is learning evidence, not full mastery yet. "
+                "LUMINA will require more than one successful check before marking a concept mastered."
+            )
         else:
-            st.warning("Not yet. Try the hint, then answer again.")
+            st.warning("Not yet. Use the hint, then try again.")
             st.info(f"Hint: {check.hint}")
 
     attempts = get_learning_attempts(lesson.id)
     if attempts:
         correct_count = sum(1 for attempt in attempts if attempt.get("correct"))
-        st.caption(f"Session evidence: {correct_count} successful check(s) from {len(attempts)} attempt(s).")
+        st.caption(
+            f"Session evidence: {correct_count} successful check(s) "
+            f"from {len(attempts)} attempt(s)."
+        )

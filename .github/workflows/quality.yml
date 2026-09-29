@@ -513,11 +513,11 @@ jobs:
       - name: Validate durable persistence adapter imports
         run: |
           python - <<'PY'
-          from lumina.persistence.supabase_store import SupabaseLearningStore
+          from lumina.persistence.postgres_store import PostgresLearningStore
           from lumina.persistence.session_store import get_learning_store
-          assert SupabaseLearningStore.__name__ == "SupabaseLearningStore"
+          assert PostgresLearningStore.__name__ == "PostgresLearningStore"
           assert callable(get_learning_store)
-          print("Durable persistence adapter imports OK")
+          print("Neon/PostgreSQL persistence adapter imports OK")
           PY
 
       - name: Validate curriculum search
@@ -537,4 +537,21 @@ jobs:
           assert lesson is not None
           assert lesson.source_pages
           print("Curriculum search OK")
+          PY
+
+      - name: Validate Neon schema contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          sql = Path("postgres/neon_schema.sql").read_text(encoding="utf-8")
+          for table in (
+              "lumina_learning_attempts",
+              "lumina_mistakes",
+              "lumina_reviews",
+              "lumina_profile_state",
+          ):
+              assert f"create table if not exists {table}" in sql.lower()
+          assert "unique (learner_key, lesson_id, check_id)" in sql.lower()
+          print("Neon schema contract OK")
           PY

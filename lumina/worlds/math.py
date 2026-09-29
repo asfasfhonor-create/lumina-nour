@@ -13,6 +13,7 @@ from lumina.curriculum.math_t2_unit3 import MATH_T2_UNIT3_LESSONS
 from lumina.curriculum.math_t2_unit4 import MATH_T2_UNIT4_LESSONS
 from lumina.curriculum.math_t2_unit5 import MATH_T2_UNIT5_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
+from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_math_world(ai: GeminiService) -> None:
@@ -111,3 +112,10 @@ def render_math_world(ai: GeminiService) -> None:
             "This unit is inventoried from the trusted source. "
             "Its verified lesson data will be connected progressively without inventing content."
         )
+
+    render_temporary_source_session(
+        ai,
+        source,
+        section_title=unit_title,
+        key_prefix="math_source_session",
+    )

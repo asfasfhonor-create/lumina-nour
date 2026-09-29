@@ -36,7 +36,7 @@ class GeminiService:
         system_instruction: str | None = None,
     ) -> str:
         if not self._client:
-            raise RuntimeError("Gemini API key is not configured.")
+            raise AIServiceError("الأداة الذكية غير مفعلة لأن Gemini API Key غير موجود.")
 
         config = None
         if system_instruction:

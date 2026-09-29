@@ -1,5 +1,5 @@
 import streamlit as st
-from lumina.ai_service import GeminiService
+from lumina.ai_service import AIServiceError, GeminiService
 from lumina.config import APP_ICON, APP_INITIAL_SIDEBAR_STATE, APP_LAYOUT, APP_TITLE
 from lumina.home import render_home_foundation
 from lumina.session_state import initialize_session_state
@@ -27,8 +27,12 @@ if not api_key:
 
 ai = GeminiService(api_key)
 
-if not render_active_world(ai):
-    render_home_foundation()
-    render_quick_access(ai)
+try:
+    if not render_active_world(ai):
+        render_home_foundation()
+        render_quick_access(ai)
+except AIServiceError as exc:
+    st.warning(str(exc))
+    st.caption("المحاولة لم تُسجل كنجاح أو Mastery بسبب فشل خدمة الذكاء الاصطناعي.")
 
 st.caption("LUMINA · built for Nour ✨ | Development branch · التقدم الحالي تجريبي حتى تفعيل الحفظ الدائم")

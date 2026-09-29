@@ -11,7 +11,14 @@ from lumina.persistence.backup import export_learning_backup, restore_learning_b
 from lumina.learning.evidence_cache import group_by_lesson
 from lumina.readiness import build_release_readiness, is_release_ready, release_blockers
 from lumina.config import BUILD_LABEL
-from lumina.curriculum.trusted_sources import SourceUpload, build_trusted_record, NEON_OBJECT_STORAGE
+from lumina.curriculum.trusted_sources import (
+    SourceUpload,
+    build_trusted_record,
+    NEON_OBJECT_STORAGE,
+    SOURCE_ROLE_OFFICIAL,
+    SOURCE_ROLE_SUPPLEMENTARY,
+    SOURCE_ROLE_LABELS,
+)
 from lumina.curriculum.trusted_source_storage import StorageConfig, NeonTrustedSourceStorage
 from lumina.persistence.trusted_source_catalog import NeonTrustedSourceCatalog
 
@@ -300,6 +307,26 @@ def _render_trusted_sources() -> None:
             "الوحدة / الفصل — اختياري",
             key="parent_trusted_source_unit",
         )
+        source_role = st.selectbox(
+            "نوع المصدر",
+            [SOURCE_ROLE_OFFICIAL, SOURCE_ROLE_SUPPLEMENTARY],
+            format_func=lambda role: SOURCE_ROLE_LABELS[role],
+            help=(
+                "المصدر الرسمي له الأولوية في تحديد المنهج والمعلومة. "
+                "المصدر المساعد يُستخدم للشرح والأمثلة والتدريب بدون أن يغيّر مرجع المنهج الأساسي."
+            ),
+            key="parent_trusted_source_role",
+        )
+        publisher = st.text_input(
+            "الناشر / اسم السلسلة — اختياري",
+            placeholder="مثال: وزارة التربية والتعليم / المعاصر",
+            key="parent_trusted_source_publisher",
+        )
+        edition_label = st.text_input(
+            "الطبعة / السنة — اختياري",
+            placeholder="مثال: 2026 / 2025–2026",
+            key="parent_trusted_source_edition",
+        )
 
         if st.button("اعتماد وحفظ المصدر", key="parent_trusted_source_save", use_container_width=True):
             if not term_label.strip():
@@ -321,6 +348,9 @@ def _render_trusted_sources() -> None:
                         unit_label=unit_label or None,
                         storage_provider=NEON_OBJECT_STORAGE,
                         storage_key=storage_key,
+                        source_role=source_role,
+                        publisher=publisher or None,
+                        edition_label=edition_label or None,
                     )
                     created = catalog.register(record)
                     if created:
@@ -343,11 +373,19 @@ def _render_trusted_sources() -> None:
         st.markdown("#### المصادر المعتمدة حاليًا")
         for source in sources:
             with st.container(border=True):
+                metadata = source.get("metadata") or {}
+                source_role = str(metadata.get("source_role", "supplied"))
+                role_label = SOURCE_ROLE_LABELS.get(source_role, "مصدر معتمد")
                 st.write(
                     f"**{source['display_name']}** · "
                     f"{SUBJECT_LABELS.get(source['subject'], source['subject'])} · "
                     f"{source['term_label']}"
                 )
+                st.caption(f"الأولوية: {role_label}")
+                if metadata.get("publisher"):
+                    st.caption(f"الناشر / السلسلة: {metadata['publisher']}")
+                if metadata.get("edition_label"):
+                    st.caption(f"الطبعة / السنة: {metadata['edition_label']}")
                 if source.get("unit_label"):
                     st.caption(f"الوحدة / الفصل: {source['unit_label']}")
                 st.caption(f"الملف: {source['filename']}")

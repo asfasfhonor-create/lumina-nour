@@ -1,5 +1,7 @@
 import streamlit as st
 
+from lumina.context_help import render_context_help
+
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import ICT_T2
 from lumina.curriculum.ict_chapter1 import ICT_CHAPTER1_LESSONS
@@ -12,6 +14,7 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 def render_ict_world(ai: GeminiService) -> None:
     st.markdown('<div class="section-title">💻 ICT Lab</div>', unsafe_allow_html=True)
+    render_context_help("ict", label="💬 قوليلي العالم ده بيعمل إيه")
     st.markdown(
         '<div class="mission"><b>School ICT stays school ICT.</b><br>'
         '<span class="muted">This world preserves the supplied Visual Basic .NET curriculum. Python remains a separate enrichment track.</span></div>',

@@ -10,7 +10,11 @@ from lumina.session_state import current_level
 
 def render_home_foundation() -> None:
     """Render the current Nour's World foundation without owning learning business logic."""
-    st.markdown(
+    photo_col, hero_col = st.columns([1, 4], vertical_alignment="center")
+    with photo_col:
+        st.image("assets/nour_avatar.jpg", width=92)
+    with hero_col:
+        st.markdown(
         """
         <div class="hero">
           <div class="brand">LUMINA · NOUR'S WORLD</div>
@@ -18,8 +22,8 @@ def render_home_foundation() -> None:
           <div class="muted">مساحتك للمذاكرة، الاكتشاف، الإنجليزي والـ AI — خطوة ممتعة كل يوم.</div>
         </div>
         """,
-        unsafe_allow_html=True,
-    )
+            unsafe_allow_html=True,
+        )
 
     level_number = current_level()
     c1, c2, c3 = st.columns(3)

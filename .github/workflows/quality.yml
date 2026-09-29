@@ -27,6 +27,7 @@ jobs:
           import lumina.worlds.english
           import lumina.worlds.science
           import lumina.worlds.math
+          import lumina.worlds.ict
           import lumina.parent_dashboard
           import lumina.persistence.session_store
           print("Import smoke test OK")
@@ -202,4 +203,18 @@ jobs:
               assert lesson.checks
               assert lesson.source_pages
           print("Math Unit 1 lesson contracts OK")
+          PY
+
+      - name: Validate ICT Chapter 1 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.ict_chapter1 import ICT_CHAPTER1_LESSONS
+
+          assert len(ICT_CHAPTER1_LESSONS) == 5
+          assert ICT_CHAPTER1_LESSONS[0].title == "Data Types"
+          assert ICT_CHAPTER1_LESSONS[-1].title == "Errors"
+          for lesson in ICT_CHAPTER1_LESSONS:
+              assert lesson.checks
+              assert lesson.source_pages
+          print("ICT Chapter 1 lesson contracts OK")
           PY

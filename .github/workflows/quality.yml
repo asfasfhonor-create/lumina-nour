@@ -1283,7 +1283,7 @@ jobs:
           assert "nour-photo-glow" in theme
           assert "object-fit:cover" in theme
           assert '[data-testid="stToolbar"]' in theme
-          assert 'toolbarMode = "minimal"' in config
+          assert 'toolbarMode = "viewer"' in config
 
           learner_text = "\n".join([home, app, quick])
           for forbidden in [

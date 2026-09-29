@@ -100,3 +100,23 @@ jobs:
           assert derive_mastery(varied).state == MASTERED
           print("Mastery rules OK")
           PY
+
+      - name: Validate English Unit 2 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.english_unit2 import UNIT2_LESSONS
+
+          assert len(UNIT2_LESSONS) == 6
+          assert [lesson.title for lesson in UNIT2_LESSONS] == [
+              "Stay Connected",
+              "Communication, Challenges and Solutions",
+              "The Silent Dinner",
+              "Story Time — Taking Initiative and Building a Team",
+              "Let's Talk — Proper Communication Skills",
+              "Staying Close — Opinion Paragraph",
+          ]
+          for lesson in UNIT2_LESSONS:
+              assert lesson.checks
+              assert lesson.source_pages
+          print("English Unit 2 lesson contracts OK")
+          PY

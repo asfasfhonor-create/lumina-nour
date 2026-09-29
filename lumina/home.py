@@ -39,7 +39,11 @@ def render_home_foundation() -> None:
     _render_learning_worlds()
 
     st.markdown("---")
-    c_review, c_parent = st.columns(2)
+    c_exam, c_review, c_parent = st.columns(3)
+    with c_exam:
+        if st.button("🧪 Exam Mode", key="open_exam_mode"):
+            st.session_state.active_world = "exam"
+            st.rerun()
     with c_review:
         if st.button("📝 مراجعاتي", key="open_review_center"):
             st.session_state.active_world = "review"

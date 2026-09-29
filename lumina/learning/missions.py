@@ -1,0 +1,88 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from datetime import date
+
+from lumina.curriculum.mapped_curriculum import (
+    MAPPED_CURRICULUM,
+    SUBJECT_LABELS,
+    all_mapped_lessons,
+)
+from lumina.learning.progress import NOT_STARTED, derive_mastery
+
+
+@dataclass(frozen=True)
+class MissionRecommendation:
+    module_id: str
+    subject_label: str
+    lesson_id: str
+    lesson_title: str
+    source_pages: str
+    reason: str
+
+
+def _lesson_index() -> dict[str, tuple[str, object]]:
+    index = {}
+    for module_id, units in MAPPED_CURRICULUM.items():
+        for lessons in units.values():
+            for lesson in lessons:
+                index[lesson.id] = (module_id, lesson)
+    return index
+
+
+def choose_mission(store) -> MissionRecommendation | None:
+    """Pick review first; otherwise rotate through not-started mapped lessons."""
+    index = _lesson_index()
+
+    for review in store.get_reviews("due"):
+        lesson_id = review.get("lesson_id")
+        if lesson_id in index:
+            module_id, lesson = index[lesson_id]
+            return MissionRecommendation(
+                module_id=module_id,
+                subject_label=SUBJECT_LABELS.get(module_id, module_id),
+                lesson_id=lesson.id,
+                lesson_title=lesson.title,
+                source_pages=lesson.source_pages,
+                reason="Review due from a previous mistake",
+            )
+
+    candidates = []
+    for module_id, units in MAPPED_CURRICULUM.items():
+        for lessons in units.values():
+            for lesson in lessons:
+                state = derive_mastery(
+                    store.get_attempts(lesson.id),
+                    store.get_mistakes(lesson.id),
+                ).state
+                if state == NOT_STARTED:
+                    candidates.append((module_id, lesson))
+
+    if not candidates:
+        all_lessons = all_mapped_lessons()
+        if not all_lessons:
+            return None
+        lesson = all_lessons[date.today().toordinal() % len(all_lessons)]
+        module_id = next(
+            sid
+            for sid, units in MAPPED_CURRICULUM.items()
+            if any(lesson in lessons for lessons in units.values())
+        )
+        reason = "Keep mastery fresh"
+    else:
+        module_id, lesson = candidates[date.today().toordinal() % len(candidates)]
+        reason = "Next mapped lesson to explore"
+
+    return MissionRecommendation(
+        module_id=module_id,
+        subject_label=SUBJECT_LABELS.get(module_id, module_id),
+        lesson_id=lesson.id,
+        lesson_title=lesson.title,
+        source_pages=lesson.source_pages,
+        reason=reason,
+    )
+
+
+def get_lesson_by_id(lesson_id: str):
+    item = _lesson_index().get(lesson_id)
+    return item[1] if item else None

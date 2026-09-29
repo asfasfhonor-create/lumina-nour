@@ -42,6 +42,15 @@ def render_curriculum_search(ai: GeminiService) -> None:
         st.write(f"• {point}")
     st.caption(f"Source: {lesson.source_pages} · {lesson.source_id}")
 
+    if st.button(
+        "افتحي الدرس كامل",
+        key=f"curriculum_open_{lesson.id}",
+        use_container_width=True,
+    ):
+        st.session_state.focus_lesson_id = lesson.id
+        st.session_state.active_world = "lesson_focus"
+        st.rerun()
+
     question = st.text_input(
         "عندك سؤال عن الجزء ده؟",
         key=f"curriculum_question_{lesson.id}",

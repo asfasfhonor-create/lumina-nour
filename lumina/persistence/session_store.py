@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import streamlit as st
 
 from lumina.persistence.base import LearningStore
+from lumina.persistence.supabase_store import SupabaseLearningStore
 
 
 def _now_iso() -> str:
@@ -90,8 +91,24 @@ class SessionLearningStore(LearningStore):
         return [review for review in reviews if review.get("status") == status]
 
 
-_STORE = SessionLearningStore()
+_SESSION_STORE = SessionLearningStore()
+_REMOTE_STORE: LearningStore | None = None
 
 
 def get_learning_store() -> LearningStore:
-    return _STORE
+    global _REMOTE_STORE
+
+    url = st.secrets.get("SUPABASE_URL", None)
+    api_key = st.secrets.get("SUPABASE_SECRET_KEY", None)
+    learner_key = st.secrets.get("NOUR_LEARNER_KEY", None)
+
+    if url and api_key and learner_key:
+        if _REMOTE_STORE is None:
+            _REMOTE_STORE = SupabaseLearningStore(
+                url=str(url),
+                api_key=str(api_key),
+                learner_key=str(learner_key),
+            )
+        return _REMOTE_STORE
+
+    return _SESSION_STORE

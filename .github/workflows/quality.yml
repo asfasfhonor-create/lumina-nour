@@ -1485,3 +1485,25 @@ jobs:
           })
           print("Supplementary source learning strategy OK")
           PY
+
+      - name: Validate gentle exam mode difficulty cap
+        run: |
+          python - <<'PY'
+          from lumina.exam_mode import _pick_checks
+          from lumina.curriculum.science_unit1 import SCIENCE_U1_L1
+
+          class EmptyStore:
+              def get_attempts(self):
+                  return []
+              def get_mistakes(self):
+                  return []
+
+          gentle = _pick_checks([SCIENCE_U1_L1], EmptyStore(), limit=5, max_difficulty=1)
+          gradual = _pick_checks([SCIENCE_U1_L1], EmptyStore(), limit=5, max_difficulty=2)
+          challenge = _pick_checks([SCIENCE_U1_L1], EmptyStore(), limit=5, max_difficulty=3)
+
+          assert [check.difficulty for _, check in gentle] == [1]
+          assert [check.difficulty for _, check in gradual] == [1, 2]
+          assert [check.difficulty for _, check in challenge] == [1, 2, 3]
+          print("Gentle exam difficulty cap OK")
+          PY

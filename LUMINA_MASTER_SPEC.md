@@ -789,23 +789,35 @@ Current stack:
 - `google-genai`;
 - Gemini 2.5 Flash;
 - Pillow;
+- psycopg / Neon PostgreSQL;
+- boto3 / Neon Object Storage;
 - Streamlit Community Cloud;
 - GitHub.
 
 Development branch:
 `feature/nour-mobile-ui`
 
-Current branch foundation includes:
-- mobile-first home;
-- seven subject presentation cards;
-- Daily English mini mission;
-- demo/session XP, streak, level;
-- AI Explorer placeholder;
+Current branch now includes:
+- modular home/router/world structure;
+- seven enabled school-subject worlds;
+- mapped curriculum registry across supplied subjects;
+- separate School English and Real English tracks;
+- AI Lab foundation;
+- source-grounded lesson checks;
+- Daily Mission;
+- adaptive Weekly Plan;
+- Curriculum Search;
+- evidence-based XP/streak/profile persistence;
+- Mistake Notebook and review queue;
+- source-grounded Exam Mode;
+- Parent Dashboard;
 - Quick Access tools;
-- improved coaching prompts;
-- project requirement/audit/inventory documents.
-
-These are foundation/prototype elements, not proof that the final learning systems are complete.
+- persistent Neon learning storage with verified live production connectivity;
+- permanent trusted-source metadata catalog;
+- selected Neon Object Storage backend and private `lumina-trusted-sources` bucket;
+- permanent-source upload/archive UI in Parent Dashboard, pending final Streamlit storage secret wiring;
+- learner-facing language cleanup and stronger mobile/photo presentation;
+- CI/AppTest coverage for navigation, school worlds, learning flows, persistence contracts, source contracts, secret scanning and learner-facing UI guards.
 
 No merge to production/main is authorized merely by this Master.
 
@@ -813,26 +825,24 @@ No merge to production/main is authorized merely by this Master.
 
 ## 31. Known gaps
 
-Still required:
-- activate and live-verify the prepared Neon durable persistence backend;
-- complete curriculum indexing for the remaining Arabic/Social/Religion/ICT content and bundled Term 2 Math/Science lessons;
-- page/image-aware retrieval;
-- live-verified persistent database connection;
-- deepen subject-specific hubs beyond the verified foundations already present;
-- extend the initial mastery engine with configurable thresholds and richer evidence;
-- extend Mistake Notebook and spaced review beyond the current foundation;
-- adaptive Tutor Profile;
-- deepen Exam Mode beyond the current source-grounded foundation;
-- full Homework Coach;
-- full English development journey;
-- listening/speaking/pronunciation;
-- deepen AI Lab progression and evidence-based badges;
-- deepen Parent Dashboard analytics;
-- persistent evidence-based gamification;
-- final live verification of Nour photo rendering;
-- robust error handling;
-- final live verification of access protection;
-- full mobile/browser regression testing.
+Still required before V1 production merge:
+- wire the Neon Object Storage credential into Streamlit Secrets and perform one real permanent-source upload/reopen test;
+- final live verification that Streamlit Community Cloud is serving the exact latest feature-branch commit;
+- final visual verification of Nour's photo crop/presentation and Streamlit toolbar hiding on desktop and phone widths;
+- one true deployed end-to-end learning transaction: answer → attempt → mistake/review where applicable → XP/progress → fresh-session restore;
+- final mobile/browser smoke on the deployed app;
+- sample curriculum grounding against real source pages in the deployed experience;
+- final access-control/PIN verification if those optional controls are enabled;
+- document any remaining V1 limitations;
+- explicit Mohamed approval before merging PR #1 to `main`.
+
+Post-V1 depth improvements remain planned rather than release blockers:
+- richer subject-specific adventures and activities;
+- deeper adaptive Tutor Profile/scaffolding;
+- broader Real English listening/speaking/pronunciation;
+- deeper AI Lab progression and evidence-based badges;
+- richer parent analytics;
+- more sophisticated spaced review and exam configuration.
 
 ---
 

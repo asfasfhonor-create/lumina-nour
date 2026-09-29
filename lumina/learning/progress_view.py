@@ -15,7 +15,7 @@ def render_learning_brain_summary(lesson_ids: list[str] | None = None) -> None:
     """Render a compact evidence summary from the current persistence adapter."""
     store = get_learning_store()
     attempts = store.get_attempts()
-    mistakes = store.store.get_mistakes(unresolved_only=True)
+    mistakes = store.get_mistakes(unresolved_only=True)
     due_reviews = store.get_reviews("due")
 
     st.markdown('<div class="section-title">🧠 Learning Brain</div>', unsafe_allow_html=True)

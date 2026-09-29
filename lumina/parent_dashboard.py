@@ -3,6 +3,7 @@ import streamlit as st
 from lumina.curriculum.english_curriculum import ENGLISH_UNIT_LESSONS, all_english_lessons
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.persistence.session_store import get_learning_store
+from lumina.persistence.backup import export_learning_backup, restore_learning_backup
 
 
 def render_parent_dashboard(parent_pin: str | None) -> None:
@@ -83,3 +84,34 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
         f"English mapped lessons: {total_lessons} · started: {started_lessons} · "
         f"overall view uses evidence, not button clicks."
     )
+
+    _render_backup_tools()
+
+
+def _render_backup_tools() -> None:
+    st.markdown("### Backup / Restore")
+    st.caption(
+        "Temporary safety net until automatic cloud persistence is connected. "
+        "The backup contains learning progress, not API keys."
+    )
+
+    st.download_button(
+        "Download learning backup",
+        data=export_learning_backup(),
+        file_name="lumina_nour_learning_backup.json",
+        mime="application/json",
+        key="download_learning_backup",
+    )
+
+    uploaded = st.file_uploader(
+        "Restore a learning backup",
+        type=["json"],
+        key="restore_learning_backup_file",
+    )
+    if uploaded and st.button("Restore this backup", key="restore_learning_backup_button"):
+        ok, message = restore_learning_backup(uploaded.getvalue().decode("utf-8"))
+        if ok:
+            st.success(message)
+            st.rerun()
+        else:
+            st.error(message)

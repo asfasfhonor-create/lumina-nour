@@ -7,6 +7,7 @@ from lumina.home import render_home_foundation
 from lumina.session_state import initialize_session_state
 from lumina.quick_access import render_quick_access
 from lumina.persistence.profile_state import hydrate_profile_state
+from lumina.persistence.session_store import persistence_status
 from lumina.theme import apply_theme
 from lumina.world_router import render_active_world
 
@@ -55,4 +56,9 @@ except PersistenceError as exc:
     st.warning(str(exc))
     st.caption("تم التحويل مؤقتًا للحفظ داخل الجلسة الحالية حتى لا يتوقف البرنامج.")
 
-st.caption("LUMINA · built for Nour ✨ | Development branch · التقدم الحالي تجريبي حتى تفعيل الحفظ الدائم")
+storage = persistence_status()
+storage_note = "الحفظ الدائم فعال" if storage["durable"] else "الحفظ الدائم غير مفعل"
+st.caption(
+    f"LUMINA · built for Nour ✨ | Development branch · "
+    f"{storage_note} · {storage['label']}"
+)

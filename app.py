@@ -44,7 +44,7 @@ if persistence_warning:
     st.caption("الحفظ السحابي متوقف لهذه الجلسة؛ لا تغلقي الجلسة قبل تنزيل Backup من Parent Dashboard.")
 
 try:
-    if not render_active_world(ai, parent_pin=parent_pin):
+    if not render_active_world(ai, parent_pin=parent_pin, app_pin_configured=bool(app_pin)):
         render_home_foundation()
         render_quick_access(ai)
 except AIServiceError as exc:

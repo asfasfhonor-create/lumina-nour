@@ -938,7 +938,7 @@ jobs:
           )
           storage = next(item for item in items if item.key == "storage")
           assert storage.ready is False
-          assert "not verified" in storage.detail
+          assert "لم يتم التحقق بعد" in storage.detail
           print("Unverified storage correctly blocks release readiness")
           PY
 

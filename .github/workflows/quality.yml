@@ -519,3 +519,22 @@ jobs:
           assert callable(get_learning_store)
           print("Durable persistence adapter imports OK")
           PY
+
+      - name: Validate curriculum search
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.search import lesson_by_id, search_curriculum
+
+          ohm = search_curriculum("Ohm law")
+          assert ohm
+          assert any("Electric" in hit.title or "Properties" in hit.title for hit in ohm)
+
+          arabic = search_curriculum("اسم المفعول")
+          assert arabic
+          assert any("الصداقة" in hit.title for hit in arabic)
+
+          lesson = lesson_by_id(arabic[0].lesson_id)
+          assert lesson is not None
+          assert lesson.source_pages
+          print("Curriculum search OK")
+          PY

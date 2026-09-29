@@ -5,7 +5,7 @@ import streamlit as st
 from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS, all_mapped_lessons
 from lumina.curriculum.coverage import SOURCE_COVERAGE
 from lumina.learning.progress import derive_mastery, mastery_label
-from lumina.persistence.session_store import get_learning_store
+from lumina.persistence.session_store import get_learning_store, persistence_status
 from lumina.persistence.backup import export_learning_backup, restore_learning_backup
 from lumina.learning.evidence_cache import group_by_lesson
 
@@ -35,6 +35,16 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
         st.rerun()
 
     store = get_learning_store()
+    status = persistence_status()
+
+    st.markdown("### System status")
+    if status["durable"]:
+        st.success(f"Durable learning storage: {status['label']}")
+    elif status["mode"] == "session_fallback":
+        st.warning("Cloud persistence is unavailable in this session. Download a backup before closing.")
+    else:
+        st.warning("Durable cloud persistence is not configured yet; progress is session-only.")
+
     attempts = store.get_attempts()
     all_mistakes = store.get_mistakes()
     mistakes = [item for item in all_mistakes if not item.get("resolved", False)]

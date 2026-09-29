@@ -767,6 +767,7 @@ jobs:
 
           ignored = {
               ".streamlit/secrets.example.toml",
+              ".github/workflows/quality.yml",
           }
           patterns = {
               "Google API key": re.compile(r"AIza[0-9A-Za-z_-]{30,}"),

@@ -736,7 +736,7 @@ jobs:
           mission = choose_mission(store)
           assert mission is not None
           assert mission.lesson_id == target.id
-          assert "another look" in mission.reason
+          assert "نفهم" in mission.reason or "مراجعة" in mission.reason
 
           plan = build_weekly_plan(store, limit=5)
           assert plan

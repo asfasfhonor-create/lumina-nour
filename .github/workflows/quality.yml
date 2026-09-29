@@ -1351,3 +1351,82 @@ jobs:
 
           print("El-Moasser batch classification OK")
           PY
+
+      - name: Validate gentle adaptive learning scaffolding
+        run: |
+          python - <<'PY'
+          from lumina.learning.scaffolding import (
+              GENTLE_START,
+              BUILDING,
+              READY_CHALLENGE,
+              eligible_checks,
+              learning_stage,
+          )
+          from lumina.curriculum.science_unit1 import SCIENCE_U1_L1
+          from lumina.curriculum.math_unit1 import MATH_U1_L1
+
+          assert learning_stage([], []).id == GENTLE_START
+          assert learning_stage(
+              [{"check_id":"a","evidence_id":"a","correct":True}], []
+          ).id == BUILDING
+          assert learning_stage(
+              [
+                  {"check_id":"a","evidence_id":"a","correct":True},
+                  {"check_id":"b","evidence_id":"b","correct":True},
+              ],
+              [],
+          ).id == READY_CHALLENGE
+          assert learning_stage(
+              [{"check_id":"a","evidence_id":"a","correct":True}],
+              [{"check_id":"a","resolved":False}],
+          ).id == GENTLE_START
+
+          gentle_science = eligible_checks(SCIENCE_U1_L1, learning_stage([], []))
+          assert len(gentle_science) == 1
+          assert gentle_science[0].difficulty == 1
+
+          challenge_math = eligible_checks(
+              MATH_U1_L1,
+              learning_stage(
+                  [
+                      {"check_id":"a","evidence_id":"a","correct":True},
+                      {"check_id":"b","evidence_id":"b","correct":True},
+                  ],
+                  [],
+              ),
+          )
+          assert [item.difficulty for item in challenge_math] == [1, 2, 3]
+          print("Gentle adaptive scaffolding OK")
+          PY
+
+      - name: Audit question level and cognitive load
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import all_mapped_lessons
+
+          checked = 0
+          for lesson in all_mapped_lessons():
+              for check in lesson.checks:
+                  checked += 1
+                  assert check.difficulty in (1, 2, 3), (lesson.id, check.id)
+                  assert 2 <= len(check.options) <= 4, (lesson.id, check.id, len(check.options))
+                  assert check.hint.strip(), (lesson.id, check.id, "missing hint")
+                  assert len(check.prompt.split()) <= 40, (lesson.id, check.id, check.prompt)
+                  assert check.correct_index is not None, (lesson.id, check.id)
+          assert checked > 0
+          print(f"Question level audit OK: {checked} checks")
+          PY
+
+      - name: Validate creative Science and Maths prototypes
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.science_unit1 import SCIENCE_U1_L1
+          from lumina.curriculum.math_unit1 import MATH_U1_L1
+
+          for lesson in (SCIENCE_U1_L1, MATH_U1_L1):
+              assert [check.difficulty for check in lesson.checks[:3]] == [1, 2, 3]
+              assert [check.activity_kind for check in lesson.checks[:3]] == [
+                  "concept", "practice", "challenge"
+              ]
+          print("Creative gradual prototypes OK")
+          PY

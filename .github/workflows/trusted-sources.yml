@@ -19,7 +19,7 @@ jobs:
       - name: Validate trusted-source model
         run: |
           python - <<'PY'
-          from lumina.curriculum.trusted_sources import SourceUpload, TRUSTED, build_trusted_record
+          from lumina.curriculum.trusted_sources import SourceUpload, TRUSTED, build_trusted_record, NEON_OBJECT_STORAGE, TRUSTED_SOURCE_BUCKET
 
           upload = SourceUpload(
               filename="../Science.pdf",
@@ -27,6 +27,8 @@ jobs:
               data=b"%PDF-1.7 trusted fixture",
           )
           assert upload.filename == "Science.pdf"
+          assert NEON_OBJECT_STORAGE == "neon_object_storage"
+          assert TRUSTED_SOURCE_BUCKET == "lumina-trusted-sources"
           assert len(upload.digest) == 64
 
           record = build_trusted_record(

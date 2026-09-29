@@ -892,6 +892,7 @@ jobs:
                   "durable": True,
                   "label": "Neon PostgreSQL",
               },
+              storage_verified=True,
           )
           by_key = {item.key: item for item in items}
           assert by_key["curriculum"].ready is True
@@ -913,4 +914,26 @@ jobs:
           assert "ai_available" in signature.parameters
           assert callable(lumina.world_router.render_active_world)
           print("Parent release readiness rendering OK")
+          PY
+
+      - name: Validate unverified storage blocks release readiness
+        run: |
+          python - <<'PY'
+          from lumina.readiness import build_release_readiness
+
+          items = build_release_readiness(
+              ai_available=True,
+              app_pin_configured=True,
+              parent_pin_configured=True,
+              storage_status={
+                  "mode": "neon",
+                  "durable": True,
+                  "label": "Neon PostgreSQL",
+              },
+              storage_verified=False,
+          )
+          storage = next(item for item in items if item.key == "storage")
+          assert storage.ready is False
+          assert "not verified" in storage.detail
+          print("Unverified storage correctly blocks release readiness")
           PY

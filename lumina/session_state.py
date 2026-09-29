@@ -4,8 +4,8 @@ import streamlit as st
 def initialize_session_state() -> None:
     """Initialize prototype state in one place until persistent storage replaces it."""
     defaults = {
-        "xp": 120,
-        "streak": 3,
+        "xp": 0,
+        "streak": 0,
         "daily_done": False,
         "tasks_list": [],
         "chat_history": [],

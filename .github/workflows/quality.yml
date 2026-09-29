@@ -555,3 +555,40 @@ jobs:
           assert "unique (learner_key, lesson_id, check_id)" in sql.lower()
           print("Neon schema contract OK")
           PY
+
+      - name: Validate Neon persistence contracts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lumina.persistence.neon_store import NeonLearningStore
+          from lumina.persistence.session_store import get_learning_store
+          from lumina.persistence.backup import export_learning_backup, restore_learning_backup
+
+          schema = Path("neon/lumina_schema.sql").read_text(encoding="utf-8")
+          for table in (
+              "lumina_learning_attempts",
+              "lumina_mistakes",
+              "lumina_reviews",
+              "lumina_profile_state",
+          ):
+              assert table in schema
+
+          assert NeonLearningStore.__name__ == "NeonLearningStore"
+          assert callable(get_learning_store)
+          assert callable(export_learning_backup)
+          assert callable(restore_learning_backup)
+          print("Neon persistence contracts OK")
+          PY
+
+      - name: Validate production secrets template
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          template = Path(".streamlit/secrets.example.toml").read_text(encoding="utf-8")
+          assert "NEON_DATABASE_URL" in template
+          assert "NOUR_LEARNER_KEY" in template
+          assert "SUPABASE_SECRET_KEY = " not in template
+          assert "PASSWORD@HOST" in template
+          print("Production secrets template OK")
+          PY

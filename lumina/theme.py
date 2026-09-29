@@ -16,7 +16,13 @@ GLOBAL_CSS = """
 [data-testid="stSidebarCollapsedControl"],
 [data-testid="stMainMenu"],
 [data-testid="stAppDeployButton"],
-.stAppToolbar {
+[data-testid="stStatusWidget"],
+[data-testid="stSidebarCollapseButton"],
+.stAppToolbar,
+.stDeployButton,
+header[data-testid="stHeader"],
+.stApp > header,
+#MainMenu {
   display:none !important;
 }
 .hero { background:linear-gradient(135deg,rgba(255,118,172,.16),rgba(116,185,255,.12)); border:1px solid rgba(255,255,255,.15); border-radius:26px; padding:20px; margin-bottom:14px; box-shadow:0 16px 50px rgba(0,0,0,.22); }

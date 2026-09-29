@@ -30,7 +30,7 @@ WORLD_RENDERERS = {
 }
 
 
-def render_active_world(ai: GeminiService, parent_pin: str | None = None) -> bool:
+def render_active_world(ai: GeminiService, parent_pin: str | None = None, *, app_pin_configured: bool = False) -> bool:
     """Render the selected structured world. Return True when a world is active."""
     module_id = st.session_state.get("active_world")
     if not module_id:
@@ -41,7 +41,7 @@ def render_active_world(ai: GeminiService, parent_pin: str | None = None) -> boo
         st.rerun()
 
     if module_id == "parent":
-        render_parent_dashboard(parent_pin)
+        render_parent_dashboard(parent_pin, ai_available=ai.available, app_pin_configured=app_pin_configured)
         return True
 
     if module_id == "review":

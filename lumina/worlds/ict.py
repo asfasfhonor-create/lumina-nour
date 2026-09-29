@@ -13,18 +13,18 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_ict_world(ai: GeminiService) -> None:
-    st.markdown('<div class="section-title">💻 ICT Lab</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">💻 معمل الكمبيوتر · ICT Lab</div>', unsafe_allow_html=True)
     render_context_help("ict", label="💬 قوليلي العالم ده بيعمل إيه")
     st.markdown(
-        '<div class="mission"><b>School ICT stays school ICT.</b><br>'
-        '<span class="muted">This world preserves the supplied Visual Basic .NET curriculum. Python remains a separate enrichment track.</span></div>',
+        '<div class="mission"><b>منهج المدرسة أولًا، والتجربة تساعدنا نفهمه.</b><br>'
+        '<span class="muted">بنحافظ على منهج Visual Basic .NET كما هو، وPython يفضل مسارًا إضافيًا منفصلًا.</span></div>',
         unsafe_allow_html=True,
     )
 
     source = ICT_T2
-    st.caption(f"Trusted source: {source.display_name}")
+    st.caption(f"المصدر: {source.display_name}")
     chapter_title = st.selectbox(
-        "Choose chapter",
+        "اختاري الفصل",
         [unit.title for unit in source.units],
         key="school_ict_chapter",
     )

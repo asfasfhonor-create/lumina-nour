@@ -3,6 +3,10 @@ from __future__ import annotations
 from typing import Protocol
 
 
+class PersistenceError(RuntimeError):
+    """User-safe durable storage failure."""
+
+
 class LearningStore(Protocol):
     def record_attempt(self, attempt: dict) -> None: ...
     def get_attempts(self, lesson_id: str | None = None) -> list[dict]: ...

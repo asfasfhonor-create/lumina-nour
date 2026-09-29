@@ -588,6 +588,10 @@ jobs:
           template = Path(".streamlit/secrets.example.toml").read_text(encoding="utf-8")
           assert "NEON_DATABASE_URL" in template
           assert "NOUR_LEARNER_KEY" in template
+          assert "AWS_ENDPOINT_URL_S3" in template
+          assert "AWS_ACCESS_KEY_ID" in template
+          assert "AWS_SECRET_ACCESS_KEY" in template
+          assert "AWS_REGION" in template
           assert "SUPABASE_SECRET_KEY = " not in template
           assert "PASSWORD@HOST" in template
           print("Production secrets template OK")

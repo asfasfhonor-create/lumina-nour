@@ -445,17 +445,30 @@ def _render_trusted_sources() -> None:
                 except Exception:
                     failed.append(f"{uploaded.name}: تعذر الحفظ")
 
-            if created_count:
-                st.success(
-                    f"تم حفظ واعتماد {created_count} مصدر بشكل دائم ✅ "
-                    "دلوقتي الملفات موجودة في مكتبة LUMINA الدائمة."
-                )
-            if duplicate_count:
-                st.info(f"{duplicate_count} ملف كان محفوظ بالفعل وتم منع التكرار.")
+            st.session_state["trusted_source_last_save_result"] = {
+                "created": created_count,
+                "duplicates": duplicate_count,
+                "failed": list(failed),
+            }
             if failed:
                 st.error("تعذر حفظ بعض الملفات: " + " · ".join(failed))
-            if not failed:
-                st.rerun()
+            st.rerun()
+
+    last_save = st.session_state.pop("trusted_source_last_save_result", None)
+    if last_save:
+        created_count = int(last_save.get("created", 0))
+        duplicate_count = int(last_save.get("duplicates", 0))
+        failed = list(last_save.get("failed") or [])
+        if created_count:
+            st.success(
+                f"تم الحفظ بنجاح ✅ تم اعتماد {created_count} ملف كمصدر دائم في LUMINA."
+            )
+        if duplicate_count:
+            st.info(
+                f"{duplicate_count} ملف كان محفوظ بالفعل، فتم منع التكرار تلقائيًا."
+            )
+        if not created_count and not duplicate_count and failed:
+            st.error("لم يتم حفظ الملفات. راجع رسالة الخطأ وحاول مرة أخرى.")
 
     try:
         sources = catalog.list_active()

@@ -128,3 +128,28 @@ def get_learning_store() -> LearningStore:
         return _REMOTE_STORE
 
     return _SESSION_STORE
+
+
+def persistence_status() -> dict:
+    """Return a non-secret persistence status for UI/diagnostics."""
+    if st.session_state.get("persistence_disabled_for_session", False):
+        return {
+            "mode": "session_fallback",
+            "durable": False,
+            "label": "Session fallback",
+        }
+
+    learner_key = st.secrets.get("NOUR_LEARNER_KEY", None)
+    neon_database_url = st.secrets.get("NEON_DATABASE_URL", None)
+    if neon_database_url and learner_key:
+        return {
+            "mode": "neon",
+            "durable": True,
+            "label": "Neon PostgreSQL",
+        }
+
+    return {
+        "mode": "session",
+        "durable": False,
+        "label": "Session only",
+    }

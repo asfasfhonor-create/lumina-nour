@@ -53,8 +53,10 @@ jobs:
           python - <<'PY'
           from lumina.curriculum.catalog import ENGLISH_T1, SOURCES, get_sources
 
-          assert len(SOURCES) == 7
+          assert len(SOURCES) == 9
           assert len(get_sources("english")) == 1
+          assert len(get_sources("science")) == 2
+          assert len(get_sources("math")) == 2
           assert ENGLISH_T1.filename == "English_language_prep3_t1.pdf"
           assert [unit.title for unit in ENGLISH_T1.units][:3] == [
               "Personal Identity",

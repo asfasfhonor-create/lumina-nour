@@ -7,7 +7,12 @@ from lumina.quick_access import render_quick_access
 from lumina.theme import apply_theme
 from lumina.world_router import render_active_world
 
-st.set_page_config(page_title="LUMINA | Nour's World", page_icon="✨", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(
+    page_title=APP_TITLE,
+    page_icon=APP_ICON,
+    layout=APP_LAYOUT,
+    initial_sidebar_state=APP_INITIAL_SIDEBAR_STATE,
+)
 
 apply_theme()
 

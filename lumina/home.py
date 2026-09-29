@@ -1,5 +1,9 @@
+from datetime import date
+
 import streamlit as st
 
+from lumina.learning.missions import choose_mission
+from lumina.persistence.session_store import get_learning_store
 from lumina.module_registry import get_module, get_school_subjects
 from lumina.session_state import current_level
 
@@ -26,7 +30,7 @@ def render_home_foundation() -> None:
         )
     with c2:
         st.markdown(
-            f'<div class="stat">🔥 <b>{st.session_state.streak} أيام</b><span class="muted">Streak · تجريبي</span></div>',
+            f'<div class="stat">🔥 <b>{st.session_state.streak} أيام</b><span class="muted">Streak · تعلم فعلي</span></div>',
             unsafe_allow_html=True,
         )
     with c3:
@@ -55,34 +59,29 @@ def render_home_foundation() -> None:
 
 
 def _render_daily_mission() -> None:
+    store = get_learning_store()
+    today = date.today().isoformat()
+
+    if st.session_state.get("daily_mission_date") != today:
+        st.session_state.daily_mission_date = today
+        st.session_state.daily_mission_lesson_id = None
+
+    mission = choose_mission(store)
+    if mission is None:
+        return
+
     st.markdown('<div class="section-title">🎯 مهمة اليوم</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="mission"><b>English Mini Mission</b><br>'
-        '<span class="muted">اكتبي 3 جمل قصيرة عن يومك بالإنجليزي. المهمة تسجل ممارسة اليوم؛ الـXP الكامل هيبقى مربوط بتقييم تعليمي حقيقي.</span></div>',
+        f'<div class="mission"><b>{mission.subject_label} · {mission.lesson_title}</b><br>'
+        f'<span class="muted">{mission.reason} · {mission.source_pages}</span></div>',
         unsafe_allow_html=True,
     )
-    daily_text = st.text_area(
-        "مهمة اليوم",
-        placeholder="Write 3 short sentences...",
-        key="daily_text",
-        label_visibility="collapsed",
-    )
 
-    if not st.session_state.daily_done:
-        if st.button("سجلي محاولة اليوم", key="daily_xp"):
-            sentences = [
-                sentence.strip()
-                for sentence in daily_text.replace("!", ".").replace("?", ".").split(".")
-                if sentence.strip()
-            ]
-            if len(sentences) < 3:
-                st.warning("اكتبي 3 جمل على الأقل الأول — المهم المحاولة 🌱")
-            else:
-                st.session_state.daily_done = True
-                st.balloons()
-                st.rerun()
-    else:
-        st.success("ممارسة اليوم اتسجلت 🎉 — مش هنمنح XP تعليمي من غير دليل تعلم حقيقي.")
+    if st.button("ابدئي مهمة اليوم", key="open_daily_mission"):
+        st.session_state.daily_mission_lesson_id = mission.lesson_id
+        st.session_state.daily_mission_date = today
+        st.session_state.active_world = "mission"
+        st.rerun()
 
 
 def _render_learning_worlds() -> None:

@@ -16,8 +16,17 @@ def render_weekly_plan() -> None:
         return
 
     for index, item in enumerate(plan, start=1):
-        st.write(f"{index}. {item.subject_label} · {item.lesson_title}")
-        st.caption(f"{item.reason} · {item.source_pages}")
+        with st.container(border=True):
+            st.write(f"{index}. {item.subject_label} · {item.lesson_title}")
+            st.caption(f"{item.reason} · {item.source_pages}")
+            if st.button(
+                "ابدئي الدرس",
+                key=f"weekly_open_{item.lesson_id}",
+                use_container_width=True,
+            ):
+                st.session_state.focus_lesson_id = item.lesson_id
+                st.session_state.active_world = "lesson_focus"
+                st.rerun()
 
     st.info(
         "الخطة لا تعني إن نور لازم تخلص الخمس مهام مرة واحدة؛ "

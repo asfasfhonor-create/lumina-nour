@@ -949,3 +949,27 @@ jobs:
           assert 'st.session_state.persistence_verified = True' in parent
           print("Verified storage readiness wiring OK")
           PY
+
+      - name: Validate optional readiness is non-blocking
+        run: |
+          python - <<'PY'
+          from lumina.readiness import build_release_readiness, is_release_ready, release_blockers
+
+          items = build_release_readiness(
+              ai_available=True,
+              app_pin_configured=False,
+              parent_pin_configured=False,
+              storage_status={
+                  "mode": "neon",
+                  "durable": True,
+                  "label": "Neon PostgreSQL",
+              },
+              storage_verified=True,
+          )
+          assert is_release_ready(items) is True
+          assert release_blockers(items) == ()
+          optional = {item.key: item for item in items if not item.required}
+          assert optional["app_pin"].ready is False
+          assert optional["parent_pin"].ready is False
+          print("Optional readiness checks are non-blocking")
+          PY

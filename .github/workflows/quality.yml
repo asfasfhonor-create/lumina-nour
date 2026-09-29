@@ -1669,3 +1669,15 @@ jobs:
           assert "أول ما نور تبدأ تحديات AI" in source
           print("Parent AI not-started states OK")
           PY
+
+      - name: Validate trusted source save confirmation survives rerun
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert "trusted_source_last_save_result" in source
+          assert "تم الحفظ بنجاح" in source
+          assert "تم منع التكرار تلقائيًا" in source
+          print("Trusted source save confirmation rerun contract OK")
+          PY

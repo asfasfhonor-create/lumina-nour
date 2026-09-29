@@ -13,14 +13,12 @@ def group_by_lesson(items: list[dict]) -> dict[str, list[dict]]:
 
 
 def snapshot_learning_evidence(store):
-    """Fetch learning evidence in bulk to avoid N+1 database queries."""
+    """Fetch attempt/mistake evidence in bulk to avoid N+1 database queries."""
     attempts = store.get_attempts()
     mistakes = store.get_mistakes()
-    reviews = store.get_reviews()
     return {
         "attempts": attempts,
         "mistakes": mistakes,
-        "reviews": reviews,
         "attempts_by_lesson": group_by_lesson(attempts),
         "mistakes_by_lesson": group_by_lesson(mistakes),
     }

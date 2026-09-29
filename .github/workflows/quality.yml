@@ -901,3 +901,16 @@ jobs:
           assert by_key["app_pin"].ready is False
           print("Release readiness diagnostics OK")
           PY
+
+      - name: Validate parent release readiness rendering
+        run: |
+          python - <<'PY'
+          import inspect
+          import lumina.parent_dashboard
+          import lumina.world_router
+
+          signature = inspect.signature(lumina.parent_dashboard.render_parent_dashboard)
+          assert "ai_available" in signature.parameters
+          assert callable(lumina.world_router.render_active_world)
+          print("Parent release readiness rendering OK")
+          PY

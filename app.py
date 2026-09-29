@@ -26,9 +26,10 @@ if not api_key:
         st.info("الأدوات الذكية تحتاج Gemini API Key. Nour's World نفسها تعمل بدون المفتاح.")
 
 ai = GeminiService(api_key)
+parent_pin = st.secrets.get("PARENT_PIN", None)
 
 try:
-    if not render_active_world(ai):
+    if not render_active_world(ai, parent_pin=parent_pin):
         render_home_foundation()
         render_quick_access(ai)
 except AIServiceError as exc:

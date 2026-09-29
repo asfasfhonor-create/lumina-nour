@@ -15,13 +15,13 @@ def render_weekly_plan() -> None:
     st.caption("خطة صغيرة ومتوازنة: المراجعات المستحقة أولًا، ثم تعلم جديد من مواد مختلفة.")
 
     if not plan:
-        st.success("كل المحتوى المرسوم مراجع حاليًا. هنستخدم الخطة لاحقًا لتثبيت الإتقان.")
+        st.success("مفيش مراجعات مستحقة أو أولوية جديدة دلوقتي. هنحدّث الخطة تلقائيًا مع تقدمك.")
         return
 
     for index, item in enumerate(plan, start=1):
         with st.container(border=True):
             st.write(f"{index}. {item.subject_label} · {item.lesson_title}")
-            st.caption(f"{item.reason} · {item.source_pages}")
+            st.caption(f"{item.reason} · المصدر: {item.source_pages}")
             if st.button(
                 "ابدئي الدرس",
                 key=f"weekly_open_{item.lesson_id}",

@@ -3,10 +3,47 @@ import streamlit as st
 from lumina.ai_service import AIServiceError, GeminiService
 from lumina.learning.rewards import apply_success_reward
 from lumina.persistence.session_store import get_learning_store
+from lumina.persistence.profile_state import persist_profile_state
 
 
 AI_MODULE = "ai"
 AI_UNIT = "ai_literacy"
+
+AI_SKILL_LABELS = {
+    "prompting": "Prompting",
+    "comparison": "Comparing Answers",
+    "verification": "Verification",
+    "evidence": "Evidence Quality",
+    "uncertainty": "Handling Uncertainty",
+}
+
+ACTIVITY_SKILL = {
+    "ai_prompt_design": "prompting",
+    "ai_answer_comparison": "comparison",
+    "ai_evidence_verification": "evidence",
+    "ai_detective": "uncertainty",
+}
+
+
+def _update_ai_profile(activity_type: str, correct: bool) -> None:
+    skill = ACTIVITY_SKILL.get(activity_type)
+    if not skill:
+        return
+
+    profile = dict(st.session_state.get("ai_profile") or {})
+    skills = dict(profile.get("skills") or {})
+    item = dict(skills.get(skill) or {"correct": 0, "attempts": 0})
+    item["attempts"] = int(item.get("attempts", 0)) + 1
+    if correct:
+        item["correct"] = int(item.get("correct", 0)) + 1
+    skills[skill] = item
+    profile["skills"] = skills
+    profile["completed_skills"] = sum(
+        1 for values in skills.values()
+        if int(values.get("correct", 0)) >= 1
+    )
+    st.session_state.ai_profile = profile
+    persist_profile_state()
 
 
 def _record_ai_attempt(
@@ -31,6 +68,8 @@ def _record_ai_attempt(
             "activity_type": activity_type,
         }
     )
+    _update_ai_profile(activity_type, correct)
+
     if correct:
         store.resolve_mistake(lesson_id, check_id)
         store.complete_review(lesson_id, check_id)

@@ -51,6 +51,10 @@ def render_home_foundation() -> None:
     _render_learning_worlds()
 
     st.markdown("---")
+    if st.button("🔎 ابحثي في المنهج", key="open_curriculum_search"):
+        st.session_state.active_world = "curriculum_search"
+        st.rerun()
+
     c_weekly, c_exam, c_review, c_parent = st.columns(4)
     with c_weekly:
         if st.button("📅 خطتي", key="open_weekly_plan"):

@@ -592,3 +592,21 @@ jobs:
           assert "PASSWORD@HOST" in template
           print("Production secrets template OK")
           PY
+
+      - name: Validate persistence outage fallback imports
+        run: |
+          python - <<'PY'
+          from lumina.persistence.base import PersistenceError
+          from lumina.persistence.neon_store import NeonLearningStore
+          from lumina.persistence.profile_state import hydrate_profile_state, persist_profile_state
+
+          store = NeonLearningStore(
+              "postgresql://user:password@example.invalid/db?sslmode=require",
+              "nour",
+          )
+          assert store.learner_key == "nour"
+          assert issubclass(PersistenceError, RuntimeError)
+          assert callable(hydrate_profile_state)
+          assert callable(persist_profile_state)
+          print("Persistence outage fallback imports OK")
+          PY

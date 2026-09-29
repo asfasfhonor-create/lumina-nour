@@ -1,7 +1,7 @@
 """Permanent trusted-source contracts for LUMINA.
 
 This module deliberately separates temporary study uploads from explicitly
-promoted permanent trusted sources. Binary storage remains provider-agnostic.
+promoted permanent trusted sources. The selected durable binary provider is Neon Object Storage; metadata remains provider-aware.
 """
 
 from __future__ import annotations
@@ -21,6 +21,8 @@ SUPPORTED_MIME_TYPES = {
 TEMPORARY = "temporary"
 TRUSTED = "trusted"
 ARCHIVED = "archived"
+NEON_OBJECT_STORAGE = "neon_object_storage"
+TRUSTED_SOURCE_BUCKET = "lumina-trusted-sources"
 
 
 def content_sha256(data: bytes) -> str:

@@ -416,3 +416,56 @@ jobs:
           )] == [3,4,2,4,7]
           print("Second-term Math and Science mappings OK")
           PY
+
+      - name: Validate learning timestamps and mission imports
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import all_mapped_lessons, curriculum_counts
+          from lumina.learning.missions import get_lesson_by_id, get_module_for_lesson_id
+          from lumina.learning.rewards import XP_PER_NEW_SUCCESS
+          import lumina.daily_mission
+          import lumina.exam_mode
+
+          lessons = all_mapped_lessons()
+          assert len(lessons) == 142
+          first = lessons[0]
+          assert get_lesson_by_id(first.id) is first
+          assert get_module_for_lesson_id(first.id) in {
+              "english", "science", "math", "arabic", "social", "religion", "ict"
+          }
+          assert XP_PER_NEW_SUCCESS > 0
+          assert sum(curriculum_counts().values()) == 142
+          print("Mission/reward/import contracts OK")
+          PY
+
+      - name: Validate every mapped lesson contract
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import all_mapped_lessons
+
+          lesson_ids = set()
+          check_ids = set()
+          for lesson in all_mapped_lessons():
+              assert lesson.id not in lesson_ids, lesson.id
+              lesson_ids.add(lesson.id)
+              assert lesson.source_id
+              assert lesson.unit_id
+              assert lesson.title
+              assert lesson.source_pages
+              assert lesson.objectives
+              assert lesson.key_terms
+              assert lesson.evidence_summary
+              assert lesson.checks
+
+              for check in lesson.checks:
+                  compound = (lesson.id, check.id)
+                  assert compound not in check_ids, compound
+                  check_ids.add(compound)
+                  assert check.prompt
+                  assert check.hint
+                  assert len(check.options) >= 2
+                  assert check.correct_index is not None
+                  assert 0 <= check.correct_index < len(check.options)
+
+          print(f"Validated {len(lesson_ids)} lessons and {len(check_ids)} checks")
+          PY

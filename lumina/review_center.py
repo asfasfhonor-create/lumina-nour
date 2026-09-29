@@ -17,7 +17,7 @@ def render_review_center() -> None:
     mistakes = store.get_mistakes(unresolved_only=True)
     reviews = store.get_reviews("due")
 
-    st.markdown('<div class="section-title">📝 Mistake Notebook & Review</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">📝 مراجعاتي</div>', unsafe_allow_html=True)
     render_context_help("review_center")
     st.markdown(
         '<div class="mission"><b>الغلط هنا معلومة مفيدة، مش عقوبة.</b><br>'
@@ -27,28 +27,28 @@ def render_review_center() -> None:
 
     c1, c2 = st.columns(2)
     with c1:
-        st.metric("Mistakes to revisit", len(mistakes))
+        st.metric("أخطاء نراجعها", len(mistakes))
     with c2:
-        st.metric("Reviews due", len(reviews))
+        st.metric("مراجعات مستحقة", len(reviews))
 
     if not mistakes and not reviews:
         st.success("مفيش مراجعات مستحقة حاليًا. كمّلي تعلمك 🌱")
         return
 
     if mistakes:
-        st.markdown("### Mistake Notebook")
+        st.markdown("### دفتر الأخطاء")
         for mistake in mistakes:
             subject = SUBJECT_LABELS.get(mistake.get("module_id"), mistake.get("module_id", ""))
             title = mistake.get("lesson_title", mistake.get("lesson_id", "Lesson"))
             with st.expander(f"{subject} · {title}"):
-                st.write(f"**Question:** {mistake.get('question', '—')}")
-                st.write(f"**Your previous answer:** {mistake.get('answer', '—')}")
-                st.info(f"Hint: {mistake.get('hint', 'راجعي الفكرة مرة أخرى.')}")
+                st.write(f"**السؤال:** {mistake.get('question', '—')}")
+                st.write(f"**إجابتك السابقة:** {mistake.get('answer', '—')}")
+                st.info(f"تلميح: {mistake.get('hint', 'راجعي الفكرة مرة أخرى.')}")
                 if mistake.get("source_pages"):
-                    st.caption(f"Source: {mistake['source_pages']}")
+                    st.caption(f"المصدر: {mistake['source_pages']}")
 
     if reviews:
-        st.markdown("### Review Queue")
+        st.markdown("### أسئلة جاهزة للمراجعة")
         st.caption("راجعي السؤال هنا مباشرة بدل ما تدوري على الدرس من جديد.")
 
         seen = set()
@@ -73,7 +73,7 @@ def render_review_center() -> None:
 
             with st.container(border=True):
                 st.markdown(f"**{subject} · {lesson.title}**")
-                st.caption(f"Source: {lesson.source_pages}")
+                st.caption(f"المصدر: {lesson.source_pages}")
                 answer = st.radio(
                     check.prompt,
                     list(check.options),
@@ -117,7 +117,7 @@ def render_review_center() -> None:
                         )
                         st.success("تمام — المراجعة اتقفلت لأنك أظهرتِ فهم جديد.")
                         if earned_xp:
-                            st.caption(f"+{earned_xp} XP for successful review evidence.")
+                            st.caption(f"+{earned_xp} XP لإجابة مراجعة صحيحة.")
                         st.rerun()
                     else:
                         store.record_mistake(
@@ -135,5 +135,5 @@ def render_review_center() -> None:
                                 "resolved": False,
                             }
                         )
-                        st.warning("لسه محتاجة محاولة كمان. استخدمي الـHint وجربي مرة أخرى.")
-                        st.info(f"Hint: {check.hint}")
+                        st.warning("لسه محتاجة محاولة كمان. استخدمي التلميح وجربي مرة أخرى.")
+                        st.info(f"تلميح: {check.hint}")

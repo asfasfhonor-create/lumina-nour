@@ -3,6 +3,7 @@ import streamlit as st
 from lumina.ai_service import GeminiService
 from lumina.curriculum.catalog import MATH_T1
 from lumina.curriculum.math_unit1 import MATH_UNIT1_LESSONS
+from lumina.curriculum.math_unit2 import MATH_UNIT2_LESSONS
 from lumina.learning.lesson_view import render_verified_unit
 
 
@@ -27,6 +28,13 @@ def render_math_world(ai: GeminiService) -> None:
             "Unit 1 · Relations and Functions",
             MATH_UNIT1_LESSONS,
             "math_u1_lesson",
+            module_id="math",
+        )
+    elif unit_title == "Ratio, Proportion, Direct Variation and Inverse Variation":
+        render_verified_unit(
+            "Unit 2 · Ratio, Proportion, Direct Variation and Inverse Variation",
+            MATH_UNIT2_LESSONS,
+            "math_u2_lesson",
             module_id="math",
         )
     else:

@@ -1326,3 +1326,28 @@ jobs:
           assert len(raw) > 15000
           print("Approved Nour portrait asset OK:", image.size)
           PY
+
+      - name: Validate El-Moasser batch source classification
+        run: |
+          python - <<'PY'
+          from lumina.parent_dashboard import _suggest_source_profile
+
+          cases = {
+              "Math G9 T1 P1 2027.pdf": ("math", "main_book", "شرح وتدريب"),
+              "Math G9 T1 P2 2027.pdf": ("math", "assessment_revision", "اختبارات ومراجعة"),
+              "Math G9 T1 P3 2027.pdf": ("math", "answer_guide", "مرجع تصحيح"),
+              "Prep 3 Main book معاصر ساينس ٣ ع ترم اول ٢٠٢٧.pdf": ("science", "main_book", "شرح وتدريب"),
+              "Prep3 Notebook.pdf": ("science", "revision_exam", "مراجعة وامتحانات"),
+              "El-Moasser English Guide Answers Prep 3 T1 2027.pdf": ("english", "answer_guide", "مرجع تصحيح"),
+          }
+
+          for filename, expected in cases.items():
+              profile = _suggest_source_profile(filename)
+              actual = (profile["subject"], profile["resource_use"], profile["resource_use_label"])
+              assert actual == expected, (filename, actual, expected)
+              assert profile["publisher"] == "المعاصر"
+              assert profile["edition_label"] == "2027"
+              assert profile["term_label"] == "Term 1"
+
+          print("El-Moasser batch classification OK")
+          PY

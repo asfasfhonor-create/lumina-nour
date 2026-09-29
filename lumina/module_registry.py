@@ -13,6 +13,11 @@ class LearningModule:
     enabled: bool = True
     coming_soon: bool = True
     mastery_dimensions: Tuple[str, ...] = field(default_factory=tuple)
+    prerequisites: Tuple[str, ...] = field(default_factory=tuple)
+    stages: Tuple[str, ...] = field(default_factory=tuple)
+    activity_types: Tuple[str, ...] = field(default_factory=tuple)
+    source_requirements: Tuple[str, ...] = field(default_factory=tuple)
+    parent_metrics: Tuple[str, ...] = field(default_factory=tuple)
 
 
 CORE_MODULES: Tuple[LearningModule, ...] = (
@@ -84,10 +89,21 @@ CORE_MODULES: Tuple[LearningModule, ...] = (
 )
 
 
+_MODULES = {module.id: module for module in CORE_MODULES}
+
+
+def register_module(module: LearningModule, *, replace: bool = False) -> None:
+    """Register a future learning module without changing navigation/business logic."""
+    if module.id in _MODULES and not replace:
+        raise ValueError(f"Module already registered: {module.id}")
+    _MODULES[module.id] = module
+
+
 def get_modules(enabled_only: bool = True) -> Tuple[LearningModule, ...]:
+    modules = tuple(_MODULES.values())
     if enabled_only:
-        return tuple(module for module in CORE_MODULES if module.enabled)
-    return CORE_MODULES
+        return tuple(module for module in modules if module.enabled)
+    return modules
 
 
 def get_school_subjects() -> Tuple[LearningModule, ...]:
@@ -95,4 +111,4 @@ def get_school_subjects() -> Tuple[LearningModule, ...]:
 
 
 def get_module(module_id: str) -> LearningModule | None:
-    return next((module for module in CORE_MODULES if module.id == module_id), None)
+    return _MODULES.get(module_id)

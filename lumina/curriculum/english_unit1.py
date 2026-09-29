@@ -32,9 +32,15 @@ ENGLISH_U1_L1 = LessonData(
     checks=(
         LessonCheck(
             id="identity_core",
-            prompt="According to the lesson, is personal identity mainly about appearance? Explain in one or two sentences.",
-            expected_points=("not mainly appearance", "who you are inside", "values or personal qualities"),
+            prompt="Which idea best matches Ahmed's message in the lesson?",
+            expected_points=("identity includes inner qualities and values, not only appearance or popularity",),
             hint="Think about what Ahmed says matters more than how other people see him.",
+            options=(
+                "Your appearance is the most important part of your identity.",
+                "Who you are includes your values and inner qualities, not just looks or popularity.",
+                "Being popular on social media is the best way to build confidence.",
+            ),
+            correct_index=1,
         ),
         LessonCheck(
             id="social_media",

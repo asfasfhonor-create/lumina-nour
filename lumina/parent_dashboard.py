@@ -43,6 +43,18 @@ def render_parent_dashboard(parent_pin: str | None) -> None:
     with c3:
         st.metric("Reviews due", len(reviews))
 
+    profile = st.session_state.get("english_profile", {})
+    st.markdown("### Real English profile")
+    if profile:
+        st.write(
+            f"Starting band: **{profile.get('broad_band', '—')}** · "
+            f"baseline {profile.get('baseline_correct', 0)}/{profile.get('baseline_total', 0)}"
+        )
+        if profile.get("support_note"):
+            st.caption(profile["support_note"])
+    else:
+        st.caption("No Real English baseline completed yet.")
+
     st.markdown("### English curriculum progress")
     unit_rows = []
     for unit_title, lessons in ENGLISH_UNIT_LESSONS.items():

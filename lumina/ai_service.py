@@ -9,6 +9,10 @@ from google.genai import types
 DEFAULT_MODEL = "gemini-2.5-flash"
 
 
+class AIServiceError(RuntimeError):
+    """User-safe wrapper for provider failures."""
+
+
 class GeminiService:
     """Centralized Gemini access for LUMINA.
 
@@ -40,9 +44,15 @@ class GeminiService:
                 system_instruction=system_instruction,
             )
 
-        response = self._client.models.generate_content(
-            model=self.model,
-            contents=contents,
-            config=config,
-        )
+        try:
+            response = self._client.models.generate_content(
+                model=self.model,
+                contents=contents,
+                config=config,
+            )
+        except Exception as exc:
+            raise AIServiceError(
+                "تعذر تشغيل الأداة الذكية الآن. جرّبي مرة أخرى بعد قليل."
+            ) from exc
+
         return response.text or ""

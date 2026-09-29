@@ -1,6 +1,6 @@
 # LUMINA / NOUR'S WORLD — MASTER SPECIFICATION
 
-**Status:** Master v1.0 — APPROVED IMPLEMENTATION AUTHORITY  
+**Status:** Master v1.1 — APPROVED IMPLEMENTATION AUTHORITY  
 **Date:** 2026-09-29  
 **Product owner:** Mohamed  
 **Learner:** Nour  
@@ -98,9 +98,11 @@ Initial supplied subject areas:
 2. English — Term 1.
 3. Islamic Religion — Term 1.
 4. Social Studies — Term 1.
-5. Mathematics in English — Student Book, First Term.
-6. Science in English — First Term.
+5. Mathematics in English — one supplied student-book PDF that contains a verified Term 1 section and a bundled explicit Term 2 section.
+6. Science in English — one supplied student-book PDF that contains a verified Term 1 section and a bundled explicit Term 2 section.
 7. Computer / ICT — supplied Second Semester source.
+
+The curriculum catalog must model term scopes separately even when two terms share the same physical PDF file. A filename or cover label alone must not override verified internal term boundaries.
 
 The detailed file-derived structure is maintained in `CURRICULUM_INVENTORY.md`.
 
@@ -812,22 +814,20 @@ No merge to production/main is authorized merely by this Master.
 ## 31. Known gaps
 
 Still required:
-- modular application refactor;
-- real module registry;
-- complete curriculum indexing;
+- finish durable persistence backend;
+- complete curriculum indexing for the remaining Arabic/Social/Religion/ICT content and bundled Term 2 Math/Science lessons;
 - page/image-aware retrieval;
 - persistent database;
-- functional subject hubs;
-- mastery engine;
-- mistake notebook;
-- spaced review;
+- deepen subject-specific hubs beyond the verified foundations already present;
+- extend the initial mastery engine with configurable thresholds and richer evidence;
+- extend Mistake Notebook and spaced review beyond the current foundation;
 - adaptive Tutor Profile;
 - Exam Mode;
 - full Homework Coach;
 - full English development journey;
 - listening/speaking/pronunciation;
-- functional AI Lab;
-- parent dashboard;
+- deepen AI Lab progression and evidence-based badges;
+- deepen Parent Dashboard analytics;
 - persistent evidence-based gamification;
 - Nour photo integration;
 - robust error handling;
@@ -1047,3 +1047,19 @@ This Master is successfully implemented only when LUMINA can demonstrate the fol
 The curriculum changes, her English level rises, AI evolves, and Mohamed may add new skills that are not known today. The architecture must therefore preserve a stable learning core while allowing content, modules, skills, activities, assessments, models, and experiences to evolve.
 
 The product is successful when Nour increasingly needs fewer hints, understands more deeply, communicates better in English, uses AI more critically and creatively, and can keep learning new skills through the same expandable platform.
+
+
+---
+
+## 40. Master v1.1 change note
+
+This revision does not change the product mission. It records verified implementation/source discoveries made after v1.0:
+
+- The supplied Math PDF contains explicit Term 1 and Term 2 sections.
+- The supplied Science PDF contains explicit Term 1 and Term 2 sections.
+- Term scope is therefore modeled independently from physical file identity.
+- All seven school subject worlds now have functional routing foundations.
+- The reusable learning brain now includes learning evidence, Mistake Notebook, Review Queue, conservative Mastery state derivation, a persistence contract, and a Parent Dashboard foundation.
+- English Term 1, Science Term 1, and Math Term 1 have progressed from inventory-only status to structured verified lesson mappings in the development branch.
+
+All architectural principles and acceptance criteria from v1.0 remain in force.

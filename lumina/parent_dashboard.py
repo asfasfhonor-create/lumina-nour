@@ -397,7 +397,7 @@ def _render_trusted_sources() -> None:
 
     st.markdown("#### جاهزية الكتب الأساسية")
     try:
-        primary_statuses = audit_primary_runtime_sources(database_url, learner_key)
+        primary_statuses = audit_primary_runtime_sources(database_url, learner_key, storage)
         ready_count = sum(item.ready for item in primary_statuses)
         st.caption(f"جاهز للقراءة داخل الدروس: {ready_count}/{len(primary_statuses)}")
         for item in primary_statuses:
@@ -407,6 +407,8 @@ def _render_trusted_sources() -> None:
             if item.ready:
                 suffix = " · هوية أساسية مؤكدة" if item.resolution == "canonical" else " · مطابق بالاسم فقط"
                 st.write(f"✅ **{subject_label}** — {label}{suffix}")
+            elif item.reason == "storage_object_missing_or_unreadable":
+                st.write(f"⚠️ **{subject_label}** — {label} · السجل موجود لكن ملف التخزين غير متاح")
             elif item.reason == "source_needs_current_year_verification":
                 st.write(f"⚠️ **{subject_label}** — {label} · يحتاج تحقق من تغطية السنة الحالية")
             else:

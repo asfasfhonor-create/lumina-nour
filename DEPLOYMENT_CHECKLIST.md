@@ -100,4 +100,8 @@ Do not merge the development PR until:
 - Automated full learning transaction test passes: incorrect Science attempt → mistake/review → correct retry → XP.
 - Automated AI Literacy transaction test passes and writes AI skill evidence.
 - Automated Real English baseline transaction passes and stores the adaptive skill profile.
+- Real English activity evidence from Reading/Writing/Conversation/Vocabulary is now persisted separately from the baseline.
+- AI verification now records both verification and evidence-quality skill evidence.
+- Portable learning backup/restore includes AI profile and daily-mission profile state.
+- Parent Dashboard can verify that every saved source object exists with a non-zero stored size.
 - Remaining release gates: latest-commit live visual verification on deployed Streamlit, one live source-booster interaction using the saved PDFs, final phone/browser visual smoke, and explicit Mohamed approval before merge.

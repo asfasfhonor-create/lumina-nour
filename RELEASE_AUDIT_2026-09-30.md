@@ -3,7 +3,7 @@
 **Date:** 2026-09-30  
 **Branch:** `feature/nour-mobile-ui`  
 **PR:** #1 — must remain Draft until Mohamed gives explicit merge approval.  
-**Build label:** `RC-2026.09.30-A`
+**Build label:** `RC-2026.09.30-B`
 
 ## Executive result
 
@@ -70,7 +70,8 @@ Verified:
 - Reading Detective;
 - writing, conversation, and vocabulary activities;
 - recommended next focus from observed weakest skill;
-- parent dashboard visibility.
+- parent dashboard visibility;
+- actual Reading/Writing/Conversation/Vocabulary activity evidence is persisted separately from the initial baseline, avoiding false claims that an AI-generated coaching response is automatically a correct proficiency score.
 
 ## Mobile / UX / privacy QA
 
@@ -83,7 +84,10 @@ Automated guards verify:
 - no committed secrets;
 - large curriculum PDF limit raised to 500 MB;
 - permanent-source UI clearly distinguishes selected files from saved files;
-- save confirmation survives Streamlit rerun.
+- save confirmation survives Streamlit rerun;
+- partial upload failures remain visible after rerun;
+- Parent Dashboard includes a lightweight object-size integrity check for all saved source files;
+- learning backup/restore includes AI profile and daily-mission profile state.
 
 ## Remaining live gates
 

@@ -437,6 +437,10 @@ def _render_trusted_sources() -> None:
         accept_multiple_files=False,
         key=f"parent_primary_source_upload_{primary_source.id}",
     )
+    st.caption(
+        "رفع الكتب الكبيرة مدعوم حتى 500 MB في إعدادات LUMINA؛ "
+        "لذلك يمكن اعتماد كتاب العربي كاملًا بدون تقسيم أو ضغط يفقد الصفحات."
+    )
     if primary_file is not None:
         filename_matches = primary_file.name == primary_source.filename
         if not filename_matches:

@@ -17,8 +17,8 @@ BASELINE_ITEMS = (
         "id": "vocab_context",
         "skill": "Vocabulary",
         "prompt": "Choose the best word: I was very ___ before the exam, but I felt better after I started.",
-        "options": ("ancient", "stressed", "silent"),
-        "correct_index": 1,
+        "options": ("stressed", "ancient", "silent"),
+        "correct_index": 0,
     },
     {
         "id": "grammar_present_perfect",
@@ -51,11 +51,11 @@ BASELINE_ITEMS = (
             "What can we infer?"
         ),
         "options": (
-            "Maya stopped caring about debate.",
             "Maya became more confident after practice.",
+            "Maya stopped caring about debate.",
             "Maya never practiced speaking.",
         ),
-        "correct_index": 1,
+        "correct_index": 0,
     },
     {
         "id": "real_life_expression",

@@ -13,6 +13,7 @@ from lumina.learning.scaffolding import (
 )
 from lumina.curriculum.permanent_source_learning import render_permanent_source_booster
 from lumina.curriculum.lesson_source_context import context_for_lesson
+from lumina.curriculum.primary_source_learning import answer_from_primary_source
 
 
 def render_verified_unit(
@@ -118,7 +119,7 @@ def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
             for point in lesson.evidence_summary[2:]:
                 st.write(f"• {point}")
 
-    if ai is not None:
+    if ai is not None and ai.available:\n        st.markdown("#### 📖 اسألي من صفحات الدرس")\n        source_question = st.text_input("سؤالك عن الدرس", key=f"primary_source_question_{module_id}_{lesson.id}")\n        ask_primary = st.button("اشرح من الكتاب الأساسي", key=f"primary_source_ask_{module_id}_{lesson.id}", use_container_width=True)\n        if ask_primary and source_question:\n            with st.spinner("براجع صفحات الدرس من الكتاب..."):\n                response, error = answer_from_primary_source(ai, lesson, source_question)\n            if response:\n                st.markdown(response)\n                st.caption(f"الإجابة من الكتاب الأساسي · {lesson.source_pages}")\n            else:\n                st.info(error)\n\n    if ai is not None:
         render_permanent_source_booster(
             ai,
             subject_id=module_id,

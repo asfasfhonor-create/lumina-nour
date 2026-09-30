@@ -42,11 +42,13 @@ class NeonLearningStore(LearningStore):
                 """
                 insert into lumina_learning_attempts (
                     learner_key, module_id, unit_id, lesson_id, check_id,
-                    evidence_id, answer, correct, source_pages, activity_type, created_at
+                    evidence_id, answer, correct, source_pages, activity_type,
+                    cognitive_kind, mastery_eligible, created_at
                 )
                 values (
                     %(learner_key)s, %(module_id)s, %(unit_id)s, %(lesson_id)s, %(check_id)s,
-                    %(evidence_id)s, %(answer)s, %(correct)s, %(source_pages)s, %(activity_type)s, %(created_at)s
+                    %(evidence_id)s, %(answer)s, %(correct)s, %(source_pages)s, %(activity_type)s,
+                    %(cognitive_kind)s, %(mastery_eligible)s, %(created_at)s
                 )
                 """,
                 {
@@ -60,6 +62,8 @@ class NeonLearningStore(LearningStore):
                     "correct": payload.get("correct"),
                     "source_pages": payload.get("source_pages"),
                     "activity_type": payload.get("activity_type"),
+                    "cognitive_kind": payload.get("cognitive_kind", "concept"),
+                    "mastery_eligible": payload.get("mastery_eligible", True),
                     "created_at": payload.get("created_at") or _utc_now(),
                 },
             )
@@ -255,7 +259,21 @@ class NeonLearningStore(LearningStore):
                     to_regclass('public.lumina_learning_attempts') is not null as attempts_ok,
                     to_regclass('public.lumina_mistakes') is not null as mistakes_ok,
                     to_regclass('public.lumina_reviews') is not null as reviews_ok,
-                    to_regclass('public.lumina_profile_state') is not null as profile_ok
+                    to_regclass('public.lumina_profile_state') is not null as profile_ok,
+                    exists (
+                        select 1
+                        from information_schema.columns
+                        where table_schema = 'public'
+                          and table_name = 'lumina_learning_attempts'
+                          and column_name = 'cognitive_kind'
+                    ) as cognitive_kind_ok,
+                    exists (
+                        select 1
+                        from information_schema.columns
+                        where table_schema = 'public'
+                          and table_name = 'lumina_learning_attempts'
+                          and column_name = 'mastery_eligible'
+                    ) as mastery_eligible_ok
                 """
             ).fetchone()
         return bool(
@@ -264,4 +282,6 @@ class NeonLearningStore(LearningStore):
             and row.get("mistakes_ok")
             and row.get("reviews_ok")
             and row.get("profile_ok")
+            and row.get("cognitive_kind_ok")
+            and row.get("mastery_eligible_ok")
         )

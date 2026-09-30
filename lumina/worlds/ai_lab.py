@@ -23,11 +23,11 @@ ACTIVITY_SKILL = {
     "ai_answer_comparison": ("comparison",),
     "ai_evidence_verification": ("verification", "evidence"),
     "ai_detective": ("uncertainty",),
-    "ai_app_idea": ("prompting", "creation"),
+    "ai_app_idea": ("creation",),
 }
 
 
-def _update_ai_profile(activity_type: str, correct: bool) -> None:
+def _update_ai_profile(activity_type: str, correct: bool | None) -> None:
     target_skills = ACTIVITY_SKILL.get(activity_type)
     if not target_skills:
         return
@@ -35,15 +35,16 @@ def _update_ai_profile(activity_type: str, correct: bool) -> None:
     profile = dict(st.session_state.get("ai_profile") or {})
     skills = dict(profile.get("skills") or {})
     for skill in target_skills:
-        item = dict(skills.get(skill) or {"correct": 0, "attempts": 0})
+        item = dict(skills.get(skill) or {"correct": 0, "attempts": 0, "completed": 0})
         item["attempts"] = int(item.get("attempts", 0)) + 1
-        if correct:
+        item["completed"] = int(item.get("completed", 0)) + 1
+        if correct is True:
             item["correct"] = int(item.get("correct", 0)) + 1
         skills[skill] = item
     profile["skills"] = skills
     profile["completed_skills"] = sum(
         1 for values in skills.values()
-        if int(values.get("correct", 0)) >= 1
+        if int(values.get("correct", 0)) >= 1 or int(values.get("completed", 0)) >= 1
     )
     st.session_state.ai_profile = profile
     persist_profile_state()
@@ -110,6 +111,30 @@ def _record_ai_attempt(
         }
     )
     return 0
+
+
+def _record_ai_creation(*, lesson_id: str, check_id: str, answer: str) -> int:
+    store = get_learning_store()
+    store.record_attempt(
+        {
+            "module_id": AI_MODULE,
+            "unit_id": AI_UNIT,
+            "lesson_id": lesson_id,
+            "check_id": check_id,
+            "evidence_id": check_id,
+            "answer": answer,
+            "correct": None,
+            "source_pages": "LUMINA AI Literacy",
+            "activity_type": "ai_app_idea",
+        }
+    )
+    _update_ai_profile("ai_app_idea", None)
+    return apply_success_reward(
+        module_id=AI_MODULE,
+        lesson_id=lesson_id,
+        evidence_id=check_id,
+        activity_type="ai_creation",
+    )
 
 
 def _success(message: str, xp: int) -> None:
@@ -219,17 +244,16 @@ Do not dump code. Do not say AI can build every app perfectly. Keep it age-appro
             return
 
         st.markdown(plan)
-        xp = _record_ai_attempt(
+        xp = _record_ai_creation(
             lesson_id="build_app_idea",
             check_id="idea_to_prototype_plan",
             answer=idea,
-            correct=True,
-            activity_type="ai_app_idea",
         )
-        _success(
-            "كده إنتِ عملتي أول خطوة حقيقية في تصميم برنامج: فكرة واضحة → مميزات → Prompt → اختبار.",
-            xp,
+        st.success(
+            "كده إنتِ عملتي أول خطوة حقيقية في تصميم برنامج: فكرة واضحة → مميزات → Prompt → اختبار."
         )
+        if xp:
+            st.caption(f"+{xp} XP لأنك أنجزتي أول نشاط إنشاء بالـAI.")
         st.caption(
             "السر مش إن AI يعمل كل حاجة لوحده؛ السر إنك تعرفي تطلبي، تشوفي النتيجة، وتعدّليها."
         )

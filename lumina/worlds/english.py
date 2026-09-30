@@ -15,6 +15,43 @@ from lumina.learning.english_profile import (
     recommended_focus,
 )
 from lumina.persistence.profile_state import persist_profile_state
+from lumina.persistence.session_store import get_learning_store
+
+
+def _record_real_english_evidence(
+    *,
+    skill: str,
+    activity_type: str,
+    answer: str,
+    correct: bool | None,
+) -> None:
+    store = get_learning_store()
+    lesson_id = f"real_english_{skill.lower().replace('/', '_').replace(' ', '_')}"
+    store.record_attempt(
+        {
+            "module_id": "english",
+            "unit_id": "real_english",
+            "lesson_id": lesson_id,
+            "check_id": activity_type,
+            "evidence_id": activity_type,
+            "answer": answer,
+            "correct": correct,
+            "source_pages": "Real English",
+            "activity_type": activity_type,
+        }
+    )
+
+    profile = dict(st.session_state.get("english_profile") or {})
+    evidence = dict(profile.get("activity_evidence") or {})
+    item = dict(evidence.get(skill) or {"attempts": 0, "correct": 0, "completed": 0})
+    item["attempts"] = int(item.get("attempts", 0)) + 1
+    item["completed"] = int(item.get("completed", 0)) + 1
+    if correct is True:
+        item["correct"] = int(item.get("correct", 0)) + 1
+    evidence[skill] = item
+    profile["activity_evidence"] = evidence
+    st.session_state.english_profile = profile
+    persist_profile_state()
 
 
 def render_english_world(ai: GeminiService) -> None:
@@ -203,7 +240,14 @@ def _reading_mission() -> None:
         if answer is None:
             st.warning("اختاري إجابة الأول.")
             return
-        if answer.startswith("She became"):
+        correct = answer.startswith("She became")
+        _record_real_english_evidence(
+            skill="Reading",
+            activity_type="real_english_reading_inference",
+            answer=answer,
+            correct=correct,
+        )
+        if correct:
             st.success("Exactly 👏 You used the story to infer the change in her confidence.")
             st.caption("Inference = نفهم معنى غير مكتوب حرفيًا لكن الدليل في القصة بيوصّل له.")
         else:
@@ -242,7 +286,14 @@ Give a short, encouraging diagnostic snapshot:
 6. Give a cautious approximate CEFR-style writing band only if there is enough evidence; otherwise say there is not enough evidence yet.
 
 Use English first. Use brief Arabic only when it helps understanding. Do not overwhelm her."""
-        st.markdown(ai.generate(prompt))
+        response = ai.generate(prompt)
+        st.markdown(response)
+        _record_real_english_evidence(
+            skill="Writing",
+            activity_type="real_english_writing_practice",
+            answer=writing,
+            correct=None,
+        )
 
 
 def _conversation_mission(ai: GeminiService) -> None:
@@ -276,7 +327,14 @@ Rules:
 - If she replied, respond naturally, correct only one important issue, then ask the next short question.
 - Do not turn this into a grammar lecture.
 - Keep most of the response in English; use one brief Arabic hint only if needed."""
-        st.markdown(ai.generate(prompt))
+        response = ai.generate(prompt)
+        st.markdown(response)
+        _record_real_english_evidence(
+            skill="Speaking/Use",
+            activity_type="real_english_conversation_practice",
+            answer=answer if answer else "[started conversation]",
+            correct=None,
+        )
 
 
 def _vocabulary_mission(ai: GeminiService) -> None:
@@ -298,6 +356,13 @@ Include exactly:
 - one mini challenge that makes her use at least two of them;
 - brief Arabic support only for difficult meaning.
 Keep it concise and practical."""
-        st.markdown(ai.generate(prompt))
+        response = ai.generate(prompt)
+        st.markdown(response)
+        _record_real_english_evidence(
+            skill="Vocabulary",
+            activity_type="real_english_vocabulary_practice",
+            answer=topic,
+            correct=None,
+        )
 
 

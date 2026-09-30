@@ -17,6 +17,7 @@ def initialize_session_state() -> None:
         "parent_unlocked": False,
         "app_unlocked": False,
         "english_profile": {},
+        "ai_profile": {},
         "rewarded_evidence": [],
         "learning_days": [],
         "badges": [],

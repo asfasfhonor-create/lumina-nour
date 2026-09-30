@@ -165,8 +165,7 @@ def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
         if answer is None:
             st.warning("اختاري إجابة الأول — مفيش أي خصم لو كانت غلط.")
         else:
-            selected_index = list(presented_options(check)).index(answer)
-            correct = selected_index == check.correct_index
+            correct = is_correct_answer(check, answer)
             store.record_attempt(
                 {
                     "module_id": module_id,

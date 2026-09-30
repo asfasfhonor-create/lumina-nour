@@ -13,25 +13,25 @@ def _need_ai(ai: GeminiService) -> bool:
 
 
 def render_quick_access(ai: GeminiService) -> None:
-    """Render preserved utility tools while the structured learning worlds are rebuilt."""
-    st.markdown('<div class="section-title">⚡ أدوات سريعة</div>', unsafe_allow_html=True)
+    """Keep power tools available without overwhelming Nour's first screen."""
+    with st.expander("⚡ أدوات إضافية لما تحتاجيها", expanded=False):
+        st.caption("مش لازم تفتحي أي حاجة هنا دلوقتي. دي أدوات زيادة وقت ما تحتاجيها.")
+        tabs = st.tabs(["📄 ملف PDF", "💬 مساعد ذكي", "📸 حل مسألة", "🇬🇧 English", "🗝️ مغامرة", "💻 Python", "🎯 أهدافي"])
 
-    tabs = st.tabs(["📄 ملف PDF", "💬 مساعد ذكي", "📸 حل مسألة", "🇬🇧 English", "🗝️ مغامرة", "💻 Python", "🎯 أهدافي"])
-
-    with tabs[0]:
-        _render_pdf_tool(ai)
-    with tabs[1]:
-        _render_ai_buddy(ai)
-    with tabs[2]:
-        _render_problem_coach(ai)
-    with tabs[3]:
-        _render_english_helper(ai)
-    with tabs[4]:
-        _render_escape_room(ai)
-    with tabs[5]:
-        _render_python_helper(ai)
-    with tabs[6]:
-        _render_goals(ai)
+        with tabs[0]:
+            _render_pdf_tool(ai)
+        with tabs[1]:
+            _render_ai_buddy(ai)
+        with tabs[2]:
+            _render_problem_coach(ai)
+        with tabs[3]:
+            _render_english_helper(ai)
+        with tabs[4]:
+            _render_escape_room(ai)
+        with tabs[5]:
+            _render_python_helper(ai)
+        with tabs[6]:
+            _render_goals(ai)
 
 
 def _render_pdf_tool(ai: GeminiService) -> None:

@@ -56,7 +56,11 @@ MISSION_THEMES = {
 def learning_stage(attempts: list[dict], mistakes: list[dict]) -> LearningStage:
     """Choose a low-pressure level from real evidence, never from age assumptions."""
     unresolved = [item for item in mistakes if not item.get("resolved", False)]
-    correct = [item for item in attempts if item.get("correct") is True]
+    correct = [
+        item for item in attempts
+        if item.get("correct") is True
+        and item.get("mastery_eligible", True) is not False
+    ]
     distinct_correct = {
         str(item.get("evidence_id") or item.get("check_id") or "")
         for item in correct

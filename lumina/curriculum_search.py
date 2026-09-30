@@ -1,6 +1,7 @@
 import streamlit as st
 
 from lumina.ai_service import GeminiService
+from lumina.curriculum.retrieval import context_for_hit, grounded_prompt
 from lumina.curriculum.search import lesson_by_id, search_curriculum
 
 
@@ -60,23 +61,14 @@ def render_curriculum_search(ai: GeminiService) -> None:
             st.warning("الشرح الذكي مش مفعّل حاليًا. تقدري تفتحي الدرس وتكمّلي المراجعة عادي.")
             return
 
-        source_text = "\n".join(f"- {point}" for point in lesson.evidence_summary)
-        response = ai.generate(
-            f"""You are Nour's curriculum tutor.
-Answer ONLY from the verified lesson evidence below.
-If the evidence is insufficient, say clearly that the mapped evidence is not enough.
-Do not invent facts, page details, examples, or exam rules.
-Preserve the lesson terminology and explain simply.
+        selected_hit = next((hit for hit in hits if hit.lesson_id == lesson.id), None)
+        context = context_for_hit(selected_hit) if selected_hit is not None else None
+        if context is None:
+            st.warning("المصدر المرتبط بالدرس غير مكتمل في سجل المنهج، لذلك لن نخمن الإجابة.")
+            return
 
-Lesson: {lesson.title}
-Source pages: {lesson.source_pages}
-Verified evidence:
-{source_text}
-
-Nour's question:
-{question}
-
-Use the tutor pattern: explain briefly, give one small example only if supported by the evidence, then ask one checking question."""
-        )
+        response = ai.generate(grounded_prompt(context, question))
         st.markdown(response)
-        st.caption(f"الشرح مبني على المصدر: {lesson.source_pages}")
+        st.caption(f"الشرح مبني على المصدر: {context.provenance_label}")
+        if not context.trusted:
+            st.caption("تنبيه: هذا المصدر مرفوع للمشروع لكن تغطيته للسنة الحالية لم تُتحقق بعد.")

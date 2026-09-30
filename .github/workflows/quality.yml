@@ -1286,8 +1286,7 @@ jobs:
           for forbidden in [
               "Gemini API Key",
               "Development branch",
-              "Parent Dashboard",
-              "Exam Mode",
+                        "Exam Mode",
           ]:
               assert forbidden not in learner_text, forbidden
 

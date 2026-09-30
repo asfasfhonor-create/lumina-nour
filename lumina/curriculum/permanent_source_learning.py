@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import os
+import tempfile
+from pathlib import Path
+
 import streamlit as st
 from google.genai import types
 
@@ -91,12 +95,47 @@ Rules:
 """
 
 
-def _load_pdf_part(storage: NeonTrustedSourceStorage, source: dict):
-    pdf_bytes = storage.get_bytes(source["storage_key"])
-    return types.Part.from_bytes(
-        data=pdf_bytes,
-        mime_type=source["mime_type"],
-    )
+INLINE_PDF_LIMIT_BYTES = 45 * 1024 * 1024
+
+
+def _load_source_content(
+    ai: GeminiService,
+    storage: NeonTrustedSourceStorage,
+    source: dict,
+):
+    """Use inline bytes for small files and Gemini Files API for large documents."""
+    size = int(source.get("size_bytes") or storage.object_size(source["storage_key"]))
+    if size <= INLINE_PDF_LIMIT_BYTES:
+        pdf_bytes = storage.get_bytes(source["storage_key"])
+        return types.Part.from_bytes(
+            data=pdf_bytes,
+            mime_type=source["mime_type"],
+        )
+
+    cache_key = f"gemini_file_{source['source_id']}"
+    cached_name = st.session_state.get(cache_key)
+    if cached_name:
+        try:
+            return ai.get_uploaded_file(str(cached_name))
+        except AIServiceError:
+            st.session_state.pop(cache_key, None)
+
+    suffix = Path(str(source.get("filename") or "source.pdf")).suffix or ".pdf"
+    handle = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+    temp_path = handle.name
+    handle.close()
+    try:
+        storage.download_to_path(source["storage_key"], temp_path)
+        uploaded = ai.upload_file_path(temp_path)
+        uploaded_name = str(getattr(uploaded, "name", "") or "")
+        if uploaded_name:
+            st.session_state[cache_key] = uploaded_name
+        return uploaded
+    finally:
+        try:
+            os.remove(temp_path)
+        except OSError:
+            pass
 
 
 def _valid_practice(payload: dict) -> bool:
@@ -179,7 +218,7 @@ def render_permanent_source_booster(
             if mode:
                 try:
                     storage = NeonTrustedSourceStorage(storage_config)
-                    pdf_part = _load_pdf_part(storage, explanation_source)
+                    pdf_part = _load_source_content(ai, storage, explanation_source)
                     prompt = _support_prompt(
                         lesson_title=lesson_title,
                         mode=mode,
@@ -213,7 +252,7 @@ def render_permanent_source_booster(
             ):
                 try:
                     storage = NeonTrustedSourceStorage(storage_config)
-                    pdf_part = _load_pdf_part(storage, practice_source)
+                    pdf_part = _load_source_content(ai, storage, practice_source)
                     payload = ai.generate_json([
                         pdf_part,
                         _practice_prompt(

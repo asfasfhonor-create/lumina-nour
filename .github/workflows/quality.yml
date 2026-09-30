@@ -1957,3 +1957,95 @@ jobs:
           assert "ترتيب المنهج" in mission.reason
           print("Daily mission respects first unfinished lesson in selected subject")
           PY
+
+      - name: Validate lesson order follows source pages
+        run: |
+          python - <<'PY'
+          import re
+          from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM
+
+          def first_page(text):
+              nums = [int(x) for x in re.findall(r"\d+", str(text))]
+              return nums[0] if nums else None
+
+          checked = 0
+          for subject, units in MAPPED_CURRICULUM.items():
+              for unit_name, lessons in units.items():
+                  pages = [first_page(lesson.source_pages) for lesson in lessons]
+                  pages = [p for p in pages if p is not None]
+                  if len(pages) >= 2:
+                      checked += 1
+                      assert pages == sorted(pages), (subject, unit_name, pages)
+          assert checked >= 10
+          print(f"Lesson source-page order OK across {checked} multi-lesson units")
+          PY
+
+      - name: Validate exact Science Math ICT topic sequence
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.science_unit1 import SCIENCE_UNIT1_LESSONS
+          from lumina.curriculum.science_unit2 import SCIENCE_UNIT2_LESSONS
+          from lumina.curriculum.science_unit3 import SCIENCE_UNIT3_LESSONS
+          from lumina.curriculum.science_unit4 import SCIENCE_UNIT4_LESSONS
+          from lumina.curriculum.science_t2_unit1 import SCIENCE_T2_UNIT1_LESSONS
+          from lumina.curriculum.science_t2_unit2 import SCIENCE_T2_UNIT2_LESSONS
+          from lumina.curriculum.science_t2_unit3 import SCIENCE_T2_UNIT3_LESSONS
+          from lumina.curriculum.math_unit1 import MATH_UNIT1_LESSONS
+          from lumina.curriculum.math_unit2 import MATH_UNIT2_LESSONS
+          from lumina.curriculum.math_unit3 import MATH_UNIT3_LESSONS
+          from lumina.curriculum.math_unit4 import MATH_UNIT4_LESSONS
+          from lumina.curriculum.math_unit5 import MATH_UNIT5_LESSONS
+          from lumina.curriculum.ict_chapter1 import ICT_CHAPTER1_LESSONS
+          from lumina.curriculum.ict_chapter2 import ICT_CHAPTER2_LESSONS
+          from lumina.curriculum.ict_chapter3 import ICT_CHAPTER3_LESSONS
+          from lumina.curriculum.ict_chapter4 import ICT_CHAPTER4_LESSONS
+
+          def titles(items):
+              return [item.title for item in items]
+
+          assert titles(SCIENCE_UNIT1_LESSONS) == [
+              "Motion in One Direction",
+              "Graphic Representation of Motion in a Straight Line",
+              "Physical Quantities: Scalars and Vectors",
+          ]
+          assert titles(SCIENCE_UNIT2_LESSONS) == ["Mirrors", "Lenses"]
+          assert titles(SCIENCE_UNIT3_LESSONS) == ["The Universe and the Solar System"]
+          assert titles(SCIENCE_UNIT4_LESSONS) == ["Cell Division", "Sexual and Asexual Reproduction"]
+          assert titles(SCIENCE_T2_UNIT1_LESSONS) == ["Chemical Reactions", "Rate of the Chemical Reaction"]
+          assert titles(SCIENCE_T2_UNIT2_LESSONS) == [
+              "Physical Properties of the Electric Current",
+              "The Electric Current and Cells",
+              "Radioactivity and Nuclear Energy",
+          ]
+          assert titles(SCIENCE_T2_UNIT3_LESSONS) == ["The Main Principles of Heredity"]
+
+          assert titles(MATH_UNIT1_LESSONS) == ["Cartesian Product", "Relations", "Functions (Mapping)", "Polynomial Functions"]
+          assert titles(MATH_UNIT2_LESSONS) == ["Ratio", "Proportion", "Direct Variation and Inverse Variation"]
+          assert titles(MATH_UNIT3_LESSONS) == ["Collecting Data", "Dispersion"]
+          assert titles(MATH_UNIT4_LESSONS) == [
+              "The Main Trigonometrical Ratios of the Acute Angle",
+              "The Main Trigonometrical Ratios of Some Angles",
+          ]
+          assert titles(MATH_UNIT5_LESSONS) == [
+              "Distance Between Two Points",
+              "The Two Coordinates of the Midpoint Segment",
+              "The Slope of the Straight Line",
+              "The Equation of the Straight Line Given Its Slope and Its y-Intercept",
+          ]
+
+          assert titles(ICT_CHAPTER1_LESSONS) == ["Data Types", "Constants and Variables", "Assignment Statement", "Operator Precedence", "Errors"]
+          assert titles(ICT_CHAPTER2_LESSONS) == ["If Then", "If Then Else", "Select Case"]
+          assert titles(ICT_CHAPTER3_LESSONS) == ["For Next", "Do While", "Procedure", "Function"]
+          assert titles(ICT_CHAPTER4_LESSONS) == ["Cyber Bullying"]
+          print("Exact Science/Math/ICT topic sequence OK")
+          PY
+
+      - name: Validate Science sequence note is visible
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          source = Path("lumina/worlds/science.py").read_text(encoding="utf-8")
+          assert "Science, Technology and Society" in source
+          assert "ترتيب الكتاب محفوظ كما هو" in source
+          print("Science sequence note OK")
+          PY

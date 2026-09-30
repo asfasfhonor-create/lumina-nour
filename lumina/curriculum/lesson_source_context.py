@@ -19,6 +19,7 @@ class LessonSourceContext:
     page_end: int | None
     extraction_mode: str
     trusted: bool
+    page_reference_kind: str
 
     @property
     def page_label(self) -> str:
@@ -49,6 +50,8 @@ def context_for_lesson(lesson) -> LessonSourceContext | None:
     if source is None:
         return None
     start, end = parse_page_range(lesson.source_pages)
+    raw_pages = (lesson.source_pages or "").strip().lower()
+    page_reference_kind = "pdf" if raw_pages.startswith("pdf page") else "book"
     return LessonSourceContext(
         source_id=source.id,
         source_title=source.title,
@@ -58,6 +61,7 @@ def context_for_lesson(lesson) -> LessonSourceContext | None:
         page_end=end,
         extraction_mode=source.extraction_mode,
         trusted=source.trusted,
+        page_reference_kind=page_reference_kind,
     )
 
 
@@ -70,6 +74,11 @@ def grounding_instruction(lesson) -> str:
         )
 
     page_scope = context.page_label or "the lesson's registered page range"
+    page_reference_rule = (
+        "The registered numbers are PDF file page indices; use those exact PDF pages. "
+        if context.page_reference_kind == "pdf"
+        else "The registered numbers are printed book-page numbers; locate those printed page numbers in the PDF before answering. "
+    )
     visual_rule = (
         "Treat page images, diagrams, maps, formulas, tables and layout as evidence; "
         "do not rely on extracted text alone. "
@@ -84,6 +93,7 @@ def grounding_instruction(lesson) -> str:
     return (
         f"Primary curriculum source: {context.source_title} ({context.term}), "
         f"file {context.filename}, {page_scope}. "
+        f"{page_reference_rule}"
         f"{visual_rule}{trust_rule}"
         "Use only evidence supported by that source scope. If the evidence available to the runtime "
         "is insufficient, say that clearly instead of filling the gap from general model knowledge."

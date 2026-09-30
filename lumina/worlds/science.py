@@ -37,6 +37,13 @@ def render_science_world(ai: GeminiService) -> None:
         key=f"school_science_unit_{source.id}",
     )
 
+    if source.id == "science_prep3_t1":
+        st.caption(
+            "📘 ترتيب الكتاب محفوظ كما هو. بعد كل وحدة يوجد جزء "
+            "Science, Technology and Society في المصدر؛ يظهر كجزء إثرائي من الكتاب "
+            "ولا يتم إنشاء أسئلة له إلا بعد ربط صفحاته نفسها."
+        )
+
     if source.id == "science_prep3_t1" and unit_title == "Force and Motion":
         render_verified_unit(
             "Unit 1 · Force and Motion",

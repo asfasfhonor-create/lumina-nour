@@ -116,6 +116,62 @@ _SESSION_STORE = SessionLearningStore()
 _REMOTE_STORE: LearningStore | None = None
 
 
+class ResilientLearningStore:
+    """Use Neon normally, but preserve a failed write in the current session."""
+
+    def __init__(self, remote: LearningStore, fallback: SessionLearningStore) -> None:
+        self.remote = remote
+        self.fallback = fallback
+
+    def _write(self, method: str, *args) -> None:
+        try:
+            getattr(self.remote, method)(*args)
+        except Exception as exc:
+            from lumina.persistence.base import PersistenceError
+            if not isinstance(exc, PersistenceError):
+                raise
+            getattr(self.fallback, method)(*args)
+            st.session_state.persistence_disabled_for_session = True
+            st.session_state.persistence_verified = False
+            st.session_state.persistence_warning = (
+                "الحفظ السحابي متوقف مؤقتًا. احتفظنا بآخر تقدم داخل هذه الجلسة؛ "
+                "لا تغلقي الصفحة، ويمكن تنزيل نسخة أمان من لوحة وليّ الأمر."
+            )
+
+    def record_attempt(self, attempt: dict) -> None:
+        self._write("record_attempt", attempt)
+
+    def record_mistake(self, mistake: dict) -> None:
+        self._write("record_mistake", mistake)
+
+    def resolve_mistake(self, lesson_id: str, check_id: str) -> None:
+        self._write("resolve_mistake", lesson_id, check_id)
+
+    def queue_review(self, review: dict) -> None:
+        self._write("queue_review", review)
+
+    def complete_review(self, lesson_id: str, check_id: str) -> None:
+        self._write("complete_review", lesson_id, check_id)
+
+    def save_profile_state(self, state: dict) -> None:
+        self._write("save_profile_state", state)
+
+    def get_attempts(self, lesson_id: str | None = None) -> list[dict]:
+        return self.remote.get_attempts(lesson_id)
+
+    def get_mistakes(self, lesson_id: str | None = None, unresolved_only: bool = False) -> list[dict]:
+        return self.remote.get_mistakes(lesson_id, unresolved_only)
+
+    def get_reviews(self, status: str | None = None) -> list[dict]:
+        return self.remote.get_reviews(status)
+
+    def get_profile_state(self) -> dict:
+        return self.remote.get_profile_state()
+
+    def health_check(self) -> bool:
+        return self.remote.health_check()
+
+
 def get_learning_store() -> LearningStore:
     global _REMOTE_STORE
 
@@ -131,7 +187,7 @@ def get_learning_store() -> LearningStore:
                 database_url=str(neon_database_url),
                 learner_key=str(learner_key),
             )
-        return _REMOTE_STORE
+        return ResilientLearningStore(_REMOTE_STORE, _SESSION_STORE)
 
     return _SESSION_STORE
 

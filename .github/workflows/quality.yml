@@ -1610,8 +1610,8 @@ jobs:
 
           assert "ai_profile" in PROFILE_KEYS
           assert ai_lab.AI_SKILL_LABELS["prompting"] == "Prompting"
-          assert ai_lab.ACTIVITY_SKILL["ai_answer_comparison"] == "comparison"
-          assert ai_lab.ACTIVITY_SKILL["ai_evidence_verification"] == "evidence"
+          assert ai_lab.ACTIVITY_SKILL["ai_answer_comparison"] == ("comparison",)
+          assert ai_lab.ACTIVITY_SKILL["ai_evidence_verification"] == ("verification", "evidence")
 
           dashboard = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
           assert "تقدّم مهارات AI" in dashboard
@@ -1833,4 +1833,51 @@ jobs:
           assert ".stButton>button" in css and "min-height:46px" in css
           assert '[data-testid="stToolbar"]' in css
           print("Mobile-first release CSS OK")
+          PY
+
+      - name: Validate Real English activity evidence persistence
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.worlds.english as english
+
+          assert callable(english._record_real_english_evidence)
+          source = Path("lumina/worlds/english.py").read_text(encoding="utf-8")
+          for token in (
+              "real_english_reading_inference",
+              "real_english_writing_practice",
+              "real_english_conversation_practice",
+              "real_english_vocabulary_practice",
+              "activity_evidence",
+          ):
+              assert token in source, token
+
+          parent = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert "نشاط Real English الفعلي" in parent
+          print("Real English activity evidence persistence OK")
+          PY
+
+      - name: Validate source object integrity contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lumina.curriculum.trusted_source_storage import NeonTrustedSourceStorage
+
+          assert callable(NeonTrustedSourceStorage.object_size)
+          parent = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert "اختبر سلامة الملفات المحفوظة" in parent
+          assert "سلامة التخزين مؤكدة" in parent
+          print("Source object integrity contract OK")
+          PY
+
+      - name: Validate backup restores extended profiles
+        run: |
+          python - <<'PY'
+          from lumina.persistence.backup import PROFILE_KEYS
+
+          assert "english_profile" in PROFILE_KEYS
+          assert "ai_profile" in PROFILE_KEYS
+          assert "daily_mission_lesson_id" in PROFILE_KEYS
+          assert "daily_mission_date" in PROFILE_KEYS
+          print("Extended profile backup contract OK")
           PY

@@ -2167,3 +2167,60 @@ jobs:
           assert SOCIAL_U4_LESSONS[1].title.startswith("كفاح الحركة الوطنية وبناء الوعي الوطني")
           print("Social Studies source titles OK")
           PY
+
+      - name: Validate age-appropriate assessment language
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import all_mapped_lessons
+
+          forbidden = (
+              "ترتيب الحروف",
+              "لون الخريطة",
+              "أطول اسم",
+              "بناء الأهرامات",
+              "تواريخ الحكام فقط",
+              "أسماء العواصم فقط",
+          )
+          for lesson in all_mapped_lessons():
+              for check in lesson.checks:
+                  joined = " ".join([check.prompt, check.hint, *check.options])
+                  for phrase in forbidden:
+                      assert phrase not in joined, (lesson.id, check.id, phrase)
+          print("Age-appropriate distractor guard OK")
+          PY
+
+      - name: Validate recall stays non-mastery after persistence
+        run: |
+          python - <<'PY'
+          from lumina.learning.progress import derive_mastery, MASTERED
+          from lumina.learning.scaffolding import learning_stage, READY_CHALLENGE
+
+          attempts = [
+              {
+                  "check_id": f"r{i}",
+                  "evidence_id": f"r{i}",
+                  "correct": True,
+                  "activity_type": "lesson_recall",
+              }
+              for i in range(5)
+          ]
+          assert derive_mastery(attempts, []).state != MASTERED
+          assert learning_stage(attempts, []).id != READY_CHALLENGE
+          print("Persisted recall evidence stays non-mastery")
+          PY
+
+      - name: Validate onboarding version contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.home as home
+          from lumina.persistence.profile_state import PROFILE_KEYS
+
+          assert home.ONBOARDING_VERSION >= 2
+          assert "onboarding_version" in PROFILE_KEYS
+          session = Path("lumina/session_state.py").read_text(encoding="utf-8")
+          backup = Path("lumina/persistence/backup.py").read_text(encoding="utf-8")
+          assert '"onboarding_version": 0' in session
+          assert '"onboarding_version"' in backup
+          print("Versioned onboarding contract OK")
+          PY

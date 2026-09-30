@@ -2304,3 +2304,19 @@ jobs:
           assert snapshot.distinct_evidence == 0
           print("Recall success remains gentle and non-mastery")
           PY
+
+      - name: Validate quick training correct-answer transaction
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.science_unit1 import SCIENCE_U1_L1
+          from lumina.learning.question_presentation import presented_options, correct_answer_text, is_correct_answer
+
+          check = SCIENCE_U1_L1.checks[0]
+          shown = presented_options(check)
+          correct = correct_answer_text(check)
+          assert correct in shown
+          learner_choice = correct
+          assert is_correct_answer(check, learner_choice) is True
+          assert not is_correct_answer(check, next(option for option in shown if option != correct))
+          print("Quick training answer transaction OK")
+          PY

@@ -19,6 +19,7 @@ PROFILE_KEYS = (
     "daily_mission_lesson_id",
     "daily_mission_date",
     "first_run_complete",
+    "onboarding_version",
 )
 
 

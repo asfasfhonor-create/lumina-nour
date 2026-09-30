@@ -7,6 +7,7 @@ from lumina.context_help import render_context_help
 from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS
 from lumina.persistence.session_store import get_learning_store
 from lumina.learning.rewards import apply_success_reward
+from lumina.learning.question_presentation import presented_options, is_correct_answer
 from lumina.learning.progress import LEARNING, MASTERED, NEEDS_REVIEW, NOT_STARTED, derive_mastery
 from lumina.learning.evidence_cache import group_by_lesson
 
@@ -104,12 +105,12 @@ def render_exam_mode() -> None:
     for idx, (lesson, check) in enumerate(checks, start=1):
         choice = st.radio(
             f"{idx}. {check.prompt}",
-            list(check.options),
+            list(presented_options(check)),
             index=None,
             key=f"exam_{subject_id}_{unit_title}_{lesson.id}_{check.id}",
         )
         if choice is not None:
-            answers[f"{lesson.id}:{check.id}"] = list(check.options).index(choice)
+            answers[f"{lesson.id}:{check.id}"] = list(presented_options(check)).index(choice)
 
     if st.button("شوفي نتيجتي", key=f"exam_submit_{subject_id}_{unit_title}"):
         if len(answers) != len(checks):
@@ -120,10 +121,9 @@ def render_exam_mode() -> None:
         results = []
 
         for lesson, check in checks:
-            selected = answers[f"{lesson.id}:{check.id}"]
-            correct = selected == check.correct_index
+            answer_text = answers[f"{lesson.id}:{check.id}"]
+            correct = is_correct_answer(check, answer_text)
             score += int(correct)
-            answer_text = check.options[selected]
 
             store.record_attempt(
                 {

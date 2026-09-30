@@ -1881,3 +1881,13 @@ jobs:
           assert "daily_mission_date" in PROFILE_KEYS
           print("Extended profile backup contract OK")
           PY
+
+      - name: Validate installed app title
+        run: |
+          python - <<'PY'
+          from lumina.config import APP_TITLE, BUILD_LABEL
+
+          assert APP_TITLE == "LUMINA NOUR"
+          assert BUILD_LABEL == "RC-2026.09.30-C"
+          print("Installed app title OK")
+          PY

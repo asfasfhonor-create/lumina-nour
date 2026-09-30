@@ -107,6 +107,27 @@ class NeonTrustedSourceCatalog:
         except psycopg.Error as exc:
             raise PersistenceError("تعذر قراءة قائمة المصادر الدائمة.") from exc
 
+
+    def find_active_by_filename(self, filename: str) -> dict | None:
+        target = (filename or "").strip()
+        if not target:
+            return None
+        try:
+            with psycopg.connect(self.database_url, row_factory=dict_row) as conn:
+                row = conn.execute(
+                    """
+                    select *
+                    from lumina_trusted_sources
+                    where learner_key = %s and active = true and filename = %s
+                    order by updated_at desc
+                    limit 1
+                    """,
+                    (self.learner_key, target),
+                ).fetchone()
+            return dict(row) if row else None
+        except psycopg.Error as exc:
+            raise PersistenceError("تعذر العثور على مصدر المنهج المحفوظ.") from exc
+
     def archive(self, source_id: str) -> None:
         try:
             with psycopg.connect(self.database_url) as conn:

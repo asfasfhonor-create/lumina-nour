@@ -5,6 +5,7 @@ import streamlit as st
 from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS, all_mapped_lessons
 from lumina.curriculum.coverage import SOURCE_COVERAGE
 from lumina.curriculum.source_registry import CURRICULUM_SOURCES
+from lumina.curriculum.runtime_source_audit import audit_primary_runtime_sources
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.learning.english_profile import recommended_focus
 from lumina.persistence.session_store import get_learning_store, persistence_status
@@ -393,6 +394,24 @@ def _render_trusted_sources() -> None:
     if not storage.health_check():
         st.warning("تخزين الملفات الدائم غير متاح دلوقتي. جرّب مرة تانية لاحقًا.")
         return
+
+    st.markdown("#### جاهزية الكتب الأساسية")
+    try:
+        primary_statuses = audit_primary_runtime_sources(database_url, learner_key)
+        ready_count = sum(item.ready for item in primary_statuses)
+        st.caption(f"جاهز للقراءة داخل الدروس: {ready_count}/{len(primary_statuses)}")
+        for item in primary_statuses:
+            source = next((candidate for candidate in CURRICULUM_SOURCES if candidate.id == item.source_id), None)
+            label = source.title if source is not None else item.filename
+            subject_label = SUBJECT_LABELS.get(item.subject_id, item.subject_id)
+            if item.ready:
+                st.write(f"✅ **{subject_label}** — {label}")
+            elif item.reason == "source_needs_current_year_verification":
+                st.write(f"⚠️ **{subject_label}** — {label} · يحتاج تحقق من تغطية السنة الحالية")
+            else:
+                st.write(f"❌ **{subject_label}** — {label} · ملف الكتاب الأساسي غير محفوظ بعد")
+    except PersistenceError as exc:
+        st.warning(str(exc))
 
     st.markdown("#### الكتب الأساسية للمنهج")
     st.caption(

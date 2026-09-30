@@ -838,7 +838,7 @@ Current branch now includes:
 - persistent Neon learning storage with verified live production connectivity;
 - permanent trusted-source metadata catalog;
 - selected Neon Object Storage backend and private `lumina-trusted-sources` bucket;
-- permanent-source upload/archive UI in Parent Dashboard, pending final Streamlit storage secret wiring;
+- permanent-source upload/archive UI in Parent Dashboard with live Neon Object Storage verified by six real El-Moasser uploads;
 - learner-facing language cleanup and stronger mobile/photo presentation;
 - CI/AppTest coverage for navigation, school worlds, learning flows, persistence contracts, source contracts, secret scanning and learner-facing UI guards.
 
@@ -849,15 +849,18 @@ No merge to production/main is authorized merely by this Master.
 ## 31. Known gaps
 
 Still required before V1 production merge:
-- wire the Neon Object Storage credential into Streamlit Secrets and perform one real permanent-source upload/reopen test;
 - final live verification that Streamlit Community Cloud is serving the exact latest feature-branch commit;
-- final visual verification of Nour's photo crop/presentation and Streamlit toolbar hiding on desktop and phone widths;
-- one true deployed end-to-end learning transaction: answer → attempt → mistake/review where applicable → XP/progress → fresh-session restore;
-- final mobile/browser smoke on the deployed app;
-- sample curriculum grounding against real source pages in the deployed experience;
-- final access-control/PIN verification if those optional controls are enabled;
-- document any remaining V1 limitations;
+- one live interaction proving a saved supplementary PDF can be read by the deployed app for explanation/practice;
+- final phone/browser visual smoke on the deployed app;
+- final access-control/PIN verification only if those optional controls are enabled;
 - explicit Mohamed approval before merging PR #1 to `main`.
+
+Completed release evidence:
+- six real El-Moasser PDFs are registered in Neon and present in private Object Storage;
+- automated full learning transaction passes: wrong answer → mistake/review → correct retry → XP;
+- AI Literacy hands-on activity transaction and durable skill profile pass;
+- Real English baseline/adaptive profile transaction passes;
+- mobile-first CSS/release guards and all current CI contracts pass on the development branch.
 
 Post-V1 depth improvements remain planned rather than release blockers:
 - richer subject-specific adventures and activity formats beyond the current mission/puzzle foundation;
@@ -1180,3 +1183,28 @@ Approved implementation rules:
 - Science and Maths contain the first curated Level 1 → Level 2 → Level 3 prototype flows, to be generalized after learner validation.
 
 This change strengthens Sections 2, 6, 11, 16 and 19 without changing the product mission.
+
+
+---
+
+## 43. Master v1.6 release-audit note — 2026-09-30
+
+The pre-release audit now distinguishes **automated evidence** from **live visual evidence**.
+
+Automated evidence completed on the development branch includes:
+- permanent-source classification and priority rules;
+- six real supplementary PDFs stored in Neon Object Storage with matching database metadata;
+- source-role routing that keeps Answer Guides learner-hidden;
+- gentle adaptive question difficulty and one-question-at-a-time scaffolding;
+- wrong-answer → review → correct-retry → XP end-to-end AppTest;
+- AI Literacy evidence tracking;
+- Real English adaptive baseline/profile tracking;
+- mobile CSS guards and secret scanning.
+
+The remaining checks intentionally require the deployed Streamlit UI:
+1. confirm the exact latest candidate commit is live;
+2. trigger one saved-PDF explanation/practice action against the deployed storage credentials;
+3. visually inspect the final experience at phone width;
+4. obtain Mohamed's explicit production-merge approval.
+
+No merge is authorized by this note.

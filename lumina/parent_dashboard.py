@@ -4,6 +4,7 @@ import streamlit as st
 
 from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM, SUBJECT_LABELS, all_mapped_lessons
 from lumina.curriculum.coverage import SOURCE_COVERAGE
+from lumina.curriculum.source_registry import CURRICULUM_SOURCES
 from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.learning.english_profile import recommended_focus
 from lumina.persistence.session_store import get_learning_store, persistence_status
@@ -393,6 +394,78 @@ def _render_trusted_sources() -> None:
         st.warning("تخزين الملفات الدائم غير متاح دلوقتي. جرّب مرة تانية لاحقًا.")
         return
 
+    st.markdown("#### الكتب الأساسية للمنهج")
+    st.caption(
+        "ارفع هنا فقط نسخة الكتاب المطابقة للمصدر المسجل. "
+        "LUMINA يحفظ الهوية الأصلية للكتاب منفصلة عن الكتب الخارجية."
+    )
+    primary_options = {
+        f"{SUBJECT_LABELS.get(source.subject_id, source.subject_id)} · {source.term} · {source.title}": source
+        for source in CURRICULUM_SOURCES
+    }
+    primary_label = st.selectbox(
+        "اختر الكتاب الأساسي",
+        options=list(primary_options),
+        key="parent_primary_source_choice",
+    )
+    primary_source = primary_options[primary_label]
+    primary_file = st.file_uploader(
+        f"ملف الكتاب الأساسي · المتوقع: {primary_source.filename}",
+        type=["pdf"],
+        accept_multiple_files=False,
+        key=f"parent_primary_source_upload_{primary_source.id}",
+    )
+    if primary_file is not None:
+        filename_matches = primary_file.name == primary_source.filename
+        if not filename_matches:
+            st.warning(
+                "اسم الملف لا يطابق اسم المصدر المسجل. لن يتم اعتماده تلقائيًا "
+                "حتى لا نربط كتابًا خاطئًا بالمنهج."
+            )
+        if st.button(
+            "اعتماد الكتاب الأساسي وحفظه",
+            key=f"parent_primary_source_save_{primary_source.id}",
+            use_container_width=True,
+            disabled=not filename_matches,
+        ):
+            try:
+                upload = SourceUpload(
+                    filename=primary_file.name,
+                    mime_type=primary_file.type or "application/pdf",
+                    data=primary_file.getvalue(),
+                )
+                storage_key = storage.put(upload, learner_key=learner_key)
+                record = build_trusted_record(
+                    upload,
+                    learner_key=learner_key,
+                    display_name=primary_source.title,
+                    subject=primary_source.subject_id,
+                    term_label=primary_source.term,
+                    unit_label=None,
+                    storage_provider=NEON_OBJECT_STORAGE,
+                    storage_key=storage_key,
+                    metadata={
+                        "canonical_source_id": primary_source.id,
+                        "resource_use": "primary_curriculum",
+                        "resource_use_label": "الكتاب الأساسي للمنهج",
+                        "extraction_mode": primary_source.extraction_mode,
+                    },
+                    source_role=primary_source.source_role,
+                    publisher=primary_source.publisher,
+                    edition_label=primary_source.edition_label,
+                )
+                created = catalog.register(record)
+                if created:
+                    st.success("تم حفظ الكتاب الأساسي وربطه بالمنهج بهوية ثابتة.")
+                else:
+                    st.info("هذا الملف محفوظ بالفعل، وتم منع إنشاء نسخة مكررة.")
+                st.rerun()
+            except (ValueError, PersistenceError) as exc:
+                st.error(str(exc))
+            except Exception:
+                st.error("تعذر حفظ الكتاب الأساسي الآن.")
+
+    st.markdown("#### الكتب والمذكرات الإضافية")
     uploaded_files = st.file_uploader(
         "أضف كتابًا أو مذكرة كمصدر دائم",
         type=["pdf", "jpg", "jpeg", "png", "webp"],

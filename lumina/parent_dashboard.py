@@ -264,7 +264,11 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
             continue
         attempts_count = int(values.get("attempts", 0))
         correct_count = int(values.get("correct", 0))
-        st.write(f"• **{label}** — نجاح {correct_count}/{attempts_count}")
+        completed_count = int(values.get("completed", attempts_count))
+        if skill_id == "creation":
+            st.write(f"• **{label}** — {completed_count} نشاط إنشاء مكتمل")
+        else:
+            st.write(f"• **{label}** — نجاح {correct_count}/{attempts_count}")
 
     if ai_skills:
         st.caption(

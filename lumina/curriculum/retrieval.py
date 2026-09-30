@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from lumina.curriculum.search import CurriculumHit, lesson_by_id, search_curriculum
 from lumina.curriculum.source_registry import get_source
+from lumina.curriculum.lesson_source_context import parse_page_range
 
 
 @dataclass(frozen=True)
@@ -16,6 +17,8 @@ class RetrievalContext:
     extraction_mode: str
     evidence: tuple[str, ...]
     trusted: bool
+    page_start: int | None = None
+    page_end: int | None = None
 
     @property
     def provenance_label(self) -> str:
@@ -31,6 +34,8 @@ def context_for_hit(hit: CurriculumHit) -> RetrievalContext | None:
     if source is None:
         return None
 
+    page_start, page_end = parse_page_range(lesson.source_pages)
+
     return RetrievalContext(
         lesson_id=lesson.id,
         lesson_title=lesson.title,
@@ -40,6 +45,8 @@ def context_for_hit(hit: CurriculumHit) -> RetrievalContext | None:
         extraction_mode=source.extraction_mode,
         evidence=tuple(lesson.evidence_summary),
         trusted=source.trusted,
+        page_start=page_start,
+        page_end=page_end,
     )
 
 
@@ -50,6 +57,14 @@ def retrieve_context(query: str, limit: int = 5) -> tuple[RetrievalContext, ...]
         if context is not None:
             contexts.append(context)
     return tuple(contexts)
+
+
+def page_scope_prompt(context: RetrievalContext) -> str:
+    if context.page_start is None:
+        return "Use the registered lesson range only."
+    if context.page_end is None or context.page_end == context.page_start:
+        return f"Use book page {context.page_start} only."
+    return f"Use book pages {context.page_start} through {context.page_end} only."
 
 
 def grounded_prompt(context: RetrievalContext, question: str) -> str:
@@ -67,8 +82,7 @@ For page-image-aware sources, do not pretend the text summary replaces diagrams,
 
 Lesson: {context.lesson_title}
 Source: {context.source_filename}
-Pages/range: {context.source_pages}
-Extraction mode: {context.extraction_mode}
+Pages/range: {context.source_pages}\nPage scope rule: {page_scope_prompt(context)}\nExtraction mode: {context.extraction_mode}
 Verified mapped evidence:
 {evidence}
 

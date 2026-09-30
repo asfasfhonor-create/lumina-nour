@@ -2285,3 +2285,21 @@ jobs:
           assert "نشاط إنشاء مكتمل" in parent
           print("AI creation completion semantics OK")
           PY
+
+      - name: Validate recall stays gentle after success
+        run: |
+          python - <<'PY'
+          from lumina.learning.scaffolding import learning_stage, GENTLE_START
+          from lumina.learning.progress import derive_mastery
+
+          attempts = [{
+              "check_id": "recall-one",
+              "evidence_id": "recall-one",
+              "correct": True,
+              "activity_type": "lesson_recall",
+          }]
+          assert learning_stage(attempts, []).id == GENTLE_START
+          snapshot = derive_mastery(attempts, [])
+          assert snapshot.distinct_evidence == 0
+          print("Recall success remains gentle and non-mastery")
+          PY

@@ -49,6 +49,8 @@ def render_home_foundation() -> None:
             unsafe_allow_html=True,
         )
 
+    _render_first_run_welcome()
+
     level_number = current_level()
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -100,6 +102,47 @@ def render_home_foundation() -> None:
             st.rerun()
 
     render_home_help()
+
+
+def _render_first_run_welcome() -> None:
+    if st.session_state.get("first_run_complete", False):
+        return
+
+    st.markdown(
+        """
+        <div class="mission">
+          <b>✨ مفاجأة صغيرة قبل ما تبدأي</b><br>
+          <span class="muted">
+          العالم ده اتبنى بمساعدة الذكاء الاصطناعي مخصوص ليكي.
+          ومش لازم تكوني بتعرفي كود علشان تبدأي تعملي فكرتك بنفسك —
+          أهم حاجة تعرفي تطلبي صح، تجربي، وتعدّلي.
+          </span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.caption("أول جولة مدتها كام دقيقة بس. مفيش اختبار ولا درجات.")
+
+    left, right = st.columns(2)
+    with left:
+        if st.button(
+            "🤖 ورّيني AI بيعمل إيه",
+            key="first_run_ai",
+            use_container_width=True,
+        ):
+            st.session_state.first_run_complete = True
+            persist_profile_state()
+            st.session_state.active_world = "ai"
+            st.rerun()
+    with right:
+        if st.button(
+            "🌍 أختار عالمي بنفسي",
+            key="first_run_choose",
+            use_container_width=True,
+        ):
+            st.session_state.first_run_complete = True
+            persist_profile_state()
+            st.rerun()
 
 
 def _render_daily_mission() -> None:

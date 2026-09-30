@@ -122,14 +122,20 @@ def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
     if check is None:
         mastery = derive_mastery(attempts, mistakes)
         if lesson.checks and mastery.correct_attempts:
-            st.success(
-                "تمام 👏 أثبتّي فهم أولي للدرس. تقدري تنتقلي للدرس اللي بعده، "
-                "وLUMINA هيرجع للفكرة لاحقًا في مراجعة قصيرة علشان تثبت أكتر."
-            )
-            st.caption(
-                "الانتقال للدرس التالي لا يعني إننا بنقول «Mastered» من مرة واحدة — "
-                "الإتقان الكامل يحتاج أدلة مختلفة مع الوقت."
-            )
+            if mastery.distinct_evidence:
+                st.success(
+                    "تمام 👏 أثبتّي فهم أولي للدرس. تقدري تنتقلي للدرس اللي بعده، "
+                    "وLUMINA هيرجع للفكرة لاحقًا في مراجعة قصيرة علشان تثبت أكتر."
+                )
+                st.caption(
+                    "الانتقال للدرس التالي لا يعني إننا بنقول «Mastered» من مرة واحدة — "
+                    "الإتقان الكامل يحتاج أدلة مختلفة مع الوقت."
+                )
+            else:
+                st.success(
+                    "تمام 👏 معلومة التذكّر ثبتت. تقدري تكمّلي، لكن LUMINA مش هيعتبر "
+                    "ده إتقان للدرس قبل ما يظهر فهم أو تطبيق."
+                )
         else:
             st.info("الدرس متاح للشرح حاليًا، ولسه مفيش تحدّي مناسب مضاف له.")
         st.caption(

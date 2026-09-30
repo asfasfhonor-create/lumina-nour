@@ -17,30 +17,30 @@ BASELINE_ITEMS = (
         "id": "vocab_context",
         "skill": "Vocabulary",
         "prompt": "Choose the best word: I was very ___ before the exam, but I felt better after I started.",
-        "options": ("stressed", "ancient", "silent"),
-        "correct_index": 0,
+        "options": ("ancient", "stressed", "silent"),
+        "correct_index": 1,
     },
     {
         "id": "grammar_present_perfect",
         "skill": "Grammar",
         "prompt": "Choose the best sentence.",
         "options": (
-            "I have finished my homework already.",
             "I has finished my homework already.",
+            "I have finished my homework already.",
             "I finished already my homework tomorrow.",
         ),
-        "correct_index": 0,
+        "correct_index": 1,
     },
     {
         "id": "grammar_condition",
         "skill": "Grammar",
         "prompt": "Choose the best sentence for an unreal past situation.",
         "options": (
-            "If I had studied more, I would have done better.",
             "If I study more, I would have did better.",
             "If I will study more, I did better.",
+            "If I had studied more, I would have done better.",
         ),
-        "correct_index": 0,
+        "correct_index": 2,
     },
     {
         "id": "reading_inference",
@@ -51,25 +51,25 @@ BASELINE_ITEMS = (
             "What can we infer?"
         ),
         "options": (
-            "Maya became more confident after practice.",
             "Maya stopped caring about debate.",
+            "Maya became more confident after practice.",
             "Maya never practiced speaking.",
         ),
-        "correct_index": 0,
+        "correct_index": 1,
     },
     {
         "id": "real_life_expression",
         "skill": "Speaking/Use",
         "prompt": "Which reply sounds most natural when someone says, 'Thanks for helping me'?",
-        "options": ("You're welcome!", "I am welcome.", "No thanks me."),
-        "correct_index": 0,
+        "options": ("I am welcome.", "No thanks me.", "You're welcome!"),
+        "correct_index": 2,
     },
     {
         "id": "connector",
         "skill": "Writing/Grammar",
         "prompt": "Choose the best connector: I was tired, ___ I finished my project.",
-        "options": ("but", "because of", "unless"),
-        "correct_index": 0,
+        "options": ("unless", "but", "because of"),
+        "correct_index": 1,
     },
 )
 

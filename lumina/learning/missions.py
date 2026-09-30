@@ -8,8 +8,25 @@ from lumina.curriculum.mapped_curriculum import (
     SUBJECT_LABELS,
     all_mapped_lessons,
 )
-from lumina.learning.progress import LEARNING, MASTERED, NEEDS_REVIEW, NOT_STARTED, derive_mastery
+from lumina.learning.progress import MASTERED, NEEDS_REVIEW, derive_mastery
 from lumina.learning.evidence_cache import snapshot_learning_evidence
+
+
+AUTO_STUDY_SUBJECTS = ("english", "science", "math", "arabic", "social", "religion")
+
+
+def _term1_lessons(module_id: str):
+    units = MAPPED_CURRICULUM.get(module_id, {})
+    return tuple(
+        lesson
+        for unit_name, lessons in units.items()
+        if unit_name.startswith("Term 1")
+        for lesson in lessons
+    )
+
+
+def _has_success(attempts: list[dict]) -> bool:
+    return any(item.get("correct") is True for item in attempts)
 
 
 @dataclass(frozen=True)
@@ -32,10 +49,12 @@ def _lesson_index() -> dict[str, tuple[str, object]]:
 
 
 def choose_mission(store) -> MissionRecommendation | None:
-    """Choose review first; otherwise advance through curriculum in source order.
+    """Review genuine problems first, then move forward through Term 1 in source order.
 
-    New learning must never jump ahead merely because of the calendar date.
-    Reviews may intentionally return to an earlier lesson that needs reinforcement.
+    A first correct answer means the learner is ready to move on, not permanently
+    mastered. Mastery can still grow later through review and varied evidence.
+    Automatic recommendations deliberately exclude second-semester-only ICT and
+    Term 2 material; those remain available when Nour opens them intentionally.
     """
     index = _lesson_index()
 
@@ -56,54 +75,50 @@ def choose_mission(store) -> MissionRecommendation | None:
     attempts_by_lesson = evidence["attempts_by_lesson"]
     mistakes_by_lesson = evidence["mistakes_by_lesson"]
 
-    # If a lesson has an unresolved mistake, review it before introducing new content.
-    for module_id, units in MAPPED_CURRICULUM.items():
-        for lessons in units.values():
-            for lesson in lessons:
-                state = derive_mastery(
-                    attempts_by_lesson.get(lesson.id, []),
-                    mistakes_by_lesson.get(lesson.id, []),
-                ).state
-                if state == NEEDS_REVIEW:
-                    return MissionRecommendation(
-                        module_id=module_id,
-                        subject_label=SUBJECT_LABELS.get(module_id, module_id),
-                        lesson_id=lesson.id,
-                        lesson_title=lesson.title,
-                        source_pages=lesson.source_pages,
-                        reason="نراجع نقطة سابقة قبل ما نكمل الجديد",
-                    )
+    for module_id in AUTO_STUDY_SUBJECTS:
+        for lesson in _term1_lessons(module_id):
+            state = derive_mastery(
+                attempts_by_lesson.get(lesson.id, []),
+                mistakes_by_lesson.get(lesson.id, []),
+            ).state
+            if state == NEEDS_REVIEW:
+                return MissionRecommendation(
+                    module_id=module_id,
+                    subject_label=SUBJECT_LABELS.get(module_id, module_id),
+                    lesson_id=lesson.id,
+                    lesson_title=lesson.title,
+                    source_pages=lesson.source_pages,
+                    reason="نراجع نقطة سابقة قبل ما نكمل الجديد",
+                )
 
-    # Rotate subjects, but inside each subject always take the earliest unfinished lesson.
-    subject_ids = list(MAPPED_CURRICULUM)
+    subject_ids = list(AUTO_STUDY_SUBJECTS)
     rotation = date.today().toordinal() % len(subject_ids)
     subject_ids = subject_ids[rotation:] + subject_ids[:rotation]
 
     for module_id in subject_ids:
-        for lessons in MAPPED_CURRICULUM[module_id].values():
-            for lesson in lessons:
-                state = derive_mastery(
-                    attempts_by_lesson.get(lesson.id, []),
-                    mistakes_by_lesson.get(lesson.id, []),
-                ).state
-                if state in (LEARNING, NOT_STARTED):
-                    reason = (
-                        "نكمل الدرس اللي بدأناه حسب ترتيب المنهج"
-                        if state == LEARNING
-                        else "نبدأ الدرس التالي حسب ترتيب المنهج"
-                    )
-                    return MissionRecommendation(
-                        module_id=module_id,
-                        subject_label=SUBJECT_LABELS.get(module_id, module_id),
-                        lesson_id=lesson.id,
-                        lesson_title=lesson.title,
-                        source_pages=lesson.source_pages,
-                        reason=reason,
-                    )
+        for lesson in _term1_lessons(module_id):
+            attempts = attempts_by_lesson.get(lesson.id, [])
+            mistakes = mistakes_by_lesson.get(lesson.id, [])
+            unresolved = [item for item in mistakes if not item.get("resolved", False)]
+            if unresolved:
+                continue
+            if not _has_success(attempts):
+                reason = (
+                    "نكمل محاولة بدأناها بهدوء"
+                    if attempts
+                    else "نبدأ الدرس التالي حسب ترتيب المنهج"
+                )
+                return MissionRecommendation(
+                    module_id=module_id,
+                    subject_label=SUBJECT_LABELS.get(module_id, module_id),
+                    lesson_id=lesson.id,
+                    lesson_title=lesson.title,
+                    source_pages=lesson.source_pages,
+                    reason=reason,
+                )
 
-    # Everything is mastered: spaced reinforcement can return to the first mapped lesson.
     for module_id in subject_ids:
-        lessons = all_mapped_lessons(module_id)
+        lessons = _term1_lessons(module_id)
         if lessons:
             lesson = lessons[0]
             return MissionRecommendation(
@@ -112,10 +127,11 @@ def choose_mission(store) -> MissionRecommendation | None:
                 lesson_id=lesson.id,
                 lesson_title=lesson.title,
                 source_pages=lesson.source_pages,
-                reason="تحدّي خفيف يحافظ على الفهم",
+                reason="تحدّي خفيف للمراجعة بعد ما غطّينا الجديد",
             )
 
     return None
+
 
 def get_lesson_by_id(lesson_id: str):
     item = _lesson_index().get(lesson_id)

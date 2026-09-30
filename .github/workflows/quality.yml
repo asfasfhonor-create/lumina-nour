@@ -1098,18 +1098,18 @@ jobs:
           assert not at.exception, at.exception
           labels = [button.label for button in at.button]
           for expected in [
-              "🔎 ابحثي في المنهج",
-              "📅 خطتي",
-              "🧪 تدريب سريع",
-              "📝 مراجعاتي",
+              "🔎 Curriculum Search · البحث في المنهج",
+              "📅 My Plan · خطتي",
+              "🧪 Quick Practice · تدريب سريع",
+              "📝 My Reviews · مراجعاتي",
               "فتح لوحة وليّ الأمر",
-              "ابدئي مغامرة الإنجليزي",
-              "ادخلي معمل العلوم",
-              "ابدئي تحدّي الرياضيات",
+              "Start English Adventure · ابدئي مغامرة الإنجليزي",
+              "Enter Science Lab · ادخلي معمل العلوم",
+              "Start Math Quest · ابدئي تحدّي الرياضيات",
           ]:
               assert expected in labels, (expected, labels)
 
-          next(button for button in at.button if button.label == "🔎 ابحثي في المنهج").click()
+          next(button for button in at.button if button.label == "🔎 Curriculum Search · البحث في المنهج").click()
           at.run()
           assert not at.exception, at.exception
           assert any("Curriculum" in markdown.value or "المنهج" in markdown.value for markdown in at.markdown)
@@ -1131,13 +1131,13 @@ jobs:
           from streamlit.testing.v1 import AppTest
 
           worlds = [
-              ("ابدئي مغامرة الإنجليزي", "مغامرة الإنجليزي"),
-              ("ادخلي معمل العلوم", "معمل العلوم"),
-              ("ابدئي تحدّي الرياضيات", "تحدّي الرياضيات"),
-              ("ادخلي عالم العربي", "عالم العربي"),
-              ("ابدئي مغامرة الدراسات", "مغامرة الدراسات"),
-              ("ابدئي رحلة الدين", "رحلة الدين"),
-              ("ادخلي معمل الكمبيوتر", "معمل الكمبيوتر"),
+              ("Start English Adventure · ابدئي مغامرة الإنجليزي", "مغامرة الإنجليزي"),
+              ("Enter Science Lab · ادخلي معمل العلوم", "معمل العلوم"),
+              ("Start Math Quest · ابدئي تحدّي الرياضيات", "تحدّي الرياضيات"),
+              ("Open Arabic World · ادخلي عالم العربي", "عالم العربي"),
+              ("Start Social Detective · ابدئي مغامرة الدراسات", "مغامرة الدراسات"),
+              ("Start Religion Journey · ابدئي رحلة الدين", "رحلة الدين"),
+              ("Enter ICT Lab · ادخلي معمل الكمبيوتر", "معمل الكمبيوتر"),
           ]
 
           for button_label, expected_title in worlds:
@@ -1183,9 +1183,9 @@ jobs:
           from streamlit.testing.v1 import AppTest
 
           flows = [
-              ("📅 خطتي", "الخطة الأسبوعية"),
-              ("🧪 تدريب سريع", "تدريب سريع"),
-              ("📝 مراجعاتي", "مراجعاتي"),
+              ("📅 My Plan · خطتي", "الخطة الأسبوعية"),
+              ("🧪 Quick Practice · تدريب سريع", "تدريب سريع"),
+              ("📝 My Reviews · مراجعاتي", "مراجعاتي"),
               ("فتح لوحة وليّ الأمر", "لوحة وليّ الأمر"),
           ]
 
@@ -1694,7 +1694,7 @@ jobs:
               at.run()
           assert not at.exception, at.exception
 
-          next(b for b in at.button if b.label == "ادخلي معمل العلوم").click()
+          next(b for b in at.button if b.label == "Enter Science Lab · ادخلي معمل العلوم").click()
           at.run()
           assert not at.exception, at.exception
 
@@ -1710,7 +1710,7 @@ jobs:
 
           next(b for b in at.button if b.label == "← العودة إلى عالم نور").click()
           at.run()
-          next(b for b in at.button if b.label == "📝 مراجعاتي").click()
+          next(b for b in at.button if b.label == "📝 My Reviews · مراجعاتي").click()
           at.run()
           assert not at.exception, at.exception
 
@@ -1796,7 +1796,7 @@ jobs:
           if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
               next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
               at.run()
-          next(b for b in at.button if b.label == "ابدئي مغامرة الإنجليزي").click()
+          next(b for b in at.button if b.label == "Start English Adventure · ابدئي مغامرة الإنجليزي").click()
           at.run()
           assert not at.exception, at.exception
 

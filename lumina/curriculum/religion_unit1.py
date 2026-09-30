@@ -24,7 +24,7 @@ RELIGION_U1_LESSONS = (
         objectives=("تعريف المد المنفصل.", "تمييزه وتطبيقه في التلاوة."),
         key_terms=("المد المنفصل","حرف المد","الهمزة","حركتان","أربع أو خمس حركات"),
         evidence_summary=("يقع حرف المد في آخر كلمة وتأتي الهمزة في أول الكلمة التالية.", "يعرض الكتاب جواز القصر والمد وفق أوجه التلاوة المذكورة."),
-        checks=(LessonCheck(id="munfasil",prompt="متى يكون المد منفصلًا؟",expected_points=("حرف المد آخر كلمة والهمزة أول الكلمة التالية",),hint="سبب التسمية هو انفصال حرف المد عن الهمزة في كلمتين.",options=("المد والهمزة في كلمة واحدة","حرف المد آخر كلمة والهمزة أول الكلمة التالية","لا توجد همزة"),correct_index=1),),
+        checks=(LessonCheck(id="munfasil",prompt="متى يكون المد منفصلًا؟",expected_points=("حرف المد آخر كلمة والهمزة أول الكلمة التالية",),hint="سبب التسمية هو انفصال حرف المد عن الهمزة في كلمتين.",options=("المد والهمزة في كلمة واحدة","حرف المد آخر كلمة والهمزة أول الكلمة التالية","لا توجد همزة"),correct_index=1,activity_kind="recall",mastery_eligible=False),),
     ),
     LessonData(
         id="religion_u1_l4", source_id="religion_prep3_t1", unit_id="u1",
@@ -48,7 +48,7 @@ RELIGION_U1_LESSONS = (
         objectives=("التعرف على سيرة الإمام أبي حنيفة.", "معرفة فضله في خدمة الشريعة."),
         key_terms=("أبو حنيفة","الفقه","العلم","الشريعة"),
         evidence_summary=("تخصص الوحدة درسًا لسيرة الإمام أبي حنيفة النعمان.", "يركز الهدف المعلن على فضله وخدمته للشريعة."),
-        checks=(LessonCheck(id="abu_hanifa",prompt="إلى أي مجال يرتبط الإمام أبو حنيفة في سياق الدرس؟",expected_points=("الفقه وخدمة الشريعة",),hint="انظر إلى هدف الدرس في الوحدة.",options=("الطب","الفقه وخدمة الشريعة","الفلك"),correct_index=1),),
+        checks=(LessonCheck(id="abu_hanifa",prompt="إلى أي مجال يرتبط الإمام أبو حنيفة في سياق الدرس؟",expected_points=("الفقه وخدمة الشريعة",),hint="انظر إلى هدف الدرس في الوحدة.",options=("الطب","الفقه وخدمة الشريعة","الفلك"),correct_index=1,activity_kind="recall",mastery_eligible=False),),
     ),
     LessonData(
         id="religion_u1_l7", source_id="religion_prep3_t1", unit_id="u1",

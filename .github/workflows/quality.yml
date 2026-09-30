@@ -2049,3 +2049,103 @@ jobs:
           assert "ترتيب الكتاب محفوظ كما هو" in source
           print("Science sequence note OK")
           PY
+
+      - name: Validate first-day educational experience
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          home = Path("lumina/home.py").read_text(encoding="utf-8")
+          quick = Path("lumina/quick_access.py").read_text(encoding="utf-8")
+          ai = Path("lumina/worlds/ai_lab.py").read_text(encoding="utf-8")
+
+          assert 'if not st.session_state.get("first_run_complete", False):\n        return' in home
+          assert 'if not st.session_state.get("first_run_complete", False):\n        return' in quick
+          assert "✨ اصنعي فكرة برنامج مع AI" in ai
+          assert "idea_to_prototype_plan" in ai
+          assert "real apps still need testing and iteration" in ai
+          print("First-day educational experience OK")
+          PY
+
+      - name: Validate automatic planning stays in Term 1
+        run: |
+          python - <<'PY'
+          from lumina.learning.missions import choose_mission
+          from lumina.learning.weekly_plan import build_weekly_plan
+          from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM
+
+          class EmptyStore:
+              def get_reviews(self, status=None): return []
+              def get_attempts(self, lesson_id=None): return []
+              def get_mistakes(self, lesson_id=None, unresolved_only=False): return []
+
+          store = EmptyStore()
+          mission = choose_mission(store)
+          assert mission is not None
+          unit_name = next(
+              name for name, lessons in MAPPED_CURRICULUM[mission.module_id].items()
+              if any(lesson.id == mission.lesson_id for lesson in lessons)
+          )
+          assert unit_name.startswith("Term 1"), unit_name
+          assert mission.module_id != "ict"
+
+          plan = build_weekly_plan(store, limit=5)
+          assert plan
+          for item in plan:
+              assert item.module_id != "ict"
+              unit_name = next(
+                  name for name, lessons in MAPPED_CURRICULUM[item.module_id].items()
+                  if any(lesson.id == item.lesson_id for lesson in lessons)
+              )
+              assert unit_name.startswith("Term 1"), (item.module_id, unit_name)
+          print("Automatic planning Term 1 only OK")
+          PY
+
+      - name: Validate Real English baseline answer-position balance
+        run: |
+          python - <<'PY'
+          from lumina.learning.english_profile import BASELINE_ITEMS, score_baseline
+
+          indices = [item["correct_index"] for item in BASELINE_ITEMS]
+          assert len(set(indices)) >= 3, indices
+          assert max(indices.count(i) for i in set(indices)) <= 3, indices
+          answers = {item["id"]: item["correct_index"] for item in BASELINE_ITEMS}
+          result = score_baseline(answers)
+          assert result.correct == result.total == len(BASELINE_ITEMS)
+          print("Real English baseline answer positions OK")
+          PY
+
+      - name: Validate recall cannot create mastery
+        run: |
+          python - <<'PY'
+          from lumina.learning.progress import derive_mastery, MASTERED
+
+          attempts = [
+              {
+                  "lesson_id": "x",
+                  "check_id": f"recall-{i}",
+                  "evidence_id": f"recall-{i}",
+                  "correct": True,
+                  "mastery_eligible": False,
+              }
+              for i in range(5)
+          ]
+          snapshot = derive_mastery(attempts, [])
+          assert snapshot.state != MASTERED
+          assert snapshot.distinct_evidence == 0
+          print("Recall-only evidence cannot create mastery")
+          PY
+
+      - name: Validate Social Studies source titles
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.social_unit2 import SOCIAL_U2_LESSONS
+          from lumina.curriculum.social_unit3 import SOCIAL_U3_LESSONS
+          from lumina.curriculum.social_unit4 import SOCIAL_U4_LESSONS
+
+          assert SOCIAL_U2_LESSONS[2].title == "مصر في عصر خلفاء محمد علي"
+          assert SOCIAL_U3_LESSONS[0].title == "نظم الغابات والحشائش في قارات العالم الجديد"
+          assert SOCIAL_U4_LESSONS[0].title == "الثورة العرابية وبداية الاحتلال البريطاني لمصر"
+          assert SOCIAL_U4_LESSONS[1].title.startswith("كفاح الحركة الوطنية وبناء الوعي الوطني")
+          print("Social Studies source titles OK")
+          PY

@@ -18,25 +18,26 @@ AI_SKILL_LABELS = {
 }
 
 ACTIVITY_SKILL = {
-    "ai_prompt_design": "prompting",
-    "ai_answer_comparison": "comparison",
-    "ai_evidence_verification": "evidence",
-    "ai_detective": "uncertainty",
+    "ai_prompt_design": ("prompting",),
+    "ai_answer_comparison": ("comparison",),
+    "ai_evidence_verification": ("verification", "evidence"),
+    "ai_detective": ("uncertainty",),
 }
 
 
 def _update_ai_profile(activity_type: str, correct: bool) -> None:
-    skill = ACTIVITY_SKILL.get(activity_type)
-    if not skill:
+    target_skills = ACTIVITY_SKILL.get(activity_type)
+    if not target_skills:
         return
 
     profile = dict(st.session_state.get("ai_profile") or {})
     skills = dict(profile.get("skills") or {})
-    item = dict(skills.get(skill) or {"correct": 0, "attempts": 0})
-    item["attempts"] = int(item.get("attempts", 0)) + 1
-    if correct:
-        item["correct"] = int(item.get("correct", 0)) + 1
-    skills[skill] = item
+    for skill in target_skills:
+        item = dict(skills.get(skill) or {"correct": 0, "attempts": 0})
+        item["attempts"] = int(item.get("attempts", 0)) + 1
+        if correct:
+            item["correct"] = int(item.get("correct", 0)) + 1
+        skills[skill] = item
     profile["skills"] = skills
     profile["completed_skills"] = sum(
         1 for values in skills.values()

@@ -12,6 +12,7 @@ from lumina.learning.scaffolding import (
     support_depth,
 )
 from lumina.curriculum.permanent_source_learning import render_permanent_source_booster
+from lumina.curriculum.lesson_source_context import context_for_lesson
 
 
 def render_verified_unit(
@@ -85,7 +86,15 @@ def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
     icon, mission_name = mission_theme(module_id)
 
     st.markdown(f"### {lesson.title}")
-    st.caption(f"من المصدر: {lesson.source_pages}")
+    source_context = context_for_lesson(lesson)
+    if source_context is not None:
+        verification = "" if source_context.trusted else " · يحتاج تحقق من تغطية السنة الحالية"
+        st.caption(
+            f"من المصدر: {source_context.source_title} · {source_context.term} · "
+            f"{lesson.source_pages}{verification}"
+        )
+    else:
+        st.caption(f"من المصدر: {lesson.source_pages}")
 
     st.markdown(
         f'<div class="mission"><b>{icon} {mission_name} · {stage.label}</b><br>'

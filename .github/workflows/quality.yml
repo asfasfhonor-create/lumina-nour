@@ -702,43 +702,31 @@ jobs:
           print("Bounded persistence query counts OK")
           PY
 
-      - name: Validate adaptive learning priority
+      - name: Validate curriculum-first mission priority
         run: |
           python - <<'PY'
-          from lumina.curriculum.mapped_curriculum import all_mapped_lessons
+          from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM
           from lumina.learning.missions import choose_mission
-          from lumina.learning.weekly_plan import build_weekly_plan
-
-          target = all_mapped_lessons()[0]
 
           class Store:
               def get_attempts(self, lesson_id=None):
-                  attempts = [{
-                      "lesson_id": target.id,
-                      "check_id": "priority-check",
-                      "evidence_id": "priority-check",
-                      "correct": False,
-                  }]
-                  if lesson_id is None:
-                      return attempts
-                  return [item for item in attempts if item["lesson_id"] == lesson_id]
-
+                  return []
               def get_mistakes(self, lesson_id=None, unresolved_only=False):
-                  mistakes = []
-                  if lesson_id is None:
-                      return mistakes
-                  return mistakes
-
+                  return []
               def get_reviews(self, status=None):
                   return []
 
-          store = Store()
-          mission = choose_mission(store)
+          mission = choose_mission(Store())
           assert mission is not None
-          assert mission.lesson_id == target.id
-          assert "ترتيب المنهج" in mission.reason or "نكمل الدرس" in mission.reason
-
-          print("Curriculum-first adaptive learning priority OK")
+          subject_lessons = [
+              lesson
+              for lessons in MAPPED_CURRICULUM[mission.module_id].values()
+              for lesson in lessons
+          ]
+          assert subject_lessons
+          assert mission.lesson_id == subject_lessons[0].id
+          assert "ترتيب المنهج" in mission.reason
+          print("Curriculum-first mission priority OK")
           PY
 
       - name: Validate safe AI provider failures

@@ -14,6 +14,8 @@ def _need_ai(ai: GeminiService) -> bool:
 
 def render_quick_access(ai: GeminiService) -> None:
     """Keep power tools available without overwhelming Nour's first screen."""
+    if not st.session_state.get("first_run_complete", False):
+        return
     with st.expander("⚡ أدوات إضافية لما تحتاجيها", expanded=False):
         st.caption("مش لازم تفتحي أي حاجة هنا دلوقتي. دي أدوات زيادة وقت ما تحتاجيها.")
         tabs = st.tabs(["📄 ملف PDF", "💬 مساعد ذكي", "📸 حل مسألة", "🇬🇧 English", "🗝️ مغامرة", "💻 Python", "🎯 أهدافي"])

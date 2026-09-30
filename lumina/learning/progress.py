@@ -47,6 +47,7 @@ def derive_mastery(
     mastery_correct = [
         a for a in correct
         if a.get("mastery_eligible", True) is not False
+        and not str(a.get("activity_type") or "").endswith("_recall")
     ]
     distinct = {
         a.get("check_id") or a.get("evidence_id")

@@ -23,7 +23,9 @@ def audit_primary_runtime_sources(database_url: str, learner_key: str) -> tuple[
     statuses = []
     for source in CURRICULUM_SOURCES:
         try:
-            record = catalog.find_active_by_filename(source.filename)
+            record = catalog.find_active_by_canonical_source(source.id)
+            if record is None:
+                record = catalog.find_active_by_filename(source.filename)
         except PersistenceError:
             record = None
         ready = record is not None

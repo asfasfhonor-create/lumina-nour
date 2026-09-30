@@ -10,6 +10,7 @@ from lumina.session_state import current_level
 from lumina.persistence.profile_state import persist_profile_state
 from lumina.learning.missions import get_lesson_by_id, get_module_for_lesson_id
 from lumina.context_help import help_text, render_home_help
+from lumina.language_policy import ENGLISH_FIRST_LABELS, WORLD_LABELS
 
 
 ONBOARDING_VERSION = 2
@@ -45,8 +46,8 @@ def render_home_foundation() -> None:
         """
         <div class="hero">
           <div class="brand">LUMINA · NOUR'S WORLD</div>
-          <div class="hello">أهلاً يا نور ✨ جاهزة نبدأ حاجة حلوة النهارده؟</div>
-          <div class="muted">عالمك للمذاكرة والاكتشاف والإنجليزي والذكاء الاصطناعي — خطوة صغيرة كل يوم.</div>
+          <div class="hello">Hi Nour ✨ Ready to discover something new today?</div>
+          <div class="muted">Your world for learning, discovery, English & AI.<br><small>عالمك للتعلّم والاكتشاف — خطوة صغيرة كل يوم.</small></div>
         </div>
         """,
             unsafe_allow_html=True,
@@ -60,17 +61,17 @@ def render_home_foundation() -> None:
     c1, c2, c3 = st.columns(3)
     with c1:
         st.markdown(
-            f'<div class="stat">⭐ <b>{st.session_state.xp} XP</b><span class="muted">نقاطك</span></div>',
+            f'<div class="stat">⭐ <b>{st.session_state.xp} XP</b><span class="muted">Your points · نقاطك</span></div>',
             unsafe_allow_html=True,
         )
     with c2:
         st.markdown(
-            f'<div class="stat">🔥 <b>{st.session_state.streak} أيام</b><span class="muted">أيام التعلّم المتتالية</span></div>',
+            f'<div class="stat">🔥 <b>{st.session_state.streak} days</b><span class="muted">Learning streak · أيام متتالية</span></div>',
             unsafe_allow_html=True,
         )
     with c3:
         st.markdown(
-            f'<div class="stat">🌱 <b>المستوى {level_number}</b><span class="muted">مستكشفة</span></div>',
+            f'<div class="stat">🌱 <b>Level {level_number}</b><span class="muted">Explorer · مستكشفة</span></div>',
             unsafe_allow_html=True,
         )
 
@@ -82,25 +83,25 @@ def render_home_foundation() -> None:
     _render_learning_worlds()
 
     st.markdown("---")
-    if st.button("🔎 ابحثي في المنهج", key="open_curriculum_search", use_container_width=True, help=help_text("curriculum_search")):
+    if st.button("🔎 " + ENGLISH_FIRST_LABELS["curriculum_search"], key="open_curriculum_search", use_container_width=True, help=help_text("curriculum_search")):
         st.session_state.active_world = "curriculum_search"
         st.rerun()
 
     top_left, top_right = st.columns(2)
     with top_left:
-        if st.button("📅 خطتي", key="open_weekly_plan", use_container_width=True, help=help_text("weekly_plan")):
+        if st.button("📅 " + ENGLISH_FIRST_LABELS["weekly_plan"], key="open_weekly_plan", use_container_width=True, help=help_text("weekly_plan")):
             st.session_state.active_world = "weekly"
             st.rerun()
     with top_right:
-        if st.button("🧪 تدريب سريع", key="open_exam_mode", use_container_width=True, help=help_text("exam_mode")):
+        if st.button("🧪 " + ENGLISH_FIRST_LABELS["exam_mode"], key="open_exam_mode", use_container_width=True, help=help_text("exam_mode")):
             st.session_state.active_world = "exam"
             st.rerun()
 
-    if st.button("📝 مراجعاتي", key="open_review_center", use_container_width=True, help=help_text("review_center")):
+    if st.button("📝 " + ENGLISH_FIRST_LABELS["review_center"], key="open_review_center", use_container_width=True, help=help_text("review_center")):
         st.session_state.active_world = "review"
         st.rerun()
 
-    with st.expander("👨‍👧 للأسرة", expanded=False):
+    with st.expander("👨‍👧 " + ENGLISH_FIRST_LABELS["parent_area"], expanded=False):
         st.caption("ده جزء منفصل لمتابعة التقدّم والمصادر، ومش محتاجاه أثناء مذاكرتك.")
         if st.button("فتح لوحة وليّ الأمر", key="open_parent_dashboard", use_container_width=True):
             st.session_state.active_world = "parent"
@@ -186,41 +187,32 @@ def _render_daily_mission() -> None:
         st.session_state.daily_mission_date = today
         persist_profile_state()
 
-    st.markdown('<div class="section-title">🎯 مهمة اليوم</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-title">🎯 {ENGLISH_FIRST_LABELS["daily_mission"]}</div>', unsafe_allow_html=True)
     st.markdown(
         f'<div class="mission"><b>{mission.subject_label} · {mission.lesson_title}</b><br>'
         f'<span class="muted">{mission.reason} · {mission.source_pages}</span></div>',
         unsafe_allow_html=True,
     )
 
-    if st.button("ابدئي مهمة اليوم", key="open_daily_mission"):
+    if st.button(ENGLISH_FIRST_LABELS["start_daily_mission"], key="open_daily_mission"):
         st.session_state.active_world = "mission"
         st.rerun()
 
 
 def _render_learning_worlds() -> None:
-    st.markdown('<div class="section-title">📚 اختاري عالمك</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-title">📚 {ENGLISH_FIRST_LABELS["learning_worlds"]}</div>', unsafe_allow_html=True)
     cols = st.columns(2)
 
     for index, module in enumerate(get_school_subjects()):
         with cols[index % 2]:
             st.markdown(
-                f'<div class="subject"><h4>{module.icon} {module.title}</h4>'
+                f'<div class="subject"><h4>{module.icon} {WORLD_LABELS.get(module.id, (module.title, ""))[0]}</h4>'
                 f'<span class="muted">{module.description}</span><br>'
                 '<small>عالم تعلّم منظم</small></div>',
                 unsafe_allow_html=True,
             )
             if module.id in {"english", "science", "math", "ict", "arabic", "social", "religion"}:
-                labels = {
-                    "english": "ابدئي مغامرة الإنجليزي",
-                    "science": "ادخلي معمل العلوم",
-                    "math": "ابدئي تحدّي الرياضيات",
-                    "ict": "ادخلي معمل الكمبيوتر",
-                    "arabic": "ادخلي عالم العربي",
-                    "social": "ابدئي مغامرة الدراسات",
-                    "religion": "ابدئي رحلة الدين",
-                }
-                label = labels[module.id]
+                label = WORLD_LABELS[module.id][1]
                 if st.button(label, key=f"open_world_{module.id}", help=help_text(module.id)):
                     st.session_state.active_world = module.id
                     st.rerun()
@@ -243,6 +235,6 @@ def _render_learning_worlds() -> None:
             '<span class="muted">نتعلم نسأل صح، نراجع الإجابات، ونبحث عن الدليل بدل الثقة العمياء.</span></div>',
             unsafe_allow_html=True,
         )
-        if st.button("ادخلي عالم الذكاء الاصطناعي", key="open_world_ai", help=help_text("ai")):
+        if st.button(WORLD_LABELS["ai"][1], key="open_world_ai", help=help_text("ai")):
             st.session_state.active_world = "ai"
             st.rerun()

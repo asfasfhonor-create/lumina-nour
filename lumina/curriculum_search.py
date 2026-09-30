@@ -41,7 +41,15 @@ def render_curriculum_search(ai: GeminiService) -> None:
     st.markdown(f"### {lesson.title}")
     for point in lesson.evidence_summary:
         st.write(f"• {point}")
-    st.caption(f"المصدر: {lesson.source_pages}")
+    selected_hit = next((hit for hit in hits if hit.lesson_id == lesson.id), None)
+    if selected_hit:
+        trust_note = "" if selected_hit.source_trusted else " · يحتاج تحقق من تغطية السنة الحالية"
+        st.caption(
+            f"المصدر: {selected_hit.source_title} · {selected_hit.source_term} · "
+            f"{lesson.source_pages}{trust_note}"
+        )
+    else:
+        st.caption(f"المصدر: {lesson.source_pages}")
 
     if st.button(
         "افتحي الدرس كامل",

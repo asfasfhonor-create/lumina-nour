@@ -1,30 +1,50 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Tuple
 
-
-@dataclass(frozen=True)
-class CurriculumSource:
-    id: str
-    subject_id: str
-    title: str
-    filename: str
-    term: str
-    pages: int
-    extraction_mode: str
-    trust: str = "trusted_project_source"
-    notes: str = ""
+from lumina.curriculum.models import (
+    CurriculumSource,
+    SOURCE_ROLE_OFFICIAL,
+    SOURCE_ROLE_SUPPLIED,
+)
 
 
 CURRICULUM_SOURCES: Tuple[CurriculumSource, ...] = (
-    CurriculumSource("arabic_t1","arabic","Arabic — Term 1","Arabic_language_prep3_t1.pdf","Term 1",161,"page_image",notes="Integrated Arabic skills; page-image-aware retrieval required."),
-    CurriculumSource("english_t1","english","English — Term 1","English_language_prep3_t1.pdf","Term 1",114,"page_image",notes="School English source; keep separate from Real English enrichment."),
-    CurriculumSource("religion_t1","religion","Islamic Religion — Term 1","Islamic_religion_prep3_t1.pdf","Term 1",82,"parsed_text",notes="Knowledge, skills and values strands."),
-    CurriculumSource("social_t1","social","Social Studies — Term 1","Social_studies_prep3_t1.pdf","Term 1",113,"page_image",notes="Maps and visual evidence are educational content."),
-    CurriculumSource("math_t1","math","Mathematics in English — Student Book","الرياضيات باللغة الانجليزية-كتاب الطالب-334a9f66.pdf","Term 1",178,"mixed_page_image_preferred",notes="Preserve formulas, notation, diagrams and worked examples."),
-    CurriculumSource("science_t1","science","Science in English — Student Book","العلوم باللغة الانجليزية-كتاب الطالب-0d9bc9e8.pdf","Term 1",148,"page_image",notes="2025–2026 cover; preserve diagrams, formulas and observations."),
-    CurriculumSource("ict_t2","ict","Computer / ICT — Second Semester","computer_3prep_scond_term_english.pdf","Second Semester",66,"parsed_text",trust="supplied_source_unverified_current_year",notes="Uses VB.NET. Do not silently replace school ICT with Python."),
+    CurriculumSource(
+        id="arabic_t1", subject_id="arabic", title="Arabic", filename="Arabic_language_prep3_t1.pdf",
+        term="Term 1", language="ar", source_role=SOURCE_ROLE_SUPPLIED, extraction_mode="page_image",
+    ),
+    CurriculumSource(
+        id="english_t1", subject_id="english", title="English", filename="English_language_prep3_t1.pdf",
+        term="Term 1", language="en", source_role=SOURCE_ROLE_SUPPLIED, extraction_mode="page_image",
+    ),
+    CurriculumSource(
+        id="religion_t1", subject_id="religion", title="Islamic Religion", filename="Islamic_religion_prep3_t1.pdf",
+        term="Term 1", language="ar", source_role=SOURCE_ROLE_SUPPLIED, extraction_mode="parsed_text",
+    ),
+    CurriculumSource(
+        id="social_t1", subject_id="social", title="Social Studies", filename="Social_studies_prep3_t1.pdf",
+        term="Term 1", language="ar", source_role=SOURCE_ROLE_SUPPLIED, extraction_mode="page_image",
+    ),
+    CurriculumSource(
+        id="math_t1", subject_id="math", title="Mathematics in English — Student Book",
+        filename="الرياضيات باللغة الانجليزية-كتاب الطالب-334a9f66.pdf", term="Term 1", language="en",
+        source_role=SOURCE_ROLE_OFFICIAL, publisher="Ministry curriculum development",
+        edition_label="Cover: 2025–2026; internal legacy strings preserved as source metadata",
+        extraction_mode="mixed_page_image_preferred",
+    ),
+    CurriculumSource(
+        id="science_t1", subject_id="science", title="Science in English — Student Book",
+        filename="العلوم باللغة الانجليزية-كتاب الطالب-0d9bc9e8.pdf", term="Term 1", language="en",
+        source_role=SOURCE_ROLE_OFFICIAL, publisher="Ministry curriculum development",
+        edition_label="2025–2026", extraction_mode="page_image",
+    ),
+    CurriculumSource(
+        id="ict_t2", subject_id="ict", title="Computer / ICT", filename="computer_3prep_scond_term_english.pdf",
+        term="Second Semester", language="en", source_role=SOURCE_ROLE_SUPPLIED,
+        extraction_mode="parsed_text", trusted=False,
+        edition_label="Supplied source; current-year coverage not yet externally verified",
+    ),
 )
 
 
@@ -39,7 +59,7 @@ def sources_for_subject(subject_id: str) -> Tuple[CurriculumSource, ...]:
 def source_inventory_summary() -> dict:
     return {
         "source_count": len(CURRICULUM_SOURCES),
-        "subjects": sorted({source.subject_id for source in CURRICULUM_SOURCES}),
+        "subjects": tuple(sorted({source.subject_id for source in CURRICULUM_SOURCES})),
         "page_image_aware_required": any("page_image" in source.extraction_mode for source in CURRICULUM_SOURCES),
-        "unverified_current_year": [source.id for source in CURRICULUM_SOURCES if source.trust != "trusted_project_source"],
+        "needs_verification": tuple(source.id for source in CURRICULUM_SOURCES if not source.trusted),
     }

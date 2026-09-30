@@ -15,6 +15,7 @@ AI_SKILL_LABELS = {
     "verification": "Verification",
     "evidence": "Evidence Quality",
     "uncertainty": "Handling Uncertainty",
+    "creation": "Building With AI",
 }
 
 ACTIVITY_SKILL = {
@@ -22,6 +23,7 @@ ACTIVITY_SKILL = {
     "ai_answer_comparison": ("comparison",),
     "ai_evidence_verification": ("verification", "evidence"),
     "ai_detective": ("uncertainty",),
+    "ai_app_idea": ("prompting", "creation"),
 }
 
 
@@ -131,6 +133,7 @@ def render_ai_world(ai: GeminiService) -> None:
     mode = st.radio(
         "اختاري تحدّي",
         [
+            "✨ اصنعي فكرة برنامج مع AI",
             "🛠️ صلّحي الـPrompt",
             "⚖️ قارني إجابتين من AI",
             "🔎 تحققي بالدليل",
@@ -141,7 +144,9 @@ def render_ai_world(ai: GeminiService) -> None:
         key="ai_lab_mode",
     )
 
-    if mode == "🛠️ صلّحي الـPrompt":
+    if mode == "✨ اصنعي فكرة برنامج مع AI":
+        _build_app_idea(ai)
+    elif mode == "🛠️ صلّحي الـPrompt":
         _fix_the_prompt(ai)
     elif mode == "⚖️ قارني إجابتين من AI":
         _compare_ai_answers()
@@ -160,6 +165,74 @@ def _need_ai(ai: GeminiService) -> bool:
         st.warning("الجزء الذكي ده مش متاح دلوقتي، لكن تقدري تكمّلي التحديات اللي مش محتاجة اتصال AI.")
         return False
     return True
+
+
+def _build_app_idea(ai: GeminiService) -> None:
+    st.markdown("### ✨ أول تجربة: من فكرة لبرنامج")
+    st.info(
+        "LUMINA نفسه مثال: فكرة بدأت بكلام عادي، والـAI ساعد في تحويلها لبرنامج. "
+        "مش لازم تعرفي كود علشان تبدأي — المهم تعرفي إنتِ عايزة البرنامج يعمل إيه، "
+        "وبعدين تجربي وتراجعي وتعدّلي."
+    )
+
+    starter = st.selectbox(
+        "اختاري بداية أو اكتبي فكرتك",
+        [
+            "تطبيق يساعدني أراجع قبل الامتحان",
+            "لعبة أسئلة لصاحبتي وأنا",
+            "منظم بسيط لحاجاتي اليومية",
+            "فكرة تانية من عندي",
+        ],
+        key="ai_app_starter",
+    )
+    custom = st.text_input(
+        "فكرتك في جملة واحدة",
+        key="ai_app_custom",
+        placeholder="مثال: برنامج يحول مذاكرتي للعبة تحديات قصيرة",
+    )
+    idea = custom.strip() or (starter if starter != "فكرة تانية من عندي" else "")
+
+    if st.button("حوّلي فكرتي لخطة ✨", key="ai_app_build", use_container_width=True):
+        if not idea:
+            st.warning("اكتبي فكرتك في جملة واحدة الأول.")
+            return
+        if not _need_ai(ai):
+            return
+        try:
+            plan = ai.generate(
+                f"""You are a friendly AI product coach for Nour, a 13-year-old student.
+Her app idea: {idea}
+
+The purpose is to show her that she can start building useful software with AI even before she knows programming, while being truthful that real apps still need testing and iteration.
+
+Give a very short, exciting plan in Arabic with simple English tech words where useful:
+1. What the app would do in one sentence.
+2. Exactly 3 simple screens/features.
+3. A ready-to-copy first prompt she could give an AI coding assistant to create a tiny prototype.
+4. One thing she should test herself after the prototype appears.
+5. End with one tiny choice: what would she change first?
+
+Do not dump code. Do not say AI can build every app perfectly. Keep it age-appropriate and concise."""
+            )
+        except AIServiceError as exc:
+            st.warning(str(exc))
+            return
+
+        st.markdown(plan)
+        xp = _record_ai_attempt(
+            lesson_id="build_app_idea",
+            check_id="idea_to_prototype_plan",
+            answer=idea,
+            correct=True,
+            activity_type="ai_app_idea",
+        )
+        _success(
+            "كده إنتِ عملتي أول خطوة حقيقية في تصميم برنامج: فكرة واضحة → مميزات → Prompt → اختبار.",
+            xp,
+        )
+        st.caption(
+            "السر مش إن AI يعمل كل حاجة لوحده؛ السر إنك تعرفي تطلبي، تشوفي النتيجة، وتعدّليها."
+        )
 
 
 def _fix_the_prompt(ai: GeminiService) -> None:

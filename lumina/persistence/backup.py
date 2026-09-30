@@ -52,6 +52,9 @@ def restore_learning_backup(raw: str, store: LearningStore) -> tuple[bool, str]:
     except json.JSONDecodeError:
         return False, "ملف النسخة الاحتياطية غير صالح."
 
+    if not isinstance(payload, dict):
+        return False, "محتويات النسخة الاحتياطية غير صالحة."
+
     if payload.get("schema_version") != 2:
         return False, "صيغة النسخة الاحتياطية قديمة أو غير مدعومة."
 
@@ -60,8 +63,16 @@ def restore_learning_backup(raw: str, store: LearningStore) -> tuple[bool, str]:
     mistakes = payload.get("mistakes") or []
     reviews = payload.get("reviews") or []
 
-    if not all(isinstance(items, list) for items in (attempts, mistakes, reviews)):
+    if not isinstance(profile, dict) or not all(isinstance(items, list) for items in (attempts, mistakes, reviews)):
         return False, "محتويات النسخة الاحتياطية غير صالحة."
+    if not all(isinstance(item, dict) for items in (attempts, mistakes, reviews) for item in items):
+        return False, "محتويات النسخة الاحتياطية غير صالحة."
+    if any(not item.get("lesson_id") for item in attempts):
+        return False, "النسخة الاحتياطية تحتوي على محاولة بدون درس مرتبط."
+    if any(not item.get("lesson_id") or not item.get("check_id") for item in mistakes):
+        return False, "النسخة الاحتياطية تحتوي على خطأ تعلّم غير مكتمل."
+    if any(not item.get("lesson_id") or not item.get("check_id") for item in reviews):
+        return False, "النسخة الاحتياطية تحتوي على مراجعة غير مكتملة."
 
     existing_signatures = {
         _attempt_signature(item)

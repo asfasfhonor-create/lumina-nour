@@ -138,8 +138,12 @@ def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
         )
         return
 
-    st.markdown("#### 🎮 تحدّي صغير")
-    st.caption("سؤال واحد بس دلوقتي. لما الفكرة تثبت، LUMINA تزود التحدّي تدريجيًا.")
+    if getattr(check, "activity_kind", "concept") == "recall":
+        st.markdown("#### 🧠 تذكير سريع")
+        st.caption("سؤال بسيط لتثبيت معلومة من الدرس. ده لوحده مش دليل إتقان كامل.")
+    else:
+        st.markdown("#### 🎮 تحدّي صغير")
+        st.caption("سؤال واحد بس دلوقتي. لما الفكرة تثبت، LUMINA تزود التحدّي تدريجيًا.")
 
     depth = support_depth(attempts, check.id)
     if depth:
@@ -173,6 +177,8 @@ def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
                     "correct": correct,
                     "source_pages": lesson.source_pages,
                     "activity_type": f"creative_mission_level_{getattr(check, 'difficulty', 1)}",
+                    "cognitive_kind": getattr(check, "activity_kind", "concept"),
+                    "mastery_eligible": bool(getattr(check, "mastery_eligible", True)),
                 }
             )
 

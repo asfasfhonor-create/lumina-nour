@@ -12,6 +12,9 @@ from lumina.learning.missions import get_lesson_by_id, get_module_for_lesson_id
 from lumina.context_help import help_text, render_home_help
 
 
+ONBOARDING_VERSION = 2
+
+
 def _load_nour_photo_b64() -> str:
     parts_dir = Path("assets/nour_avatar_parts_v2")
     ordered_names = ("00a.txt", "00b.txt", "02.txt", "03.txt", "04.txt", "05.txt", "06.txt", "07.txt")
@@ -50,7 +53,7 @@ def render_home_foundation() -> None:
         )
 
     _render_first_run_welcome()
-    if not st.session_state.get("first_run_complete", False):
+    if int(st.session_state.get("onboarding_version", 0)) < ONBOARDING_VERSION:
         return
 
     level_number = current_level()
@@ -107,7 +110,7 @@ def render_home_foundation() -> None:
 
 
 def _render_first_run_welcome() -> None:
-    if st.session_state.get("first_run_complete", False):
+    if int(st.session_state.get("onboarding_version", 0)) >= ONBOARDING_VERSION:
         return
 
     st.markdown(
@@ -133,6 +136,7 @@ def _render_first_run_welcome() -> None:
             use_container_width=True,
         ):
             st.session_state.first_run_complete = True
+            st.session_state.onboarding_version = ONBOARDING_VERSION
             st.session_state.ai_lab_mode = "✨ اصنعي فكرة برنامج مع AI"
             persist_profile_state()
             st.session_state.active_world = "ai"
@@ -144,6 +148,7 @@ def _render_first_run_welcome() -> None:
             use_container_width=True,
         ):
             st.session_state.first_run_complete = True
+            st.session_state.onboarding_version = ONBOARDING_VERSION
             persist_profile_state()
             st.rerun()
 

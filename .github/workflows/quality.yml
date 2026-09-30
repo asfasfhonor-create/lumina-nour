@@ -1750,7 +1750,7 @@ jobs:
           if any(b.label == "🌍 Let me choose something to explore" for b in at.button):
               next(b for b in at.button if b.label == "🌍 Let me choose something to explore").click()
               at.run()
-          next(b for b in at.button if b.label == "Enter AI Lab · ادخلي عالم الذكاء الاصطناعي").click()
+          next(b for b in at.button if b.label == "Enter AI Lab").click()
           at.run()
           assert not at.exception, at.exception
 

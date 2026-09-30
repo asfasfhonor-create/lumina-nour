@@ -94,5 +94,10 @@ Do not merge the development PR until:
 - Private Neon Object Storage bucket created: `lumina-trusted-sources`.
 - Object storage is enabled in Frankfurt / `eu-central-1`.
 - Branch-scoped storage credential created for Streamlit runtime use.
-- Remaining storage gate: place the storage credential values in Streamlit Secrets and run one real trusted-file upload/reopen test.
-- Remaining release gates: latest-commit live visual verification, deployed end-to-end learning transaction, mobile/browser visual smoke, and explicit Mohamed approval before merge.
+- Storage credential is configured in Streamlit Secrets.
+- Real permanent-source upload completed successfully: 6 El-Moasser PDFs are registered in Neon and present in the private Object Storage bucket with non-zero object sizes.
+- Source roles verified: Math/Science Main Books for explanation, Math revision for practice, Science Notebook for review/exam practice, Answer Guides hidden as correction references.
+- Automated full learning transaction test passes: incorrect Science attempt → mistake/review → correct retry → XP.
+- Automated AI Literacy transaction test passes and writes AI skill evidence.
+- Automated Real English baseline transaction passes and stores the adaptive skill profile.
+- Remaining release gates: latest-commit live visual verification on deployed Streamlit, one live source-booster interaction using the saved PDFs, final phone/browser visual smoke, and explicit Mohamed approval before merge.

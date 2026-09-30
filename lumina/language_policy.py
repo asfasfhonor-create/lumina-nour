@@ -4,6 +4,11 @@ English-first is the default. Arabic is a scaffold, not a second permanent
 translation layer. Parent/admin surfaces remain Arabic-first.
 """
 
+import streamlit as st
+
+from lumina.learning.english_profile import support_level
+
+
 ENGLISH_FIRST_LABELS = {
     "curriculum_search": "Curriculum Search · البحث في المنهج",
     "weekly_plan": "My Plan · خطتي",
@@ -28,12 +33,10 @@ WORLD_LABELS = {
 
 
 def learner_support_level() -> str:
-    """Return the current scaffold level.
-
-    Supported intentionally remains the safe default until real evidence is
-    available. Future adaptation can move to light and english_only without
-    redesigning navigation.
-    """
+    """Derive UI scaffolding from Nour's demonstrated Real English baseline."""
+    level = support_level(st.session_state.get("english_profile") or {})
+    if level == "light":
+        return "light"
     return "supported"
 
 

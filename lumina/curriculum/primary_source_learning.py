@@ -85,8 +85,7 @@ def answer_from_primary_source(ai: GeminiService, lesson, question: str) -> tupl
         prompt = f"""You are LUMINA, Nour's curriculum tutor.
 {grounding_instruction(lesson)}
 The attached PDF is the registered primary curriculum file.
-Focus only on the registered lesson page range. Do not silently use other pages or general model knowledge.
-For visual pages, inspect the actual page evidence including diagrams, maps, formulas, tables and layout when relevant.
+Focus only on the registered lesson page range. Respect whether the registry identifies printed book pages or PDF page indices. Do not silently use other pages or general model knowledge.\nFor visual pages, inspect the actual page evidence including diagrams, maps, formulas, tables and layout when relevant.
 If the requested fact is not supported in that page range, say clearly that the source range does not support it.
 Preserve the book's terminology and level. Explain for understanding, then ask one short checking question.
 

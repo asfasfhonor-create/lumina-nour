@@ -136,6 +136,8 @@ def render_exam_mode() -> None:
                     "correct": correct,
                     "source_pages": lesson.source_pages,
                     "activity_type": "exam",
+                    "cognitive_kind": getattr(check, "activity_kind", "concept"),
+                    "mastery_eligible": bool(getattr(check, "mastery_eligible", True)),
                 }
             )
 

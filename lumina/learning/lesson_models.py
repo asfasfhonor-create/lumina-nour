@@ -12,6 +12,7 @@ class LessonCheck:
     correct_index: int | None = None
     difficulty: int = 1
     activity_kind: str = "concept"
+    mastery_eligible: bool = True
 
     def __post_init__(self) -> None:
         if self.difficulty not in (1, 2, 3):

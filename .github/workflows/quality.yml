@@ -1819,3 +1819,18 @@ jobs:
           print("Real English baseline transaction OK")
           PY
           rm -f .streamlit/secrets.toml
+
+      - name: Validate mobile-first release CSS
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          css = Path("lumina/theme.py").read_text(encoding="utf-8")
+          assert "@media (max-width:640px)" in css
+          assert ".block-container{padding-left:.8rem;padding-right:.8rem" in css
+          assert ".nour-photo-wrap{width:148px" in css
+          assert ".nour-photo-glow{width:148px;height:185px" in css
+          assert ".stButton>button" in css and "min-height:46px" in css
+          assert '[data-testid="stToolbar"]' in css
+          print("Mobile-first release CSS OK")
+          PY

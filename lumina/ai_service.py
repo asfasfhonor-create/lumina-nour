@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 import json
+import time
 
 from google import genai
 from google.genai import types
@@ -29,6 +30,41 @@ class GeminiService:
     @property
     def available(self) -> bool:
         return self._client is not None
+
+    def upload_file_path(self, path: str) -> Any:
+        """Upload a large curriculum file through Gemini Files API."""
+        if not self._client:
+            raise AIServiceError("الأداة الذكية غير مفعلة لأن Gemini API Key غير موجود.")
+        try:
+            uploaded = self._client.files.upload(file=path)
+            for _ in range(60):
+                state = getattr(uploaded, "state", None)
+                state_name = str(getattr(state, "name", "") or "")
+                if not state_name or state_name == "ACTIVE":
+                    return uploaded
+                if state_name == "FAILED":
+                    break
+                time.sleep(1)
+                uploaded = self._client.files.get(name=uploaded.name)
+        except Exception as exc:
+            raise AIServiceError(
+                "تعذر تجهيز ملف المنهج الكبير للأداة الذكية الآن."
+            ) from exc
+        raise AIServiceError("تعذر تجهيز ملف المنهج الكبير للأداة الذكية الآن.")
+
+    def get_uploaded_file(self, name: str) -> Any:
+        if not self._client:
+            raise AIServiceError("الأداة الذكية غير مفعلة لأن Gemini API Key غير موجود.")
+        try:
+            uploaded = self._client.files.get(name=name)
+        except Exception as exc:
+            raise AIServiceError("ملف المنهج المؤقت انتهت صلاحيته ويحتاج تجهيزًا جديدًا.") from exc
+
+        state = getattr(uploaded, "state", None)
+        state_name = str(getattr(state, "name", "") or "")
+        if state_name and state_name != "ACTIVE":
+            raise AIServiceError("ملف المنهج المؤقت غير جاهز للاستخدام.")
+        return uploaded
 
     def generate(
         self,

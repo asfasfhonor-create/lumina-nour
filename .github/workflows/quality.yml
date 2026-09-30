@@ -1,0 +1,2322 @@
+name: Lumina Quality
+
+on:
+  push:
+    branches:
+      - feature/nour-mobile-ui
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: python -m pip install -q -r requirements.txt
+      - name: Compile Python
+        run: python -m compileall -q app.py lumina
+      - name: Import smoke test
+        run: |
+          python - <<'PY'
+          import lumina.ai_service
+          import lumina.worlds.english
+          import lumina.worlds.science
+          import lumina.worlds.math
+          import lumina.worlds.ict
+          import lumina.worlds.arabic
+          import lumina.worlds.social
+          import lumina.worlds.religion
+          import lumina.worlds.ai_lab
+          import lumina.review_center
+          import lumina.parent_dashboard
+          import lumina.persistence.session_store
+          print("Import smoke test OK")
+          PY
+      - name: Validate module registry
+        run: |
+          python - <<'PY'
+          from lumina.module_registry import get_module, get_school_subjects
+
+          subjects = get_school_subjects()
+          assert len(subjects) == 7
+          assert get_module("ai") is not None
+          assert len({module.id for module in subjects}) == len(subjects)
+          print("Module registry OK")
+          PY
+      - name: Validate curriculum catalog
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.catalog import ENGLISH_T1, SOURCES, get_sources
+
+          assert len(SOURCES) == 9
+          assert len(get_sources("english")) == 1
+          assert len(get_sources("science")) == 2
+          assert len(get_sources("math")) == 2
+          assert ENGLISH_T1.filename == "English_language_prep3_t1.pdf"
+          assert [unit.title for unit in ENGLISH_T1.units][:3] == [
+              "Personal Identity",
+              "Communication with Family and Friends",
+              "Artificial Intelligence",
+          ]
+          assert len({source.id for source in SOURCES}) == len(SOURCES)
+          print("Curriculum catalog OK")
+          PY
+
+      - name: Validate English Unit 1 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.english_unit1 import UNIT1_LESSONS
+
+          assert len(UNIT1_LESSONS) == 6
+          assert [lesson.title for lesson in UNIT1_LESSONS] == [
+              "Beyond My Looks",
+              "Self-Discovery",
+              "The Mirror Moment",
+              "Story Time — The School Garden Project",
+              "Let's Talk — Respecting Personal Identity",
+              "This Is Me — Descriptive Paragraph",
+          ]
+          for lesson in UNIT1_LESSONS:
+              assert lesson.checks
+              check = lesson.checks[0]
+              assert len(check.options) == 3
+              assert check.correct_index in (0, 1, 2)
+          print("English Unit 1 lesson contracts OK")
+          PY
+
+      - name: Validate mastery rules
+        run: |
+          python - <<'PY'
+          from lumina.learning.progress import (
+              LEARNING,
+              MASTERED,
+              NEEDS_REVIEW,
+              NOT_STARTED,
+              derive_mastery,
+          )
+
+          assert derive_mastery([]).state == NOT_STARTED
+
+          wrong = [{"check_id": "a", "correct": False}]
+          mistakes = [{"check_id": "a", "resolved": False}]
+          assert derive_mastery(wrong, mistakes).state == NEEDS_REVIEW
+
+          repeated = [
+              {"check_id": "a", "evidence_id": "a", "correct": True},
+              {"check_id": "a", "evidence_id": "a", "correct": True},
+              {"check_id": "a", "evidence_id": "a", "correct": True},
+          ]
+          assert derive_mastery(repeated).state == LEARNING
+
+          varied = [
+              {"check_id": "a", "evidence_id": "a", "correct": True},
+              {"check_id": "b", "evidence_id": "b", "correct": True},
+              {"check_id": "a", "evidence_id": "a", "correct": True},
+          ]
+          assert derive_mastery(varied).state == MASTERED
+          print("Mastery rules OK")
+          PY
+
+      - name: Validate English Unit 2 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.english_unit2 import UNIT2_LESSONS
+
+          assert len(UNIT2_LESSONS) == 6
+          assert [lesson.title for lesson in UNIT2_LESSONS] == [
+              "Stay Connected",
+              "Communication, Challenges and Solutions",
+              "The Silent Dinner",
+              "Story Time — Taking Initiative and Building a Team",
+              "Let's Talk — Proper Communication Skills",
+              "Staying Close — Opinion Paragraph",
+          ]
+          for lesson in UNIT2_LESSONS:
+              assert lesson.checks
+              assert lesson.source_pages
+          print("English Unit 2 lesson contracts OK")
+          PY
+
+      - name: Validate English Unit 3 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.english_unit3 import UNIT3_LESSONS
+
+          assert len(UNIT3_LESSONS) == 6
+          assert UNIT3_LESSONS[0].title == "Artificial Intelligence"
+          assert UNIT3_LESSONS[-1].title == "Smart Robots — Email About AI"
+          for lesson in UNIT3_LESSONS:
+              assert lesson.checks
+              assert lesson.source_pages
+          print("English Unit 3 lesson contracts OK")
+          PY
+
+      - name: Validate complete English curriculum mapping
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.english_curriculum import ENGLISH_UNIT_LESSONS, all_english_lessons
+          from lumina.curriculum.english_reviews import REVIEW1, REVIEW2
+
+          assert list(ENGLISH_UNIT_LESSONS) == [
+              "Personal Identity",
+              "Communication with Family and Friends",
+              "Artificial Intelligence",
+              "Screen Time",
+              "Design Thinking",
+              "Why Do We Like Stories?",
+          ]
+          assert len(all_english_lessons()) == 36
+          assert all(len(lessons) == 6 for lessons in ENGLISH_UNIT_LESSONS.values())
+          assert len(REVIEW1.checks) == 3
+          assert len(REVIEW2.checks) == 3
+          print("Complete English curriculum mapping OK")
+          PY
+
+      - name: Validate Science Unit 1 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.science_unit1 import SCIENCE_UNIT1_LESSONS
+
+          assert len(SCIENCE_UNIT1_LESSONS) == 3
+          assert [lesson.title for lesson in SCIENCE_UNIT1_LESSONS] == [
+              "Motion in One Direction",
+              "Graphic Representation of Motion in a Straight Line",
+              "Physical Quantities: Scalars and Vectors",
+          ]
+          for lesson in SCIENCE_UNIT1_LESSONS:
+              assert lesson.checks
+              assert lesson.source_pages
+          print("Science Unit 1 lesson contracts OK")
+          PY
+
+      - name: Validate Math Unit 1 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.math_unit1 import MATH_UNIT1_LESSONS
+
+          assert len(MATH_UNIT1_LESSONS) == 4
+          assert [lesson.title for lesson in MATH_UNIT1_LESSONS] == [
+              "Cartesian Product",
+              "Relations",
+              "Functions (Mapping)",
+              "Polynomial Functions",
+          ]
+          for lesson in MATH_UNIT1_LESSONS:
+              assert lesson.checks
+              assert lesson.source_pages
+          print("Math Unit 1 lesson contracts OK")
+          PY
+
+      - name: Validate ICT Chapter 1 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.ict_chapter1 import ICT_CHAPTER1_LESSONS
+
+          assert len(ICT_CHAPTER1_LESSONS) == 5
+          assert ICT_CHAPTER1_LESSONS[0].title == "Data Types"
+          assert ICT_CHAPTER1_LESSONS[-1].title == "Errors"
+          for lesson in ICT_CHAPTER1_LESSONS:
+              assert lesson.checks
+              assert lesson.source_pages
+          print("ICT Chapter 1 lesson contracts OK")
+          PY
+
+      - name: Validate Arabic Social Religion foundations
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.arabic_unit1 import ARABIC_U1_LESSONS
+          from lumina.curriculum.social_unit1 import SOCIAL_U1_LESSONS
+          from lumina.curriculum.religion_unit1 import RELIGION_U1_LESSONS
+
+          assert len(ARABIC_U1_LESSONS) == 4
+          assert ARABIC_U1_LESSONS[0].title == "آداب التعامل مع الوالدين"
+          assert len(SOCIAL_U1_LESSONS) == 3
+          assert SOCIAL_U1_LESSONS[0].title == "موقع ومظاهر سطح قارات العالم الجديد"
+          assert len(RELIGION_U1_LESSONS) == 7
+          assert RELIGION_U1_LESSONS[0].title == "من أسماء الله الحسنى: الغفور"
+          for lesson in (
+              ARABIC_U1_LESSONS[0],
+              SOCIAL_U1_LESSONS[0],
+              RELIGION_U1_LESSONS[0],
+          ):
+              assert lesson.checks
+              assert lesson.source_pages
+          print("Arabic, Social, Religion foundations OK")
+          PY
+
+      - name: Validate Science Unit 2 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.science_unit2 import SCIENCE_UNIT2_LESSONS
+
+          assert len(SCIENCE_UNIT2_LESSONS) == 2
+          assert [lesson.title for lesson in SCIENCE_UNIT2_LESSONS] == ["Mirrors", "Lenses"]
+          assert all(lesson.checks for lesson in SCIENCE_UNIT2_LESSONS)
+          print("Science Unit 2 lesson contracts OK")
+          PY
+
+      - name: Validate Math Unit 2 curriculum lessons
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.math_unit2 import MATH_UNIT2_LESSONS
+
+          assert len(MATH_UNIT2_LESSONS) == 3
+          assert [lesson.title for lesson in MATH_UNIT2_LESSONS] == [
+              "Ratio",
+              "Proportion",
+              "Direct Variation and Inverse Variation",
+          ]
+          assert all(lesson.checks for lesson in MATH_UNIT2_LESSONS)
+          print("Math Unit 2 lesson contracts OK")
+          PY
+
+      - name: Validate complete first-term Science mapping
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.science_unit1 import SCIENCE_UNIT1_LESSONS
+          from lumina.curriculum.science_unit2 import SCIENCE_UNIT2_LESSONS
+          from lumina.curriculum.science_unit3 import SCIENCE_UNIT3_LESSONS
+          from lumina.curriculum.science_unit4 import SCIENCE_UNIT4_LESSONS
+
+          groups = [
+              SCIENCE_UNIT1_LESSONS,
+              SCIENCE_UNIT2_LESSONS,
+              SCIENCE_UNIT3_LESSONS,
+              SCIENCE_UNIT4_LESSONS,
+          ]
+          assert [len(group) for group in groups] == [3, 2, 1, 2]
+          assert all(lesson.checks for group in groups for lesson in group)
+          print("Complete first-term Science mapping OK")
+          PY
+
+      - name: Validate complete first-term Math mapping
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.math_unit1 import MATH_UNIT1_LESSONS
+          from lumina.curriculum.math_unit2 import MATH_UNIT2_LESSONS
+          from lumina.curriculum.math_unit3 import MATH_UNIT3_LESSONS
+          from lumina.curriculum.math_unit4 import MATH_UNIT4_LESSONS
+          from lumina.curriculum.math_unit5 import MATH_UNIT5_LESSONS
+
+          groups = [
+              MATH_UNIT1_LESSONS,
+              MATH_UNIT2_LESSONS,
+              MATH_UNIT3_LESSONS,
+              MATH_UNIT4_LESSONS,
+              MATH_UNIT5_LESSONS,
+          ]
+          assert [len(group) for group in groups] == [4, 3, 2, 2, 4]
+          assert all(lesson.checks for group in groups for lesson in group)
+          print("Complete first-term Math mapping OK")
+          PY
+
+      - name: Validate Real English baseline
+        run: |
+          python - <<'PY'
+          from lumina.learning.english_profile import BASELINE_ITEMS, score_baseline
+
+          assert len(BASELINE_ITEMS) == 6
+          perfect = {item["id"]: item["correct_index"] for item in BASELINE_ITEMS}
+          result = score_baseline(perfect)
+          assert result.correct == 6
+          assert result.total == 6
+          assert result.broad_band == "Independent-start"
+          print("Real English baseline OK")
+          PY
+
+      - name: Validate all-subject mapped curriculum registry
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import (
+              MAPPED_CURRICULUM,
+              all_mapped_lessons,
+              curriculum_counts,
+          )
+
+          counts = curriculum_counts()
+          assert set(MAPPED_CURRICULUM) == {
+              "english", "science", "math", "arabic", "social", "religion", "ict"
+          }
+          assert counts["english"] == 38
+          assert counts["science"] == 14
+          assert counts["math"] == 35
+          assert counts["arabic"] == 12
+          assert counts["social"] == 11
+          assert counts["religion"] == 21
+          assert counts["ict"] == 13
+          assert len(all_mapped_lessons()) == 144
+          assert all(lesson.checks for lesson in all_mapped_lessons())
+          print("All-subject mapped curriculum registry OK:", counts)
+          PY
+
+      - name: Validate complete ICT mapping
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.ict_chapter1 import ICT_CHAPTER1_LESSONS
+          from lumina.curriculum.ict_chapter2 import ICT_CHAPTER2_LESSONS
+          from lumina.curriculum.ict_chapter3 import ICT_CHAPTER3_LESSONS
+          from lumina.curriculum.ict_chapter4 import ICT_CHAPTER4_LESSONS
+          assert [len(x) for x in (
+              ICT_CHAPTER1_LESSONS,
+              ICT_CHAPTER2_LESSONS,
+              ICT_CHAPTER3_LESSONS,
+              ICT_CHAPTER4_LESSONS,
+          )] == [5,3,4,1]
+          print("Complete ICT mapping OK")
+          PY
+
+      - name: Validate complete Arabic Social Religion mapping
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.arabic_unit1 import ARABIC_U1_LESSONS
+          from lumina.curriculum.arabic_unit2 import ARABIC_U2_LESSONS
+          from lumina.curriculum.arabic_unit3 import ARABIC_U3_LESSONS
+          from lumina.curriculum.social_unit1 import SOCIAL_U1_LESSONS
+          from lumina.curriculum.social_unit2 import SOCIAL_U2_LESSONS
+          from lumina.curriculum.social_unit3 import SOCIAL_U3_LESSONS
+          from lumina.curriculum.social_unit4 import SOCIAL_U4_LESSONS
+          from lumina.curriculum.religion_unit1 import RELIGION_U1_LESSONS
+          from lumina.curriculum.religion_unit2 import RELIGION_U2_LESSONS
+          from lumina.curriculum.religion_unit3 import RELIGION_U3_LESSONS
+
+          assert [len(x) for x in (ARABIC_U1_LESSONS, ARABIC_U2_LESSONS, ARABIC_U3_LESSONS)] == [4,4,4]
+          assert [len(x) for x in (SOCIAL_U1_LESSONS, SOCIAL_U2_LESSONS, SOCIAL_U3_LESSONS, SOCIAL_U4_LESSONS)] == [3,3,3,2]
+          assert [len(x) for x in (RELIGION_U1_LESSONS, RELIGION_U2_LESSONS, RELIGION_U3_LESSONS)] == [7,7,7]
+          print("Arabic, Social, Religion mappings OK")
+          PY
+
+      - name: Validate complete second-term Math Science mapping
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.science_t2_unit1 import SCIENCE_T2_UNIT1_LESSONS
+          from lumina.curriculum.science_t2_unit2 import SCIENCE_T2_UNIT2_LESSONS
+          from lumina.curriculum.science_t2_unit3 import SCIENCE_T2_UNIT3_LESSONS
+          from lumina.curriculum.math_t2_unit1 import MATH_T2_UNIT1_LESSONS
+          from lumina.curriculum.math_t2_unit2 import MATH_T2_UNIT2_LESSONS
+          from lumina.curriculum.math_t2_unit3 import MATH_T2_UNIT3_LESSONS
+          from lumina.curriculum.math_t2_unit4 import MATH_T2_UNIT4_LESSONS
+          from lumina.curriculum.math_t2_unit5 import MATH_T2_UNIT5_LESSONS
+
+          assert [len(x) for x in (
+              SCIENCE_T2_UNIT1_LESSONS,
+              SCIENCE_T2_UNIT2_LESSONS,
+              SCIENCE_T2_UNIT3_LESSONS,
+          )] == [2,3,1]
+          assert [len(x) for x in (
+              MATH_T2_UNIT1_LESSONS,
+              MATH_T2_UNIT2_LESSONS,
+              MATH_T2_UNIT3_LESSONS,
+              MATH_T2_UNIT4_LESSONS,
+              MATH_T2_UNIT5_LESSONS,
+          )] == [3,4,2,4,7]
+          print("Second-term Math and Science mappings OK")
+          PY
+
+      - name: Validate learning timestamps and mission imports
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import all_mapped_lessons, curriculum_counts
+          from lumina.learning.missions import get_lesson_by_id, get_module_for_lesson_id
+          from lumina.learning.rewards import XP_PER_NEW_SUCCESS
+          import lumina.daily_mission
+          import lumina.exam_mode
+
+          lessons = all_mapped_lessons()
+          assert len(lessons) == 144
+          first = lessons[0]
+          assert get_lesson_by_id(first.id) is first
+          assert get_module_for_lesson_id(first.id) in {
+              "english", "science", "math", "arabic", "social", "religion", "ict"
+          }
+          assert XP_PER_NEW_SUCCESS > 0
+          assert sum(curriculum_counts().values()) == 144
+          print("Mission/reward/import contracts OK")
+          PY
+
+      - name: Validate every mapped lesson contract
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import all_mapped_lessons
+
+          lesson_ids = set()
+          check_ids = set()
+          for lesson in all_mapped_lessons():
+              assert lesson.id not in lesson_ids, lesson.id
+              lesson_ids.add(lesson.id)
+              assert lesson.source_id
+              assert lesson.unit_id
+              assert lesson.title
+              assert lesson.source_pages
+              assert lesson.objectives
+              assert lesson.key_terms
+              assert lesson.evidence_summary
+              assert lesson.checks
+
+              for check in lesson.checks:
+                  compound = (lesson.id, check.id)
+                  assert compound not in check_ids, compound
+                  check_ids.add(compound)
+                  assert check.prompt
+                  assert check.hint
+                  assert len(check.options) >= 2
+                  assert check.correct_index is not None
+                  assert 0 <= check.correct_index < len(check.options)
+
+          print(f"Validated {len(lesson_ids)} lessons and {len(check_ids)} checks")
+          PY
+
+      - name: Validate adaptive weekly plan imports
+        run: |
+          python - <<'PY'
+          from lumina.learning.weekly_plan import WeeklyPlanItem, build_weekly_plan
+          import lumina.weekly_plan
+
+          assert WeeklyPlanItem.__name__ == "WeeklyPlanItem"
+          assert callable(build_weekly_plan)
+          print("Weekly plan contracts OK")
+          PY
+
+      - name: Validate future skill registration
+        run: |
+          python - <<'PY'
+          from lumina.module_registry import LearningModule, get_module, register_module
+
+          future = LearningModule(
+              id="research_skills_test",
+              title="Research Skills",
+              description="Test-only future skill module.",
+              category="life_skill",
+              icon="🔎",
+              track="enrichment",
+              mastery_dimensions=("questioning", "sources", "verification"),
+              stages=("starter", "builder"),
+              activity_types=("mission", "project"),
+          )
+          register_module(future)
+          assert get_module("research_skills_test") == future
+          print("Future skill registration OK")
+          PY
+
+      - name: Validate app access gate import
+        run: |
+          python - <<'PY'
+          import lumina.access_control
+          assert callable(lumina.access_control.require_app_access)
+          print("App access gate import OK")
+          PY
+
+      - name: Validate durable persistence adapter imports
+        run: |
+          python - <<'PY'
+          from lumina.persistence.neon_store import NeonLearningStore
+          from lumina.persistence.session_store import get_learning_store
+          assert NeonLearningStore.__name__ == "NeonLearningStore"
+          assert callable(get_learning_store)
+          print("Neon persistence adapter imports OK")
+          PY
+
+      - name: Validate curriculum search
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.search import lesson_by_id, search_curriculum
+
+          ohm = search_curriculum("Ohm law")
+          assert ohm
+          assert any("Electric" in hit.title or "Properties" in hit.title for hit in ohm)
+
+          arabic = search_curriculum("اسم المفعول")
+          assert arabic
+          assert any("الصداقة" in hit.title for hit in arabic)
+
+          lesson = lesson_by_id(arabic[0].lesson_id)
+          assert lesson is not None
+          assert lesson.source_pages
+          print("Curriculum search OK")
+          PY
+
+      - name: Validate Neon schema contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          sql = Path("neon/lumina_schema.sql").read_text(encoding="utf-8")
+          for table in (
+              "lumina_learning_attempts",
+              "lumina_mistakes",
+              "lumina_reviews",
+              "lumina_profile_state",
+          ):
+              assert f"create table if not exists {table}" in sql.lower()
+          assert "unique (learner_key, lesson_id, check_id)" in sql.lower()
+          print("Neon schema contract OK")
+          PY
+
+      - name: Validate Neon persistence contracts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lumina.persistence.neon_store import NeonLearningStore
+          from lumina.persistence.session_store import get_learning_store
+          from lumina.persistence.backup import export_learning_backup, restore_learning_backup
+
+          schema = Path("neon/lumina_schema.sql").read_text(encoding="utf-8")
+          for table in (
+              "lumina_learning_attempts",
+              "lumina_mistakes",
+              "lumina_reviews",
+              "lumina_profile_state",
+          ):
+              assert table in schema
+
+          assert NeonLearningStore.__name__ == "NeonLearningStore"
+          assert callable(get_learning_store)
+          assert callable(export_learning_backup)
+          assert callable(restore_learning_backup)
+          print("Neon persistence contracts OK")
+          PY
+
+      - name: Validate production secrets template
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          template = Path(".streamlit/secrets.example.toml").read_text(encoding="utf-8")
+          assert "NEON_DATABASE_URL" in template
+          assert "NOUR_LEARNER_KEY" in template
+          assert "AWS_ENDPOINT_URL_S3" in template
+          assert "AWS_ACCESS_KEY_ID" in template
+          assert "AWS_SECRET_ACCESS_KEY" in template
+          assert "AWS_REGION" in template
+          assert "SUPABASE_SECRET_KEY = " not in template
+          assert "PASSWORD@HOST" in template
+          print("Production secrets template OK")
+          PY
+
+      - name: Validate persistence outage fallback imports
+        run: |
+          python - <<'PY'
+          from lumina.persistence.base import PersistenceError
+          from lumina.persistence.neon_store import NeonLearningStore
+          from lumina.persistence.profile_state import hydrate_profile_state, persist_profile_state
+
+          store = NeonLearningStore(
+              "postgresql://user:password@example.invalid/db?sslmode=require",
+              "nour",
+          )
+          assert store.learner_key == "nour"
+          assert issubclass(PersistenceError, RuntimeError)
+          assert callable(hydrate_profile_state)
+          assert callable(persist_profile_state)
+          print("Persistence outage fallback imports OK")
+          PY
+
+      - name: Streamlit runtime health smoke test
+        run: |
+          set -e
+          streamlit run app.py --server.headless true --server.port 8501 > /tmp/lumina-streamlit.log 2>&1 &
+          APP_PID=$!
+          trap 'kill $APP_PID 2>/dev/null || true' EXIT
+          python - <<'PY'
+          import time
+          from urllib.request import urlopen
+
+          last_error = None
+          for _ in range(20):
+              try:
+                  with urlopen("http://127.0.0.1:8501/_stcore/health", timeout=2) as response:
+                      body = response.read().decode("utf-8", errors="replace")
+                      assert response.status == 200
+                      assert "ok" in body.lower()
+                      print("Streamlit runtime health OK")
+                      break
+              except Exception as exc:
+                  last_error = exc
+                  time.sleep(0.5)
+          else:
+              raise SystemExit(f"Streamlit health check failed: {last_error}")
+          PY
+
+      - name: Validate direct review retry imports
+        run: |
+          python - <<'PY'
+          import lumina.review_center
+          from lumina.curriculum.search import lesson_by_id
+
+          lesson = lesson_by_id("science_t2_u2_l1")
+          assert lesson is not None
+          assert lesson.checks
+          assert callable(lumina.review_center.render_review_center)
+          print("Direct review retry imports OK")
+          PY
+
+      - name: Validate focused lesson navigation
+        run: |
+          python - <<'PY'
+          import lumina.lesson_focus
+          from lumina.learning.missions import get_lesson_by_id, get_module_for_lesson_id
+
+          lesson = get_lesson_by_id("math_t2_u5_l1")
+          assert lesson is not None
+          assert get_module_for_lesson_id(lesson.id) == "math"
+          assert callable(lumina.lesson_focus.render_lesson_focus)
+          print("Focused lesson navigation OK")
+          PY
+
+      - name: Validate bounded persistence query counts
+        run: |
+          python - <<'PY'
+          from lumina.learning.missions import choose_mission
+          from lumina.learning.weekly_plan import build_weekly_plan
+
+          class CountingStore:
+              def __init__(self):
+                  self.calls = {"attempts": 0, "mistakes": 0, "reviews": 0}
+
+              def get_attempts(self, lesson_id=None):
+                  self.calls["attempts"] += 1
+                  assert lesson_id is None, "planner must bulk-fetch attempts"
+                  return []
+
+              def get_mistakes(self, lesson_id=None, unresolved_only=False):
+                  self.calls["mistakes"] += 1
+                  assert lesson_id is None, "planner must bulk-fetch mistakes"
+                  return []
+
+              def get_reviews(self, status=None):
+                  self.calls["reviews"] += 1
+                  return []
+
+          daily = CountingStore()
+          assert choose_mission(daily) is not None
+          assert daily.calls == {"attempts": 1, "mistakes": 1, "reviews": 1}, daily.calls
+
+          weekly = CountingStore()
+          assert build_weekly_plan(weekly, limit=5)
+          assert weekly.calls == {"attempts": 1, "mistakes": 1, "reviews": 1}, weekly.calls
+
+          print("Bounded persistence query counts OK")
+          PY
+
+      - name: Validate curriculum-first mission priority
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM
+          from lumina.learning.missions import choose_mission
+
+          class Store:
+              def get_attempts(self, lesson_id=None):
+                  return []
+              def get_mistakes(self, lesson_id=None, unresolved_only=False):
+                  return []
+              def get_reviews(self, status=None):
+                  return []
+
+          mission = choose_mission(Store())
+          assert mission is not None
+          subject_lessons = [
+              lesson
+              for lessons in MAPPED_CURRICULUM[mission.module_id].values()
+              for lesson in lessons
+          ]
+          assert subject_lessons
+          assert mission.lesson_id == subject_lessons[0].id
+          assert "ترتيب المنهج" in mission.reason
+          print("Curriculum-first mission priority OK")
+          PY
+
+      - name: Validate safe AI provider failures
+        run: |
+          python - <<'PY'
+          from lumina.ai_service import AIServiceError, GeminiService
+
+          service = GeminiService(None)
+          assert service.available is False
+          try:
+              service.generate("hello")
+          except AIServiceError as exc:
+              assert "API Key" in str(exc)
+          else:
+              raise AssertionError("Missing key must raise AIServiceError")
+
+          print("Safe AI provider failures OK")
+          PY
+
+      - name: Scan repository for committed secrets
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          ignored = {
+              ".streamlit/secrets.example.toml",
+              ".github/workflows/quality.yml",
+          }
+          patterns = {
+              "Google API key": re.compile(r"AIza[0-9A-Za-z_-]{30,}"),
+              "Neon/Postgres credential URL": re.compile(
+                  r"postgres(?:ql)?://[^\s:'\"]+:[^\s@'\"]+@[^\s'\"]+"
+              ),
+              "Supabase service role JWT": re.compile(r"eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+"),
+          }
+
+          findings = []
+          for path in Path(".").rglob("*"):
+              if not path.is_file():
+                  continue
+              rel = path.as_posix()
+              if rel.startswith(".git/") or rel in ignored:
+                  continue
+              try:
+                  text = path.read_text(encoding="utf-8")
+              except (UnicodeDecodeError, OSError):
+                  continue
+              for label, pattern in patterns.items():
+                  if pattern.search(text):
+                      findings.append(f"{label}: {rel}")
+
+          if findings:
+              raise SystemExit("Potential committed secrets found:\n" + "\n".join(findings))
+          print("Committed secret scan OK")
+          PY
+
+      - name: Validate parent weak-point navigation
+        run: |
+          python - <<'PY'
+          import lumina.parent_dashboard
+          from lumina.curriculum.search import lesson_by_id
+
+          lesson = lesson_by_id("english_u1_l1")
+          assert lesson is not None
+          assert callable(lumina.parent_dashboard.render_parent_dashboard)
+          print("Parent weak-point navigation imports OK")
+          PY
+
+      - name: Validate persistence status helper
+        run: |
+          python - <<'PY'
+          import streamlit as st
+          from lumina.persistence.session_store import persistence_status
+
+          st.session_state.persistence_disabled_for_session = True
+          status = persistence_status()
+          assert status["mode"] == "session_fallback"
+          assert status["durable"] is False
+          print("Persistence status helper OK")
+          PY
+
+      - name: Validate exam follows curriculum order
+        run: |
+          python - <<'PY'
+          from lumina.exam_mode import _pick_checks
+          from lumina.curriculum.mapped_curriculum import all_mapped_lessons
+
+          lessons = [lesson for lesson in all_mapped_lessons("english") if lesson.checks][:3]
+          assert len(lessons) >= 2
+          later = lessons[1]
+
+          class Store:
+              def get_attempts(self, lesson_id=None):
+                  rows = [{
+                      "lesson_id": later.id,
+                      "check_id": later.checks[0].id,
+                      "evidence_id": later.checks[0].id,
+                      "correct": False,
+                  }]
+                  if lesson_id is None:
+                      return rows
+                  return [row for row in rows if row["lesson_id"] == lesson_id]
+
+              def get_mistakes(self, lesson_id=None, unresolved_only=False):
+                  rows = [{
+                      "lesson_id": later.id,
+                      "check_id": later.checks[0].id,
+                      "resolved": False,
+                  }]
+                  if lesson_id is not None:
+                      rows = [row for row in rows if row["lesson_id"] == lesson_id]
+                  if unresolved_only:
+                      rows = [row for row in rows if not row.get("resolved", False)]
+                  return rows
+
+          picked = _pick_checks(lessons, Store(), limit=2)
+          assert picked
+          assert picked[0][0].id == lessons[0].id, [lesson.id for lesson, _ in picked]
+          assert picked[1][0].id == lessons[1].id, [lesson.id for lesson, _ in picked]
+          print("Exam curriculum order OK")
+          PY
+
+      - name: Validate persistence health checks
+        run: |
+          python - <<'PY'
+          from lumina.persistence.session_store import SessionLearningStore
+          from lumina.persistence.neon_store import NeonLearningStore
+
+          assert SessionLearningStore().health_check() is True
+          neon = NeonLearningStore(
+              "postgresql://user:password@example.invalid/db?sslmode=require",
+              "nour",
+          )
+          assert callable(neon.health_check)
+          print("Persistence health-check contracts OK")
+          PY
+
+      - name: Validate release readiness diagnostics
+        run: |
+          python - <<'PY'
+          from lumina.readiness import build_release_readiness
+
+          items = build_release_readiness(
+              ai_available=True,
+              app_pin_configured=False,
+              parent_pin_configured=True,
+              storage_status={
+                  "mode": "neon",
+                  "durable": True,
+                  "label": "Neon PostgreSQL",
+              },
+              storage_verified=True,
+          )
+          by_key = {item.key: item for item in items}
+          assert by_key["curriculum"].ready is True
+          assert by_key["ai"].ready is True
+          assert by_key["storage"].ready is True
+          assert by_key["parent_pin"].ready is True
+          assert by_key["app_pin"].ready is False
+          print("Release readiness diagnostics OK")
+          PY
+
+      - name: Validate parent release readiness rendering
+        run: |
+          python - <<'PY'
+          import inspect
+          import lumina.parent_dashboard
+          import lumina.world_router
+
+          signature = inspect.signature(lumina.parent_dashboard.render_parent_dashboard)
+          assert "ai_available" in signature.parameters
+          assert callable(lumina.world_router.render_active_world)
+          print("Parent release readiness rendering OK")
+          PY
+
+      - name: Validate unverified storage blocks release readiness
+        run: |
+          python - <<'PY'
+          from lumina.readiness import build_release_readiness
+
+          items = build_release_readiness(
+              ai_available=True,
+              app_pin_configured=True,
+              parent_pin_configured=True,
+              storage_status={
+                  "mode": "neon",
+                  "durable": True,
+                  "label": "Neon PostgreSQL",
+              },
+              storage_verified=False,
+          )
+          storage = next(item for item in items if item.key == "storage")
+          assert storage.ready is False
+          assert "لم يتم التحقق بعد" in storage.detail
+          print("Unverified storage correctly blocks release readiness")
+          PY
+
+      - name: Validate verified storage readiness wiring
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          parent = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert 'storage_status=status' in parent
+          assert 'storage_verified=bool(st.session_state.get("persistence_verified", False))' in parent
+          assert 'st.session_state.persistence_verified = True' in parent
+          print("Verified storage readiness wiring OK")
+          PY
+
+      - name: Validate optional readiness is non-blocking
+        run: |
+          python - <<'PY'
+          from lumina.readiness import build_release_readiness, is_release_ready, release_blockers
+
+          items = build_release_readiness(
+              ai_available=True,
+              app_pin_configured=False,
+              parent_pin_configured=False,
+              storage_status={
+                  "mode": "neon",
+                  "durable": True,
+                  "label": "Neon PostgreSQL",
+              },
+              storage_verified=True,
+          )
+          assert is_release_ready(items) is True
+          assert release_blockers(items) == ()
+          optional = {item.key: item for item in items if not item.required}
+          assert optional["app_pin"].ready is False
+          assert optional["parent_pin"].ready is False
+          print("Optional readiness checks are non-blocking")
+          PY
+
+      - name: Validate review evidence cannot inflate mastery
+        run: |
+          python - <<'PY'
+          from lumina.learning.progress import LEARNING, MASTERED, derive_mastery
+
+          same_check_across_contexts = [
+              {"check_id": "a", "evidence_id": "a", "correct": True},
+              {"check_id": "a", "evidence_id": "review:a", "correct": True},
+              {"check_id": "a", "evidence_id": "exam:a", "correct": True},
+          ]
+          snapshot = derive_mastery(same_check_across_contexts)
+          assert snapshot.state == LEARNING
+          assert snapshot.distinct_evidence == 1
+
+          truly_varied = same_check_across_contexts + [
+              {"check_id": "b", "evidence_id": "b", "correct": True},
+          ]
+          assert derive_mastery(truly_varied).state == MASTERED
+          print("Review evidence cannot inflate mastery")
+          PY
+
+      - name: Validate unresolved mistakes always require review
+        run: |
+          python - <<'PY'
+          from lumina.learning.progress import NEEDS_REVIEW, derive_mastery
+
+          attempts = [
+              {"check_id": "a", "evidence_id": "a", "correct": False},
+              {"check_id": "b", "evidence_id": "b", "correct": True},
+          ]
+          unresolved = [
+              {"check_id": "a", "resolved": False},
+          ]
+          snapshot = derive_mastery(attempts, unresolved)
+          assert snapshot.state == NEEDS_REVIEW
+          assert snapshot.unresolved_mistakes == 1
+          print("Unresolved mistakes correctly keep Needs review")
+          PY
+
+      - name: Validate stable daily mission persistence
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lumina.persistence.profile_state import PROFILE_KEYS
+
+          assert "daily_mission_lesson_id" in PROFILE_KEYS
+          assert "daily_mission_date" in PROFILE_KEYS
+
+          home = Path("lumina/home.py").read_text(encoding="utf-8")
+          daily = Path("lumina/daily_mission.py").read_text(encoding="utf-8")
+          assert "persist_profile_state()" in home
+          assert "persist_profile_state()" in daily
+          assert "daily_mission_date" in home
+          assert "daily_mission_date" in daily
+          print("Stable daily mission persistence OK")
+          PY
+
+      - name: Validate automatic persistence verification
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.persistence.profile_state as profile_state
+
+          assert callable(profile_state.verify_persistence_after_hydration)
+
+          app = Path("app.py").read_text(encoding="utf-8")
+          assert "verify_persistence_after_hydration()" in app
+          assert app.index("hydrate_profile_state()") < app.index("verify_persistence_after_hydration()")
+          print("Automatic persistence verification wiring OK")
+          PY
+
+      - name: Validate persistence verification only runs once
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          state = Path("lumina/session_state.py").read_text(encoding="utf-8")
+          profile = Path("lumina/persistence/profile_state.py").read_text(encoding="utf-8")
+          app = Path("app.py").read_text(encoding="utf-8")
+
+          assert '"persistence_verification_attempted": False' in state
+          assert 'persistence_verification_attempted' in profile
+          assert 'st.session_state.persistence_verification_attempted = True' in profile
+          assert 'التقدّم محفوظ تلقائيًا' in app
+          assert 'جارٍ التحقق من الحفظ التلقائي' in app
+          print("Persistence verification is bounded and learner-facing footer is accurate")
+          PY
+
+      - name: Validate page-aware source sessions across school worlds
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.curriculum.source_session as source_session
+
+          assert callable(source_session.render_temporary_source_session)
+
+          worlds = [
+              "english",
+              "science",
+              "math",
+              "arabic",
+              "social",
+              "religion",
+              "ict",
+          ]
+          for world in worlds:
+              text = Path(f"lumina/worlds/{world}.py").read_text(encoding="utf-8")
+              assert "render_temporary_source_session" in text, world
+
+          source = Path("lumina/curriculum/source_session.py").read_text(encoding="utf-8")
+          assert "build_grounded_pdf" in source
+          assert "curriculum_prompt" in source
+          assert "اسألي من كتاب أو مذكرة في الجلسة الحالية" in source
+          print("Page-aware curriculum source sessions wired across all school worlds")
+          PY
+
+      - name: Streamlit AppTest home and navigation smoke
+        run: |
+          mkdir -p .streamlit
+          cat > .streamlit/secrets.toml <<'EOF'
+          GEMINI_API_KEY = ""
+          NOUR_APP_PIN = ""
+          PARENT_PIN = ""
+          NEON_DATABASE_URL = ""
+          NOUR_LEARNER_KEY = ""
+          EOF
+          python - <<'PY'
+          from streamlit.testing.v1 import AppTest
+
+          at = AppTest.from_file("app.py", default_timeout=20)
+          at.run()
+          if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
+              next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+              at.run()
+          assert not at.exception, at.exception
+          labels = [button.label for button in at.button]
+          for expected in [
+              "🔎 ابحثي في المنهج",
+              "📅 خطتي",
+              "🧪 تدريب سريع",
+              "📝 مراجعاتي",
+              "فتح لوحة وليّ الأمر",
+              "ابدئي مغامرة الإنجليزي",
+              "ادخلي معمل العلوم",
+              "ابدئي تحدّي الرياضيات",
+          ]:
+              assert expected in labels, (expected, labels)
+
+          next(button for button in at.button if button.label == "🔎 ابحثي في المنهج").click()
+          at.run()
+          assert not at.exception, at.exception
+          assert any("Curriculum" in markdown.value or "المنهج" in markdown.value for markdown in at.markdown)
+          print("Streamlit AppTest home/navigation smoke OK")
+          PY
+          rm -f .streamlit/secrets.toml
+
+      - name: Streamlit AppTest school world smoke
+        run: |
+          mkdir -p .streamlit
+          cat > .streamlit/secrets.toml <<'EOF'
+          GEMINI_API_KEY = ""
+          NOUR_APP_PIN = ""
+          PARENT_PIN = ""
+          NEON_DATABASE_URL = ""
+          NOUR_LEARNER_KEY = ""
+          EOF
+          python - <<'PY'
+          from streamlit.testing.v1 import AppTest
+
+          worlds = [
+              ("ابدئي مغامرة الإنجليزي", "مغامرة الإنجليزي"),
+              ("ادخلي معمل العلوم", "معمل العلوم"),
+              ("ابدئي تحدّي الرياضيات", "تحدّي الرياضيات"),
+              ("ادخلي عالم العربي", "عالم العربي"),
+              ("ابدئي مغامرة الدراسات", "مغامرة الدراسات"),
+              ("ابدئي رحلة الدين", "رحلة الدين"),
+              ("ادخلي معمل الكمبيوتر", "معمل الكمبيوتر"),
+          ]
+
+          for button_label, expected_title in worlds:
+              at = AppTest.from_file("app.py", default_timeout=20)
+              at.run()
+              if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
+                  next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+                  at.run()
+              assert not at.exception, (button_label, at.exception)
+
+              target = next(button for button in at.button if button.label == button_label)
+              target.click()
+              at.run()
+              assert not at.exception, (button_label, at.exception)
+
+              rendered = " ".join(
+                  [m.value for m in at.markdown]
+                  + [c.value for c in at.caption]
+                  + [i.value for i in at.info]
+              )
+              assert expected_title in rendered, (button_label, expected_title, rendered[:500])
+
+              back = next(button for button in at.button if button.label == "← العودة إلى عالم نور")
+              back.click()
+              at.run()
+              assert not at.exception, (button_label, "back", at.exception)
+
+          print("All school worlds open and return successfully")
+          PY
+          rm -f .streamlit/secrets.toml
+
+      - name: Streamlit AppTest learning flow smoke
+        run: |
+          mkdir -p .streamlit
+          cat > .streamlit/secrets.toml <<'EOF'
+          GEMINI_API_KEY = ""
+          NOUR_APP_PIN = ""
+          PARENT_PIN = ""
+          NEON_DATABASE_URL = ""
+          NOUR_LEARNER_KEY = ""
+          EOF
+          python - <<'PY'
+          from streamlit.testing.v1 import AppTest
+
+          flows = [
+              ("📅 خطتي", "الخطة الأسبوعية"),
+              ("🧪 تدريب سريع", "تدريب سريع"),
+              ("📝 مراجعاتي", "مراجعاتي"),
+              ("فتح لوحة وليّ الأمر", "لوحة وليّ الأمر"),
+          ]
+
+          for button_label, expected_text in flows:
+              at = AppTest.from_file("app.py", default_timeout=20)
+              at.run()
+              if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
+                  next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+                  at.run()
+              assert not at.exception, (button_label, at.exception)
+
+              target = next(button for button in at.button if button.label == button_label)
+              target.click()
+              at.run()
+              assert not at.exception, (button_label, at.exception)
+
+              rendered = " ".join(
+                  [m.value for m in at.markdown]
+                  + [c.value for c in at.caption]
+                  + [i.value for i in at.info]
+                  + [w.value for w in at.warning]
+              )
+              assert expected_text in rendered, (button_label, expected_text, rendered[:700])
+              if button_label == "فتح لوحة وليّ الأمر":
+                  assert "المصادر الدائمة" in rendered, rendered[:1200]
+
+              back = next(button for button in at.button if button.label == "← العودة إلى عالم نور")
+              back.click()
+              at.run()
+              assert not at.exception, (button_label, "back", at.exception)
+
+          print("Weekly, exam, review, and parent flows open and return successfully")
+          PY
+          rm -f .streamlit/secrets.toml
+
+      - name: Validate friendly contextual help system
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lumina.context_help import HELP_TEXTS, help_text
+
+          required = [
+              "curriculum_search",
+              "weekly_plan",
+              "exam_mode",
+              "review_center",
+              "daily_mission",
+              "english",
+              "science",
+              "math",
+              "arabic",
+              "social",
+              "religion",
+              "ict",
+              "ai",
+              "mastery",
+              "xp",
+              "streak",
+          ]
+          for key in required:
+              assert key in HELP_TEXTS, key
+              assert len(help_text(key)) >= 20, key
+
+          home = Path("lumina/home.py").read_text(encoding="utf-8")
+          assert "render_home_help()" in home
+          assert 'help=help_text("exam_mode")' in home
+          assert 'help=help_text(module.id)' in home
+
+          worlds = ["english", "science", "math", "arabic", "social", "religion", "ict"]
+          for world in worlds:
+              text = Path(f"lumina/worlds/{world}.py").read_text(encoding="utf-8")
+              assert f'render_context_help("{world}"' in text, world
+
+          print("Friendly contextual help is wired across Nour's main experience")
+          PY
+
+      - name: Validate learner-facing visual and copy guard
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          home = Path("lumina/home.py").read_text(encoding="utf-8")
+          theme = Path("lumina/theme.py").read_text(encoding="utf-8")
+          app = Path("app.py").read_text(encoding="utf-8")
+          quick = Path("lumina/quick_access.py").read_text(encoding="utf-8")
+          config = Path(".streamlit/config.toml").read_text(encoding="utf-8")
+
+          assert "nour-photo-wrap" in home
+          assert "nour-photo-glow" in theme
+          assert "width:190px" in theme
+          assert "filter:none" in theme
+          assert "nour_avatar_parts_v2" in home
+          assert "object-fit:cover" in theme
+          assert '[data-testid="stToolbar"]' in theme
+          assert 'toolbarMode = "viewer"' in config
+
+          learner_text = "\n".join([home, app, quick])
+          for forbidden in [
+              "Gemini API Key",
+              "Development branch",
+              "Parent Dashboard",
+              "Exam Mode",
+          ]:
+              assert forbidden not in learner_text, forbidden
+
+          print("Learner-facing visual and copy guard OK")
+          PY
+
+      - name: Validate approved Nour portrait asset
+        run: |
+          python - <<'PY'
+          import base64
+          import io
+          from pathlib import Path
+          from PIL import Image
+
+          parts_dir = Path("assets/nour_avatar_parts_v2")
+          names = ("00a.txt", "00b.txt", "02.txt", "03.txt", "04.txt", "05.txt", "06.txt", "07.txt")
+          parts = [parts_dir / name for name in names]
+          assert all(part.exists() for part in parts), parts
+          payload = "".join(part.read_text(encoding="utf-8").strip() for part in parts)
+          assert len(payload) == 25416, len(payload)
+          raw = base64.b64decode(payload, validate=True)
+          image = Image.open(io.BytesIO(raw))
+          image.verify()
+
+          image = Image.open(io.BytesIO(raw))
+          assert image.format == "JPEG"
+          assert image.size == (260, 325)
+          assert len(raw) > 15000
+          print("Approved Nour portrait asset OK:", image.size)
+          PY
+
+      - name: Validate El-Moasser batch source classification
+        run: |
+          python - <<'PY'
+          from lumina.parent_dashboard import _suggest_source_profile
+
+          cases = {
+              "Math G9 T1 P1 2027.pdf": ("math", "main_book", "شرح وتدريب"),
+              "Math G9 T1 P2 2027.pdf": ("math", "assessment_revision", "اختبارات ومراجعة"),
+              "Math G9 T1 P3 2027.pdf": ("math", "answer_guide", "مرجع تصحيح"),
+              "Prep 3 Main book معاصر ساينس ٣ ع ترم اول ٢٠٢٧.pdf": ("science", "main_book", "شرح وتدريب"),
+              "Prep3 Notebook.pdf": ("science", "revision_exam", "مراجعة وامتحانات"),
+              "El-Moasser English Guide Answers Prep 3 T1 2027.pdf": ("english", "answer_guide", "مرجع تصحيح"),
+          }
+
+          for filename, expected in cases.items():
+              profile = _suggest_source_profile(filename)
+              actual = (profile["subject"], profile["resource_use"], profile["resource_use_label"])
+              assert actual == expected, (filename, actual, expected)
+              assert profile["publisher"] == "المعاصر"
+              assert profile["edition_label"] == "2027"
+              assert profile["term_label"] == "Term 1"
+
+          print("El-Moasser batch classification OK")
+          PY
+
+      - name: Validate gentle adaptive learning scaffolding
+        run: |
+          python - <<'PY'
+          from lumina.learning.scaffolding import (
+              GENTLE_START,
+              BUILDING,
+              READY_CHALLENGE,
+              eligible_checks,
+              learning_stage,
+          )
+          from lumina.curriculum.science_unit1 import SCIENCE_U1_L1
+          from lumina.curriculum.math_unit1 import MATH_U1_L1
+
+          assert learning_stage([], []).id == GENTLE_START
+          assert learning_stage(
+              [{"check_id":"a","evidence_id":"a","correct":True}], []
+          ).id == BUILDING
+          assert learning_stage(
+              [
+                  {"check_id":"a","evidence_id":"a","correct":True},
+                  {"check_id":"b","evidence_id":"b","correct":True},
+              ],
+              [],
+          ).id == READY_CHALLENGE
+          assert learning_stage(
+              [{"check_id":"a","evidence_id":"a","correct":True}],
+              [{"check_id":"a","resolved":False}],
+          ).id == GENTLE_START
+
+          gentle_science = eligible_checks(SCIENCE_U1_L1, learning_stage([], []))
+          assert len(gentle_science) == 1
+          assert gentle_science[0].difficulty == 1
+
+          challenge_math = eligible_checks(
+              MATH_U1_L1,
+              learning_stage(
+                  [
+                      {"check_id":"a","evidence_id":"a","correct":True},
+                      {"check_id":"b","evidence_id":"b","correct":True},
+                  ],
+                  [],
+              ),
+          )
+          assert [item.difficulty for item in challenge_math] == [1, 2, 3]
+          print("Gentle adaptive scaffolding OK")
+          PY
+
+      - name: Audit question level and cognitive load
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import all_mapped_lessons
+
+          checked = 0
+          for lesson in all_mapped_lessons():
+              for check in lesson.checks:
+                  checked += 1
+                  assert check.difficulty in (1, 2, 3), (lesson.id, check.id)
+                  assert 2 <= len(check.options) <= 4, (lesson.id, check.id, len(check.options))
+                  assert check.hint.strip(), (lesson.id, check.id, "missing hint")
+                  assert len(check.prompt.split()) <= 40, (lesson.id, check.id, check.prompt)
+                  assert check.correct_index is not None, (lesson.id, check.id)
+          assert checked > 0
+          print(f"Question level audit OK: {checked} checks")
+          PY
+
+      - name: Validate creative Science and Maths prototypes
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.science_unit1 import SCIENCE_U1_L1
+          from lumina.curriculum.math_unit1 import MATH_U1_L1
+
+          for lesson in (SCIENCE_U1_L1, MATH_U1_L1):
+              assert [check.difficulty for check in lesson.checks[:3]] == [1, 2, 3]
+              assert [check.activity_kind for check in lesson.checks[:3]] == [
+                  "concept", "practice", "challenge"
+              ]
+          print("Creative gradual prototypes OK")
+          PY
+
+      - name: Validate supplementary source learning strategy
+        run: |
+          python - <<'PY'
+          from lumina.learning.source_strategy import (
+              choose_explanation_source,
+              choose_practice_source,
+              correction_references,
+              source_policy,
+          )
+          from lumina.curriculum.permanent_source_learning import _valid_practice
+
+          sources = [
+              {
+                  "active": True,
+                  "display_name": "Main",
+                  "metadata": {"resource_use": "main_book"},
+              },
+              {
+                  "active": True,
+                  "display_name": "Revision",
+                  "metadata": {"resource_use": "assessment_revision"},
+              },
+              {
+                  "active": True,
+                  "display_name": "Answers",
+                  "metadata": {"resource_use": "answer_guide"},
+              },
+          ]
+
+          assert choose_explanation_source(sources)["display_name"] == "Main"
+          assert choose_practice_source(sources)["display_name"] == "Revision"
+          refs = correction_references(sources)
+          assert [item["display_name"] for item in refs] == ["Answers"]
+          assert source_policy({"resource_use":"answer_guide"}).learner_visible is False
+          assert source_policy({"resource_use":"answer_guide"}).correction_reference is True
+
+          assert _valid_practice({
+              "supported": True,
+              "prompt": "Which idea fits?",
+              "options": ["A", "B", "C"],
+              "correct_index": 1,
+              "hint": "Think about the concept.",
+              "explanation": "B matches the source idea.",
+          })
+          assert not _valid_practice({
+              "supported": True,
+              "prompt": "Bad",
+              "options": ["A", "B"],
+              "correct_index": 0,
+              "hint": "x",
+              "explanation": "x",
+          })
+          print("Supplementary source learning strategy OK")
+          PY
+
+      - name: Validate gentle exam mode difficulty cap
+        run: |
+          python - <<'PY'
+          from lumina.exam_mode import _pick_checks
+          from lumina.curriculum.science_unit1 import SCIENCE_U1_L1
+
+          class EmptyStore:
+              def get_attempts(self):
+                  return []
+              def get_mistakes(self):
+                  return []
+
+          gentle = _pick_checks([SCIENCE_U1_L1], EmptyStore(), limit=5, max_difficulty=1)
+          gradual = _pick_checks([SCIENCE_U1_L1], EmptyStore(), limit=5, max_difficulty=2)
+          challenge = _pick_checks([SCIENCE_U1_L1], EmptyStore(), limit=5, max_difficulty=3)
+
+          assert [check.difficulty for _, check in gentle] == [1]
+          assert [check.difficulty for _, check in gradual] == [1, 2]
+          assert [check.difficulty for _, check in challenge] == [1, 2, 3]
+          print("Gentle exam difficulty cap OK")
+          PY
+
+      - name: Validate large curriculum upload settings
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import tomllib
+
+          config = tomllib.loads(Path(".streamlit/config.toml").read_text(encoding="utf-8"))
+          server = config.get("server", {})
+          assert int(server.get("maxUploadSize", 0)) >= 300
+          assert int(server.get("maxMessageSize", 0)) >= 300
+          print("Large curriculum upload settings OK")
+          PY
+
+      - name: Validate hands-on AI Lab missions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.worlds.ai_lab as ai_lab
+
+          source = Path("lumina/worlds/ai_lab.py").read_text(encoding="utf-8")
+          for label in (
+              "صلّحي الـPrompt",
+              "قارني إجابتين من AI",
+              "تحققي بالدليل",
+              "اكتبي Prompt من الصفر",
+              "محقق الذكاء الاصطناعي",
+              "ابني خطة تحقق",
+          ):
+              assert label in source, label
+
+          assert callable(ai_lab._fix_the_prompt)
+          assert callable(ai_lab._compare_ai_answers)
+          assert callable(ai_lab._verify_with_evidence)
+          assert callable(ai_lab._record_ai_attempt)
+          print("Hands-on AI Lab missions OK")
+          PY
+
+      - name: Validate AI Lab evidence rules
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("lumina/worlds/ai_lab.py").read_text(encoding="utf-8")
+          assert "الثقة مقابل الدليل" in source
+          assert "الإعلان الرسمي الحديث" in source
+          assert "جودة الـPrompt تساعد، لكنها لا تضمن صحة كل معلومة" in source
+          assert "activity_type=\"ai_answer_comparison\"" in source
+          assert "activity_type=\"ai_evidence_verification\"" in source
+          print("AI Lab evidence rules OK")
+          PY
+
+      - name: Validate adaptive Real English profile
+        run: |
+          python - <<'PY'
+          from lumina.learning.english_profile import (
+              BASELINE_ITEMS,
+              score_baseline,
+              support_level,
+              support_instruction,
+          )
+
+          perfect = {item["id"]: item["correct_index"] for item in BASELINE_ITEMS}
+          result = score_baseline(perfect)
+          assert result.correct == len(BASELINE_ITEMS)
+          assert result.skill_scores["Vocabulary"]["correct"] == 1
+          assert result.skill_scores["Grammar"]["total"] == 2
+          assert support_level({"broad_band": "Foundation"}) == "high"
+          assert support_level({"broad_band": "Developing"}) == "medium"
+          assert support_level({"broad_band": "Independent-start"}) == "light"
+          assert "Arabic" in support_instruction({"broad_band": "Foundation"})
+          print("Adaptive Real English profile OK")
+          PY
+
+      - name: Validate Real English activity coverage
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("lumina/worlds/english.py").read_text(encoding="utf-8")
+          for label in (
+              "تحديد نقطة البداية",
+              "قراءة وفهم",
+              "كتابة قصيرة",
+              "محادثة واقعية",
+              "كلمات في سياق",
+          ):
+              assert label in source, label
+
+          assert "Reading Detective" in source
+          assert "support_instruction(profile)" in source
+          print("Real English activity coverage OK")
+          PY
+
+      - name: Validate durable AI literacy profile
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.worlds.ai_lab as ai_lab
+          from lumina.persistence.profile_state import PROFILE_KEYS
+
+          assert "ai_profile" in PROFILE_KEYS
+          assert ai_lab.AI_SKILL_LABELS["prompting"] == "Prompting"
+          assert ai_lab.ACTIVITY_SKILL["ai_answer_comparison"] == ("comparison",)
+          assert ai_lab.ACTIVITY_SKILL["ai_evidence_verification"] == ("verification", "evidence")
+
+          dashboard = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert "تقدّم مهارات AI" in dashboard
+          assert "تقييم جودة الدليل" in dashboard
+          print("Durable AI literacy profile OK")
+          PY
+
+      - name: Validate parent Real English skill detail
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert "تفصيل المهارات المبدئي" in source
+          assert "Vocabulary" in Path("lumina/learning/english_profile.py").read_text(encoding="utf-8")
+          assert "skill_scores" in source
+          print("Parent Real English skill detail OK")
+          PY
+
+      - name: Validate adaptive Real English focus recommendation
+        run: |
+          python - <<'PY'
+          from lumina.learning.english_profile import recommended_focus
+
+          label, reason = recommended_focus({})
+          assert label == "تحديد نقطة البداية"
+          assert reason
+
+          label, reason = recommended_focus({
+              "skill_scores": {
+                  "Reading": {"correct": 0, "total": 1},
+                  "Vocabulary": {"correct": 1, "total": 1},
+              }
+          })
+          assert label == "قراءة وفهم"
+          assert "الاستنتاج" in reason or "المعنى" in reason
+
+          label, reason = recommended_focus({
+              "skill_scores": {
+                  "Speaking/Use": {"correct": 0, "total": 1},
+                  "Reading": {"correct": 1, "total": 1},
+              }
+          })
+          assert label == "محادثة واقعية"
+          print("Adaptive Real English focus recommendation OK")
+          PY
+
+      - name: Validate parent AI not-started states
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert "لسه مفيش دليل تعلم مسجل" in source
+          assert "أول ما نور تبدأ تحديات AI" in source
+          print("Parent AI not-started states OK")
+          PY
+
+      - name: Validate trusted source save confirmation survives rerun
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert "trusted_source_last_save_result" in source
+          assert "تم الحفظ بنجاح" in source
+          assert "تم منع التكرار تلقائيًا" in source
+          print("Trusted source save confirmation rerun contract OK")
+          PY
+
+      - name: Streamlit AppTest full learning transaction
+        run: |
+          mkdir -p .streamlit
+          cat > .streamlit/secrets.toml <<'EOF'
+          GEMINI_API_KEY = ""
+          NOUR_APP_PIN = ""
+          PARENT_PIN = ""
+          NEON_DATABASE_URL = ""
+          NOUR_LEARNER_KEY = ""
+          EOF
+          python - <<'PY'
+          from streamlit.testing.v1 import AppTest
+
+          at = AppTest.from_file("app.py", default_timeout=30)
+          at.run()
+          if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
+              next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+              at.run()
+          assert not at.exception, at.exception
+
+          next(b for b in at.button if b.label == "ادخلي معمل العلوم").click()
+          at.run()
+          assert not at.exception, at.exception
+
+          science_q = next(
+              r for r in at.radio
+              if "Which rule best matches average speed" in r.label
+          )
+          science_q.set_value("Average speed = total time ÷ total distance")
+          next(b for b in at.button if b.label == "أجرب إجابتي").click()
+          at.run()
+          assert not at.exception, at.exception
+          assert any("نحتاجين نفك الفكرة" in w.value or "عادي جدًا" in w.value for w in at.warning), [w.value for w in at.warning]
+
+          next(b for b in at.button if b.label == "← العودة إلى عالم نور").click()
+          at.run()
+          next(b for b in at.button if b.label == "📝 مراجعاتي").click()
+          at.run()
+          assert not at.exception, at.exception
+
+          retry = next(
+              r for r in at.radio
+              if "Which rule best matches average speed" in r.label
+          )
+          retry.set_value("Average speed = total distance ÷ total time")
+          next(b for b in at.button if b.label == "راجعت وجربت تاني").click()
+          at.run()
+          assert not at.exception, at.exception
+          rendered = " ".join(
+              [m.value for m in at.markdown]
+              + [s.value for s in at.success]
+              + [c.value for c in at.caption]
+          )
+          assert "مفيش مراجعات مستحقة" in rendered or "المراجعة اتقفلت" in rendered, rendered[:1500]
+          assert int(at.session_state["xp"]) >= 10
+          print("Full learning transaction OK")
+          PY
+          rm -f .streamlit/secrets.toml
+
+      - name: Streamlit AppTest AI literacy transaction
+        run: |
+          mkdir -p .streamlit
+          cat > .streamlit/secrets.toml <<'EOF'
+          GEMINI_API_KEY = ""
+          NOUR_APP_PIN = ""
+          PARENT_PIN = ""
+          NEON_DATABASE_URL = ""
+          NOUR_LEARNER_KEY = ""
+          EOF
+          python - <<'PY'
+          from streamlit.testing.v1 import AppTest
+
+          at = AppTest.from_file("app.py", default_timeout=30)
+          at.run()
+          if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
+              next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+              at.run()
+          next(b for b in at.button if b.label == "ادخلي عالم الذكاء الاصطناعي").click()
+          at.run()
+          assert not at.exception, at.exception
+
+          mode = next(r for r in at.radio if r.label == "اختاري تحدّي")
+          mode.set_value("⚖️ قارني إجابتين من AI")
+          at.run()
+          assert not at.exception, at.exception
+
+          next(r for r in at.radio if r.label == "مين الإجابة الأفضل؟").set_value("B")
+          next(r for r in at.radio if r.label == "إيه أهم سبب؟").set_value(
+              "لأنها بتعترف بعدم اليقين وبتطلب دليل قبل الاعتماد."
+          )
+          next(b for b in at.button if b.label == "أكشف النتيجة").click()
+          at.run()
+          assert not at.exception, at.exception
+
+          profile = at.session_state["ai_profile"]
+          assert profile["skills"]["comparison"]["attempts"] == 1
+          assert profile["skills"]["comparison"]["correct"] == 1
+          assert profile["completed_skills"] >= 1
+          assert int(at.session_state["xp"]) >= 10
+          print("AI literacy transaction OK")
+          PY
+          rm -f .streamlit/secrets.toml
+
+      - name: Streamlit AppTest Real English baseline transaction
+        run: |
+          mkdir -p .streamlit
+          cat > .streamlit/secrets.toml <<'EOF'
+          GEMINI_API_KEY = ""
+          NOUR_APP_PIN = ""
+          PARENT_PIN = ""
+          NEON_DATABASE_URL = ""
+          NOUR_LEARNER_KEY = ""
+          EOF
+          python - <<'PY'
+          from streamlit.testing.v1 import AppTest
+          from lumina.learning.english_profile import BASELINE_ITEMS
+
+          at = AppTest.from_file("app.py", default_timeout=30)
+          at.run()
+          if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
+              next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+              at.run()
+          next(b for b in at.button if b.label == "ابدئي مغامرة الإنجليزي").click()
+          at.run()
+          assert not at.exception, at.exception
+
+          mode = next(r for r in at.radio if r.label == "اختاري تدريب")
+          mode.set_value("تحديد نقطة البداية")
+          at.run()
+
+          for item in BASELINE_ITEMS:
+              label = f"{item['skill']} · {item['prompt']}"
+              radio = next(r for r in at.radio if r.label == label)
+              radio.set_value(item["options"][item["correct_index"]])
+
+          next(b for b in at.button if b.label == "اعرضي نقطة البداية").click()
+          at.run()
+          assert not at.exception, at.exception
+
+          profile = at.session_state["english_profile"]
+          assert profile["baseline_correct"] == len(BASELINE_ITEMS)
+          assert profile["broad_band"] == "Independent-start"
+          assert profile["skill_scores"]["Vocabulary"]["correct"] == 1
+          print("Real English baseline transaction OK")
+          PY
+          rm -f .streamlit/secrets.toml
+
+      - name: Validate mobile-first release CSS
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          css = Path("lumina/theme.py").read_text(encoding="utf-8")
+          assert "@media (max-width:640px)" in css
+          assert ".block-container{padding-left:.8rem;padding-right:.8rem" in css
+          assert ".nour-photo-wrap{width:148px" in css
+          assert ".nour-photo-glow{width:148px;height:185px" in css
+          assert ".stButton>button" in css and "min-height:46px" in css
+          assert '[data-testid="stToolbar"]' in css
+          print("Mobile-first release CSS OK")
+          PY
+
+      - name: Validate Real English activity evidence persistence
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.worlds.english as english
+
+          assert callable(english._record_real_english_evidence)
+          source = Path("lumina/worlds/english.py").read_text(encoding="utf-8")
+          for token in (
+              "real_english_reading_inference",
+              "real_english_writing_practice",
+              "real_english_conversation_practice",
+              "real_english_vocabulary_practice",
+              "activity_evidence",
+          ):
+              assert token in source, token
+
+          parent = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert "نشاط Real English الفعلي" in parent
+          print("Real English activity evidence persistence OK")
+          PY
+
+      - name: Validate source object integrity contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lumina.curriculum.trusted_source_storage import NeonTrustedSourceStorage
+
+          assert callable(NeonTrustedSourceStorage.object_size)
+          parent = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert "اختبر سلامة الملفات المحفوظة" in parent
+          assert "سلامة التخزين مؤكدة" in parent
+          print("Source object integrity contract OK")
+          PY
+
+      - name: Validate backup restores extended profiles
+        run: |
+          python - <<'PY'
+          from lumina.persistence.backup import PROFILE_KEYS
+
+          assert "english_profile" in PROFILE_KEYS
+          assert "ai_profile" in PROFILE_KEYS
+          assert "daily_mission_lesson_id" in PROFILE_KEYS
+          assert "daily_mission_date" in PROFILE_KEYS
+          print("Extended profile backup contract OK")
+          PY
+
+      - name: Validate installed app title
+        run: |
+          python - <<'PY'
+          from lumina.config import APP_TITLE, BUILD_LABEL
+
+          assert APP_TITLE == "LUMINA NOUR"
+          assert BUILD_LABEL == "RC-2026.09.30-C"
+          print("Installed app title OK")
+          PY
+
+      - name: Validate mapped unit sequence against source inventory
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM
+
+          expected = {
+              "english": [
+                  "Term 1 · Personal Identity",
+                  "Term 1 · Communication with Family and Friends",
+                  "Term 1 · Artificial Intelligence",
+                  "Term 1 · Review 1",
+                  "Term 1 · Screen Time",
+                  "Term 1 · Design Thinking",
+                  "Term 1 · Why Do We Like Stories?",
+                  "Term 1 · Review 2",
+              ],
+              "science": [
+                  "Term 1 · Force and Motion",
+                  "Term 1 · Light Energy",
+                  "Term 1 · Universe and Solar System",
+                  "Term 1 · Reproduction and Species Continuity",
+              ],
+              "math": [
+                  "Term 1 · Relations and Functions",
+                  "Term 1 · Ratio and Variation",
+                  "Term 1 · Statistics",
+                  "Term 1 · Trigonometry",
+                  "Term 1 · Coordinate Geometry",
+              ],
+              "arabic": [
+                  "Term 1 · قيم تحمي شبابنا",
+                  "Term 1 · نحو تفكير سليم",
+                  "Term 1 · أنا والمستقبل",
+              ],
+              "social": [
+                  "Term 1 · الملامح الطبيعية والحضارية لقارات العالم الجديد",
+                  "Term 1 · مصر في عصر محمد علي وخلفائه",
+                  "Term 1 · النظم البيئية في قارات العالم الجديد",
+                  "Term 1 · الحركة الوطنية في مواجهة الاحتلال البريطاني",
+              ],
+              "religion": [
+                  "Term 1 · قيم الإسلام في بناء الفرد والمجتمع",
+                  "Term 1 · الإسلام دين وحياة",
+                  "Term 1 · تحمل المسئولية في الإسلام",
+              ],
+          }
+
+          for subject, sequence in expected.items():
+              actual = [name for name in MAPPED_CURRICULUM[subject] if name.startswith("Term 1")]
+              assert actual[:len(sequence)] == sequence, (subject, actual, sequence)
+
+          print("Mapped unit sequence matches source inventory")
+          PY
+
+      - name: Validate daily mission does not jump ahead in new learning
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM
+          from lumina.learning.missions import choose_mission
+
+          class EmptyStore:
+              def get_reviews(self, status=None):
+                  return []
+              def get_attempts(self, lesson_id=None):
+                  return []
+              def get_mistakes(self, lesson_id=None, unresolved_only=False):
+                  return []
+
+          mission = choose_mission(EmptyStore())
+          assert mission is not None
+
+          subject_lessons = [
+              lesson
+              for lessons in MAPPED_CURRICULUM[mission.module_id].values()
+              for lesson in lessons
+          ]
+          assert mission.lesson_id == subject_lessons[0].id, (
+              mission.module_id, mission.lesson_id, subject_lessons[0].id
+          )
+          assert "ترتيب المنهج" in mission.reason
+          print("Daily mission respects first unfinished lesson in selected subject")
+          PY
+
+      - name: Validate lesson order follows source pages
+        run: |
+          python - <<'PY'
+          import re
+          from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM
+
+          def first_page(text):
+              nums = [int(x) for x in re.findall(r"\d+", str(text))]
+              return nums[0] if nums else None
+
+          checked = 0
+          for subject, units in MAPPED_CURRICULUM.items():
+              for unit_name, lessons in units.items():
+                  pages = [first_page(lesson.source_pages) for lesson in lessons]
+                  pages = [p for p in pages if p is not None]
+                  if len(pages) >= 2:
+                      checked += 1
+                      assert pages == sorted(pages), (subject, unit_name, pages)
+          assert checked >= 10
+          print(f"Lesson source-page order OK across {checked} multi-lesson units")
+          PY
+
+      - name: Validate exact Science Math ICT topic sequence
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.science_unit1 import SCIENCE_UNIT1_LESSONS
+          from lumina.curriculum.science_unit2 import SCIENCE_UNIT2_LESSONS
+          from lumina.curriculum.science_unit3 import SCIENCE_UNIT3_LESSONS
+          from lumina.curriculum.science_unit4 import SCIENCE_UNIT4_LESSONS
+          from lumina.curriculum.science_t2_unit1 import SCIENCE_T2_UNIT1_LESSONS
+          from lumina.curriculum.science_t2_unit2 import SCIENCE_T2_UNIT2_LESSONS
+          from lumina.curriculum.science_t2_unit3 import SCIENCE_T2_UNIT3_LESSONS
+          from lumina.curriculum.math_unit1 import MATH_UNIT1_LESSONS
+          from lumina.curriculum.math_unit2 import MATH_UNIT2_LESSONS
+          from lumina.curriculum.math_unit3 import MATH_UNIT3_LESSONS
+          from lumina.curriculum.math_unit4 import MATH_UNIT4_LESSONS
+          from lumina.curriculum.math_unit5 import MATH_UNIT5_LESSONS
+          from lumina.curriculum.ict_chapter1 import ICT_CHAPTER1_LESSONS
+          from lumina.curriculum.ict_chapter2 import ICT_CHAPTER2_LESSONS
+          from lumina.curriculum.ict_chapter3 import ICT_CHAPTER3_LESSONS
+          from lumina.curriculum.ict_chapter4 import ICT_CHAPTER4_LESSONS
+
+          def titles(items):
+              return [item.title for item in items]
+
+          assert titles(SCIENCE_UNIT1_LESSONS) == [
+              "Motion in One Direction",
+              "Graphic Representation of Motion in a Straight Line",
+              "Physical Quantities: Scalars and Vectors",
+          ]
+          assert titles(SCIENCE_UNIT2_LESSONS) == ["Mirrors", "Lenses"]
+          assert titles(SCIENCE_UNIT3_LESSONS) == ["The Universe and the Solar System"]
+          assert titles(SCIENCE_UNIT4_LESSONS) == ["Cell Division", "Sexual and Asexual Reproduction"]
+          assert titles(SCIENCE_T2_UNIT1_LESSONS) == ["Chemical Reactions", "Rate of the Chemical Reaction"]
+          assert titles(SCIENCE_T2_UNIT2_LESSONS) == [
+              "Physical Properties of the Electric Current",
+              "The Electric Current and Cells",
+              "Radioactivity and Nuclear Energy",
+          ]
+          assert titles(SCIENCE_T2_UNIT3_LESSONS) == ["The Main Principles of Heredity"]
+
+          assert titles(MATH_UNIT1_LESSONS) == ["Cartesian Product", "Relations", "Functions (Mapping)", "Polynomial Functions"]
+          assert titles(MATH_UNIT2_LESSONS) == ["Ratio", "Proportion", "Direct Variation and Inverse Variation"]
+          assert titles(MATH_UNIT3_LESSONS) == ["Collecting Data", "Dispersion"]
+          assert titles(MATH_UNIT4_LESSONS) == [
+              "The Main Trigonometrical Ratios of the Acute Angle",
+              "The Main Trigonometrical Ratios of Some Angles",
+          ]
+          assert titles(MATH_UNIT5_LESSONS) == [
+              "Distance Between Two Points",
+              "The Two Coordinates of the Midpoint Segment",
+              "The Slope of the Straight Line",
+              "The Equation of the Straight Line Given Its Slope and Its y-Intercept",
+          ]
+
+          assert titles(ICT_CHAPTER1_LESSONS) == ["Data Types", "Constants and Variables", "Assignment Statement", "Operator Precedence", "Errors"]
+          assert titles(ICT_CHAPTER2_LESSONS) == ["If Then", "If Then Else", "Select Case"]
+          assert titles(ICT_CHAPTER3_LESSONS) == ["For Next", "Do While", "Procedure", "Function"]
+          assert titles(ICT_CHAPTER4_LESSONS) == ["Cyber Bullying"]
+          print("Exact Science/Math/ICT topic sequence OK")
+          PY
+
+      - name: Validate Science sequence note is visible
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          source = Path("lumina/worlds/science.py").read_text(encoding="utf-8")
+          assert "Science, Technology and Society" in source
+          assert "ترتيب الكتاب محفوظ كما هو" in source
+          print("Science sequence note OK")
+          PY
+
+      - name: Validate first-day educational experience
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          home = Path("lumina/home.py").read_text(encoding="utf-8")
+          quick = Path("lumina/quick_access.py").read_text(encoding="utf-8")
+          ai = Path("lumina/worlds/ai_lab.py").read_text(encoding="utf-8")
+
+          assert "ONBOARDING_VERSION = 2" in home
+          assert 'int(st.session_state.get("onboarding_version", 0)) < ONBOARDING_VERSION' in home
+          assert 'int(st.session_state.get("onboarding_version", 0)) < 2' in quick
+          assert "✨ اصنعي فكرة برنامج مع AI" in ai
+          assert "idea_to_prototype_plan" in ai
+          assert "real apps still need testing and iteration" in ai
+          print("First-day educational experience OK")
+          PY
+
+      - name: Validate automatic planning stays in Term 1
+        run: |
+          python - <<'PY'
+          from lumina.learning.missions import choose_mission
+          from lumina.learning.weekly_plan import build_weekly_plan
+          from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM
+
+          class EmptyStore:
+              def get_reviews(self, status=None): return []
+              def get_attempts(self, lesson_id=None): return []
+              def get_mistakes(self, lesson_id=None, unresolved_only=False): return []
+
+          store = EmptyStore()
+          mission = choose_mission(store)
+          assert mission is not None
+          unit_name = next(
+              name for name, lessons in MAPPED_CURRICULUM[mission.module_id].items()
+              if any(lesson.id == mission.lesson_id for lesson in lessons)
+          )
+          assert unit_name.startswith("Term 1"), unit_name
+          assert mission.module_id != "ict"
+
+          plan = build_weekly_plan(store, limit=5)
+          assert plan
+          for item in plan:
+              assert item.module_id != "ict"
+              unit_name = next(
+                  name for name, lessons in MAPPED_CURRICULUM[item.module_id].items()
+                  if any(lesson.id == item.lesson_id for lesson in lessons)
+              )
+              assert unit_name.startswith("Term 1"), (item.module_id, unit_name)
+          print("Automatic planning Term 1 only OK")
+          PY
+
+      - name: Validate Real English baseline answer-position balance
+        run: |
+          python - <<'PY'
+          from lumina.learning.english_profile import BASELINE_ITEMS, score_baseline
+
+          indices = [item["correct_index"] for item in BASELINE_ITEMS]
+          assert len(set(indices)) >= 3, indices
+          assert max(indices.count(i) for i in set(indices)) <= 3, indices
+          answers = {item["id"]: item["correct_index"] for item in BASELINE_ITEMS}
+          result = score_baseline(answers)
+          assert result.correct == result.total == len(BASELINE_ITEMS)
+          print("Real English baseline answer positions OK")
+          PY
+
+      - name: Validate recall cannot create mastery
+        run: |
+          python - <<'PY'
+          from lumina.learning.progress import derive_mastery, MASTERED
+
+          attempts = [
+              {
+                  "lesson_id": "x",
+                  "check_id": f"recall-{i}",
+                  "evidence_id": f"recall-{i}",
+                  "correct": True,
+                  "mastery_eligible": False,
+              }
+              for i in range(5)
+          ]
+          snapshot = derive_mastery(attempts, [])
+          assert snapshot.state != MASTERED
+          assert snapshot.distinct_evidence == 0
+          print("Recall-only evidence cannot create mastery")
+          PY
+
+      - name: Validate Social Studies source titles
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.social_unit2 import SOCIAL_U2_LESSONS
+          from lumina.curriculum.social_unit3 import SOCIAL_U3_LESSONS
+          from lumina.curriculum.social_unit4 import SOCIAL_U4_LESSONS
+
+          assert SOCIAL_U2_LESSONS[2].title == "مصر في عصر خلفاء محمد علي"
+          assert SOCIAL_U3_LESSONS[0].title == "نظم الغابات والحشائش في قارات العالم الجديد"
+          assert SOCIAL_U4_LESSONS[0].title == "الثورة العرابية وبداية الاحتلال البريطاني لمصر"
+          assert SOCIAL_U4_LESSONS[1].title.startswith("كفاح الحركة الوطنية وبناء الوعي الوطني")
+          print("Social Studies source titles OK")
+          PY
+
+      - name: Validate age-appropriate assessment language
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import all_mapped_lessons
+
+          forbidden = (
+              "ترتيب الحروف",
+              "لون الخريطة",
+              "أطول اسم",
+              "بناء الأهرامات",
+              "تواريخ الحكام فقط",
+              "أسماء العواصم فقط",
+          )
+          for lesson in all_mapped_lessons():
+              for check in lesson.checks:
+                  joined = " ".join([check.prompt, check.hint, *check.options])
+                  for phrase in forbidden:
+                      assert phrase not in joined, (lesson.id, check.id, phrase)
+          print("Age-appropriate distractor guard OK")
+          PY
+
+      - name: Validate recall stays non-mastery after persistence
+        run: |
+          python - <<'PY'
+          from lumina.learning.progress import derive_mastery, MASTERED
+          from lumina.learning.scaffolding import learning_stage, READY_CHALLENGE
+
+          attempts = [
+              {
+                  "check_id": f"r{i}",
+                  "evidence_id": f"r{i}",
+                  "correct": True,
+                  "activity_type": "lesson_recall",
+              }
+              for i in range(5)
+          ]
+          assert derive_mastery(attempts, []).state != MASTERED
+          assert learning_stage(attempts, []).id != READY_CHALLENGE
+          print("Persisted recall evidence stays non-mastery")
+          PY
+
+      - name: Validate onboarding version contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.home as home
+          from lumina.persistence.profile_state import PROFILE_KEYS
+
+          assert home.ONBOARDING_VERSION >= 2
+          assert "onboarding_version" in PROFILE_KEYS
+          session = Path("lumina/session_state.py").read_text(encoding="utf-8")
+          backup = Path("lumina/persistence/backup.py").read_text(encoding="utf-8")
+          assert '"onboarding_version": 0' in session
+          assert '"onboarding_version"' in backup
+          print("Versioned onboarding contract OK")
+          PY
+
+      - name: Validate balanced presented answer positions
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from lumina.curriculum.mapped_curriculum import all_mapped_lessons
+          from lumina.learning.question_presentation import (
+              correct_answer_text,
+              is_correct_answer,
+              presented_options,
+          )
+
+          positions = Counter()
+          total = 0
+          for lesson in all_mapped_lessons():
+              for check in lesson.checks:
+                  shown = presented_options(check)
+                  correct = correct_answer_text(check)
+                  assert correct in shown, (lesson.id, check.id)
+                  assert is_correct_answer(check, correct)
+                  positions[shown.index(correct)] += 1
+                  total += 1
+
+          assert total >= 100, total
+          assert len(positions) >= 3, positions
+          largest = max(positions.values())
+          assert largest / total < 0.55, (positions, total)
+          print("Presented answer positions balanced:", dict(positions))
+          PY
+
+      - name: Validate learner-driven Real English evidence
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("lumina/worlds/english.py").read_text(encoding="utf-8")
+          assert 'profile = dict(st.session_state.get("english_profile") or {})' in source
+          assert 'if answer.strip():' in source
+          assert 'لما تردّي بنفسك بالإنجليزي' in source
+          assert 'english_world_vocab_use' in source
+          assert 'راجعي استخدامي' in source
+          assert source.index('english_world_vocab_use') < source.index(
+              'activity_type="real_english_vocabulary_practice"'
+          )
+          print("Learner-driven Real English evidence OK")
+          PY
+
+      - name: Validate AI creation is completion not correctness
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.worlds.ai_lab as ai_lab
+
+          assert ai_lab.ACTIVITY_SKILL["ai_app_idea"] == ("creation",)
+          source = Path("lumina/worlds/ai_lab.py").read_text(encoding="utf-8")
+          assert '"correct": None' in source
+          assert 'activity_type="ai_creation"' in source
+          parent = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert "نشاط إنشاء مكتمل" in parent
+          print("AI creation completion semantics OK")
+          PY
+
+      - name: Validate recall stays gentle after success
+        run: |
+          python - <<'PY'
+          from lumina.learning.scaffolding import learning_stage, GENTLE_START
+          from lumina.learning.progress import derive_mastery
+
+          attempts = [{
+              "check_id": "recall-one",
+              "evidence_id": "recall-one",
+              "correct": True,
+              "activity_type": "lesson_recall",
+          }]
+          assert learning_stage(attempts, []).id == GENTLE_START
+          snapshot = derive_mastery(attempts, [])
+          assert snapshot.distinct_evidence == 0
+          print("Recall success remains gentle and non-mastery")
+          PY
+
+      - name: Validate quick training correct-answer transaction
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.science_unit1 import SCIENCE_U1_L1
+          from lumina.learning.question_presentation import presented_options, correct_answer_text, is_correct_answer
+
+          check = SCIENCE_U1_L1.checks[0]
+          shown = presented_options(check)
+          correct = correct_answer_text(check)
+          assert correct in shown
+          learner_choice = correct
+          assert is_correct_answer(check, learner_choice) is True
+          assert not is_correct_answer(check, next(option for option in shown if option != correct))
+          print("Quick training answer transaction OK")
+          PY

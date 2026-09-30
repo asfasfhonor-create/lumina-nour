@@ -1,3 +1,6 @@
 streamlit
 google-genai
 pillow
+psycopg[binary]
+
+boto3

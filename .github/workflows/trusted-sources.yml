@@ -1,0 +1,139 @@
+name: Trusted Source Contracts
+
+on:
+  push:
+    branches:
+      - feature/nour-mobile-ui
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  trusted-source-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install trusted-source dependencies
+        run: pip install -r requirements.txt
+      - name: Validate trusted-source model
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.trusted_sources import (
+              SourceUpload,
+              TRUSTED,
+              build_trusted_record,
+              NEON_OBJECT_STORAGE,
+              TRUSTED_SOURCE_BUCKET,
+              SOURCE_ROLE_OFFICIAL,
+              SOURCE_ROLE_SUPPLEMENTARY,
+              source_role_priority,
+          )
+
+          upload = SourceUpload(
+              filename="../Science.pdf",
+              mime_type="application/pdf",
+              data=b"%PDF-1.7 trusted fixture",
+          )
+          assert upload.filename == "Science.pdf"
+          assert NEON_OBJECT_STORAGE == "neon_object_storage"
+          assert TRUSTED_SOURCE_BUCKET == "lumina-trusted-sources"
+          assert len(upload.digest) == 64
+
+          record = build_trusted_record(
+              upload,
+              learner_key="nour",
+              display_name="Science Book",
+              subject="science",
+              term_label="T1",
+              storage_provider="test-provider",
+              storage_key="sources/science.pdf",
+              source_role=SOURCE_ROLE_SUPPLEMENTARY,
+              publisher="El Moasser",
+              edition_label="2026",
+          )
+          assert record.trust_status == TRUSTED
+          assert record.source_role == SOURCE_ROLE_SUPPLEMENTARY
+          assert record.priority == source_role_priority(SOURCE_ROLE_SUPPLEMENTARY)
+          assert record.metadata["publisher"] == "El Moasser"
+          assert record.metadata["edition_label"] == "2026"
+          assert source_role_priority(SOURCE_ROLE_OFFICIAL) > record.priority
+          assert record.source_id.startswith("src_")
+          assert record.sha256 == upload.digest
+          assert record.size_bytes == len(upload.data)
+
+          try:
+              SourceUpload(filename="empty.pdf", mime_type="application/pdf", data=b"")
+          except ValueError:
+              pass
+          else:
+              raise AssertionError("empty uploads must be rejected")
+
+          try:
+              SourceUpload(filename="notes.exe", mime_type="application/octet-stream", data=b"x")
+          except ValueError:
+              pass
+          else:
+              raise AssertionError("unsupported uploads must be rejected")
+
+          print("Trusted source contracts OK")
+          PY
+
+      - name: Validate Neon source catalog schema
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          sql = Path("neon/lumina_schema.sql").read_text(encoding="utf-8")
+          assert "lumina_trusted_sources" in sql
+          assert "unique (learner_key, sha256)" in sql
+          assert "storage_provider" in sql
+          assert "storage_key" in sql
+          print("Trusted source schema OK")
+          PY
+
+      - name: Validate trusted source storage adapter
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.trusted_source_storage import StorageConfig, NeonTrustedSourceStorage
+          from lumina.curriculum.trusted_sources import SourceUpload, TRUSTED_SOURCE_BUCKET
+
+          config = StorageConfig.from_mapping({
+              "AWS_ENDPOINT_URL_S3": "https://example.invalid",
+              "AWS_ACCESS_KEY_ID": "nak_live_test",
+              "AWS_SECRET_ACCESS_KEY": "nsk_live_test",
+              "AWS_REGION": "eu-central-1",
+          })
+          assert config is not None
+          assert config.bucket == TRUSTED_SOURCE_BUCKET
+
+          storage = NeonTrustedSourceStorage(config)
+          upload = SourceUpload(
+              filename="../Science Notes.pdf",
+              mime_type="application/pdf",
+              data=b"%PDF-1.7 trusted source fixture",
+          )
+          key = storage.object_key(upload, learner_key="nour")
+          assert key.startswith("nour/")
+          assert key.endswith("/Science Notes.pdf")
+
+          assert StorageConfig.from_mapping({}) is None
+          print("Trusted source storage adapter OK")
+          PY
+
+      - name: Validate curriculum source hierarchy
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.catalog import get_sources
+          from lumina.curriculum.models import SOURCE_ROLE_OFFICIAL, SOURCE_ROLE_SUPPLIED
+
+          science = get_sources("science")
+          math = get_sources("math")
+          ict = get_sources("ict")
+          assert science and all(source.source_role == SOURCE_ROLE_OFFICIAL for source in science)
+          assert math and all(source.source_role == SOURCE_ROLE_OFFICIAL for source in math)
+          assert ict and ict[0].source_role == SOURCE_ROLE_SUPPLIED
+          assert science[0].priority > ict[0].priority
+          print("Curriculum source hierarchy OK")
+          PY

@@ -60,6 +60,7 @@ def learning_stage(attempts: list[dict], mistakes: list[dict]) -> LearningStage:
         item for item in attempts
         if item.get("correct") is True
         and item.get("mastery_eligible", True) is not False
+        and not str(item.get("activity_type") or "").endswith("_recall")
     ]
     distinct_correct = {
         str(item.get("evidence_id") or item.get("check_id") or "")

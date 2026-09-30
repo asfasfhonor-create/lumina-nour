@@ -14,6 +14,8 @@ create table if not exists lumina_learning_attempts (
     correct boolean,
     source_pages text,
     activity_type text,
+    cognitive_kind text not null default 'concept',
+    mastery_eligible boolean not null default true,
     created_at timestamptz not null default now()
 );
 
@@ -97,3 +99,11 @@ create table if not exists lumina_trusted_sources (
 
 create index if not exists lumina_trusted_sources_lookup_idx
     on lumina_trusted_sources (learner_key, subject, active, updated_at);
+
+
+-- Safe forward migration for existing LUMINA databases.
+alter table lumina_learning_attempts
+    add column if not exists cognitive_kind text not null default 'concept';
+
+alter table lumina_learning_attempts
+    add column if not exists mastery_eligible boolean not null default true;

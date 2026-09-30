@@ -405,7 +405,8 @@ def _render_trusted_sources() -> None:
             label = source.title if source is not None else item.filename
             subject_label = SUBJECT_LABELS.get(item.subject_id, item.subject_id)
             if item.ready:
-                st.write(f"✅ **{subject_label}** — {label}")
+                suffix = " · هوية أساسية مؤكدة" if item.resolution == "canonical" else " · مطابق بالاسم فقط"
+                st.write(f"✅ **{subject_label}** — {label}{suffix}")
             elif item.reason == "source_needs_current_year_verification":
                 st.write(f"⚠️ **{subject_label}** — {label} · يحتاج تحقق من تغطية السنة الحالية")
             else:

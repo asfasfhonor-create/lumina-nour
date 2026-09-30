@@ -2224,3 +2224,32 @@ jobs:
           assert '"onboarding_version"' in backup
           print("Versioned onboarding contract OK")
           PY
+
+      - name: Validate balanced presented answer positions
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from lumina.curriculum.mapped_curriculum import all_mapped_lessons
+          from lumina.learning.question_presentation import (
+              correct_answer_text,
+              is_correct_answer,
+              presented_options,
+          )
+
+          positions = Counter()
+          total = 0
+          for lesson in all_mapped_lessons():
+              for check in lesson.checks:
+                  shown = presented_options(check)
+                  correct = correct_answer_text(check)
+                  assert correct in shown, (lesson.id, check.id)
+                  assert is_correct_answer(check, correct)
+                  positions[shown.index(correct)] += 1
+                  total += 1
+
+          assert total >= 100, total
+          assert len(positions) >= 3, positions
+          largest = max(positions.values())
+          assert largest / total < 0.55, (positions, total)
+          print("Presented answer positions balanced:", dict(positions))
+          PY

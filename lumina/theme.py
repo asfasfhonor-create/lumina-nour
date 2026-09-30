@@ -77,7 +77,8 @@ header[data-testid="stHeader"],
 .mission { background:linear-gradient(135deg,rgba(255,118,172,.13),rgba(120,115,245,.14)); border:1px solid rgba(255,160,205,.24); border-radius:22px; padding:16px; }
 .feature-card { background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.1); border-radius:20px; padding:14px; margin-bottom:14px; }
 .track-card { background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:14px; margin-bottom:10px; }
-.stButton>button { width:100%; border-radius:15px; min-height:48px; font-weight:800; border:1px solid rgba(255,255,255,.10); background:linear-gradient(135deg,#ff758c,#ff7eb3 50%,#7873f5); color:white !important; box-shadow:0 8px 22px rgba(74,56,190,.18); transition:transform .15s ease,filter .15s ease,box-shadow .15s ease; }
+div[data-testid="stButton"] > button, .stButton > button, .stButton > button[kind="secondary"] { width:100%; border-radius:15px; min-height:48px; font-weight:800; border:1px solid rgba(255,255,255,.16) !important; background:linear-gradient(135deg,#ff758c,#ff7eb3 50%,#7873f5) !important; color:#ffffff !important; box-shadow:0 8px 22px rgba(74,56,190,.18); transition:transform .15s ease,filter .15s ease,box-shadow .15s ease; }
+div[data-testid="stButton"] > button *, .stButton > button * { color:#ffffff !important; }
 .stButton>button:hover { transform:translateY(-1px); filter:brightness(1.06); box-shadow:0 11px 28px rgba(74,56,190,.25); }
 .stButton>button:focus { color:white !important; border-color:rgba(255,255,255,.45); }
 .stButton>button:disabled { opacity:.52; transform:none; box-shadow:none; }

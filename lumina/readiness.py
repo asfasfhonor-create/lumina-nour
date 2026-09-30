@@ -29,9 +29,9 @@ def build_release_readiness(
     return (
         ReadinessItem(
             key="curriculum",
-            label="المنهج المرتبط",
+            label="خريطة المنهج داخل البرنامج",
             ready=mapped_count > 0,
-            detail=f"{mapped_count} درس/جزء تعلّم مرتبط",
+            detail=f"{mapped_count} درس/جزء تعلّم مرتبط · لا يعني أن ملفات الكتب الأساسية مرفوعة",
         ),
         ReadinessItem(
             key="ai",

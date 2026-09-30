@@ -110,7 +110,7 @@ def render_exam_mode() -> None:
             key=f"exam_{subject_id}_{unit_title}_{lesson.id}_{check.id}",
         )
         if choice is not None:
-            answers[f"{lesson.id}:{check.id}"] = list(presented_options(check)).index(choice)
+            answers[f"{lesson.id}:{check.id}"] = choice
 
     if st.button("شوفي نتيجتي", key=f"exam_submit_{subject_id}_{unit_title}"):
         if len(answers) != len(checks):

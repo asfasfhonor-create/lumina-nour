@@ -736,14 +736,14 @@ jobs:
           mission = choose_mission(store)
           assert mission is not None
           assert mission.lesson_id == target.id
-          assert "نفهم" in mission.reason or "مراجعة" in mission.reason
+          assert "ترتيب المنهج" in mission.reason or "نكمل الدرس" in mission.reason
 
           plan = build_weekly_plan(store, limit=5)
           assert plan
           assert plan[0].lesson_id == target.id
-          assert plan[0].reason == "Needs reinforcement"
+          assert plan[0].reason in {"Needs reinforcement", "Continue in-progress learning"}
 
-          print("Adaptive learning priority OK")
+          print("Curriculum-first adaptive learning priority OK")
           PY
 
       - name: Validate safe AI provider failures

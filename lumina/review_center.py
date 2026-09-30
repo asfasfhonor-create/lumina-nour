@@ -99,8 +99,7 @@ def render_review_center() -> None:
                         st.warning("اختاري إجابة الأول.")
                         continue
 
-                    selected_index = list(presented_options(check)).index(answer)
-                    correct = selected_index == check.correct_index
+                    correct = is_correct_answer(check, answer)
 
                     store.record_attempt(
                         {
@@ -117,8 +116,6 @@ def render_review_center() -> None:
                                 if getattr(check, "mastery_eligible", True) is False
                                 else "review"
                             ),
-                            "cognitive_kind": getattr(check, "activity_kind", "concept"),
-                            "mastery_eligible": bool(getattr(check, "mastery_eligible", True)),
                             "cognitive_kind": getattr(check, "activity_kind", "concept"),
                             "mastery_eligible": bool(getattr(check, "mastery_eligible", True)),
                         }

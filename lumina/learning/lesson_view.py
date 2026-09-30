@@ -52,7 +52,7 @@ def _pick_check(checks, attempts, mistakes):
     for check in checks:
         if check.id not in correct_ids:
             return check
-    return checks[-1] if checks else None
+    return None
 
 
 def _render_concept_support(lesson, depth: int) -> None:
@@ -119,7 +119,23 @@ def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
     checks = eligible_checks(lesson, stage)
     check = _pick_check(checks, attempts, mistakes)
     if check is None:
-        st.info("الدرس متاح للشرح حاليًا، ولسه مفيش تحدّي مناسب مضاف له.")
+        mastery = derive_mastery(attempts, mistakes)
+        if lesson.checks and mastery.correct_attempts:
+            st.success(
+                "تمام 👏 أثبتّي فهم أولي للدرس. تقدري تنتقلي للدرس اللي بعده، "
+                "وLUMINA هيرجع للفكرة لاحقًا في مراجعة قصيرة علشان تثبت أكتر."
+            )
+            st.caption(
+                "الانتقال للدرس التالي لا يعني إننا بنقول «Mastered» من مرة واحدة — "
+                "الإتقان الكامل يحتاج أدلة مختلفة مع الوقت."
+            )
+        else:
+            st.info("الدرس متاح للشرح حاليًا، ولسه مفيش تحدّي مناسب مضاف له.")
+        st.caption(
+            f"رحلة الفهم: {mastery_label(mastery.state)} · "
+            f"{mastery.correct_attempts}/{mastery.attempts} محاولات صحيحة · "
+            f"{mastery.distinct_evidence} دليل فهم مختلف"
+        )
         return
 
     st.markdown("#### 🎮 تحدّي صغير")

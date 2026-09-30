@@ -32,9 +32,9 @@ def render_home_foundation() -> None:
         photo_b64 = _load_nour_photo_b64()
         st.markdown(
             f"""
-            <div class="nour-photo-wrap" aria-label="صورة نور">
+            <div class="nour-photo-wrap" aria-label="Nour photo">
               <div class="nour-photo-glow">
-                <img src="data:image/jpeg;base64,{photo_b64}" alt="صورة نور" />
+                <img src="data:image/jpeg;base64,{photo_b64}" alt="Nour photo" />
               </div>
               <div class="nour-photo-badge">✨ NOUR</div>
             </div>
@@ -47,7 +47,7 @@ def render_home_foundation() -> None:
         <div class="hero">
           <div class="brand">LUMINA · NOUR'S WORLD</div>
           <div class="hello">Hi Nour ✨ Ready to discover something new today?</div>
-          <div class="muted">Your world for learning, discovery, English & AI.<br><small>عالمك للتعلّم والاكتشاف — خطوة صغيرة كل يوم.</small></div>
+          <div class="muted">Your world for learning, discovery, English & AI.<br><small>One small step, every day.</small></div>
         </div>
         """,
             unsafe_allow_html=True,
@@ -61,23 +61,23 @@ def render_home_foundation() -> None:
     c1, c2, c3 = st.columns(3)
     with c1:
         st.markdown(
-            f'<div class="stat">⭐ <b>{st.session_state.xp} XP</b><span class="muted">Your points · نقاطك</span></div>',
+            f'<div class="stat">⭐ <b>{st.session_state.xp} XP</b><span class="muted">Your points</span></div>',
             unsafe_allow_html=True,
         )
     with c2:
         st.markdown(
-            f'<div class="stat">🔥 <b>{st.session_state.streak} days</b><span class="muted">Learning streak · أيام متتالية</span></div>',
+            f'<div class="stat">🔥 <b>{st.session_state.streak} days</b><span class="muted">Learning streak</span></div>',
             unsafe_allow_html=True,
         )
     with c3:
         st.markdown(
-            f'<div class="stat">🌱 <b>Level {level_number}</b><span class="muted">Explorer · مستكشفة</span></div>',
+            f'<div class="stat">🌱 <b>Level {level_number}</b><span class="muted">Explorer</span></div>',
             unsafe_allow_html=True,
         )
 
     badges = st.session_state.get("badges", [])
     if badges:
-        st.caption("🏅 شاراتك: " + " · ".join(badges))
+        st.caption("🏅 Your badges: " + " · ".join(badges))
 
     _render_daily_mission()
     _render_learning_worlds()
@@ -102,8 +102,8 @@ def render_home_foundation() -> None:
         st.rerun()
 
     with st.expander("👨‍👧 " + PARENT_AREA_LABEL, expanded=False):
-        st.caption("ده جزء منفصل لمتابعة التقدّم والمصادر، ومش محتاجاه أثناء مذاكرتك.")
-        if st.button("فتح لوحة وليّ الأمر", key="open_parent_dashboard", use_container_width=True):
+        st.caption("A separate area for parents to follow progress and learning sources.")
+        if st.button("Open Parent Dashboard", key="open_parent_dashboard", use_container_width=True):
             st.session_state.active_world = "parent"
             st.rerun()
 
@@ -117,7 +117,7 @@ def _render_first_run_welcome() -> None:
     st.markdown(
         """
         <div class="mission">
-          <b>✨ مفاجأة صغيرة قبل ما تبدأي</b><br>
+          <b>✨ A little surprise before you start</b><br>
           <span class="muted">
           العالم ده اتبنى بمساعدة الذكاء الاصطناعي مخصوص ليكي.
           ومش لازم تكوني بتعرفي كود علشان تبدأي تعملي فكرتك بنفسك —
@@ -127,12 +127,12 @@ def _render_first_run_welcome() -> None:
         """,
         unsafe_allow_html=True,
     )
-    st.caption("أول جولة مدتها كام دقيقة بس. مفيش اختبار ولا درجات.")
+    st.caption("Your first tour takes only a few minutes. No test. No grades.")
 
     left, right = st.columns(2)
     with left:
         if st.button(
-            "🤖 ورّيني إزاي أعمل فكرة برنامج بالـAI",
+            "🤖 Show me how to build an idea with AI",
             key="first_run_ai",
             use_container_width=True,
         ):
@@ -144,7 +144,7 @@ def _render_first_run_welcome() -> None:
             st.rerun()
     with right:
         if st.button(
-            "🌍 أختار حاجة أجربها بنفسي",
+            "🌍 Let me choose something to explore",
             key="first_run_choose",
             use_container_width=True,
         ):
@@ -208,7 +208,7 @@ def _render_learning_worlds() -> None:
             st.markdown(
                 f'<div class="subject"><h4>{module.icon} {world_title(module.id, module.title)}</h4>'
                 f'<span class="muted">{module.description}</span><br>'
-                '<small>عالم تعلّم منظم</small></div>',
+                '<small>Structured learning world</small></div>',
                 unsafe_allow_html=True,
             )
             if module.id in {"english", "science", "math", "ict", "arabic", "social", "religion"}:
@@ -218,21 +218,21 @@ def _render_learning_worlds() -> None:
                     st.rerun()
             else:
                 st.button(
-                    "قريبًا",
+                    "Coming soon",
                     key=f"open_world_{module.id}",
                     disabled=True,
-                    help="هنفتح العالم ده بعد ربطه بمحرك المنهج والتعلم.",
+                    help="This world will open after it is connected to the learning engine.",
                 )
 
     ai_module = get_module("ai")
     if ai_module:
         st.markdown(
-            f'<div class="section-title">{ai_module.icon} {ai_module.title}</div>',
+            f'<div class="section-title">{ai_module.icon} {world_title("ai", ai_module.title)}</div>',
             unsafe_allow_html=True,
         )
         st.markdown(
-            '<div class="mission"><b>محقق الذكاء الاصطناعي · تحديات كتابة الأوامر · التحقق من المعلومات</b><br>'
-            '<span class="muted">نتعلم نسأل صح، نراجع الإجابات، ونبحث عن الدليل بدل الثقة العمياء.</span></div>',
+            '<div class="mission"><b>AI Detective · Prompt challenges · Information verification</b><br>'
+            '<span class="muted">Learn to ask better questions, check answers, and look for evidence instead of trusting AI blindly.</span></div>',
             unsafe_allow_html=True,
         )
         if st.button(world_action("ai"), key="open_world_ai", help=help_text("ai")):

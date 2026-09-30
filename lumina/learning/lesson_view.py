@@ -176,7 +176,11 @@ def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
                     "answer": answer,
                     "correct": correct,
                     "source_pages": lesson.source_pages,
-                    "activity_type": f"creative_mission_level_{getattr(check, 'difficulty', 1)}",
+                    "activity_type": (
+                        "lesson_recall"
+                        if getattr(check, "mastery_eligible", True) is False
+                        else f"creative_mission_level_{getattr(check, 'difficulty', 1)}"
+                    ),
                     "cognitive_kind": getattr(check, "activity_kind", "concept"),
                     "mastery_eligible": bool(getattr(check, "mastery_eligible", True)),
                 }

@@ -255,6 +255,7 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
         "verification": "التحقق",
         "evidence": "تقييم جودة الدليل",
         "uncertainty": "التعامل مع عدم اليقين",
+        "creation": "تحويل فكرة إلى مشروع بالـAI",
     }
     for skill_id, label in ai_skill_labels.items():
         values = ai_skills.get(skill_id)

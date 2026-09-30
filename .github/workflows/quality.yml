@@ -1160,7 +1160,7 @@ jobs:
               )
               assert expected_title in rendered, (button_label, expected_title, rendered[:500])
 
-              back = next(button for button in at.button if button.label == "← العودة إلى عالم نور")
+              back = next(button for button in at.button if button.label == "← Back to Nour’s World · العودة لعالم نور")
               back.click()
               at.run()
               assert not at.exception, (button_label, "back", at.exception)
@@ -1212,7 +1212,7 @@ jobs:
               if button_label == "فتح لوحة وليّ الأمر":
                   assert "المصادر الدائمة" in rendered, rendered[:1200]
 
-              back = next(button for button in at.button if button.label == "← العودة إلى عالم نور")
+              back = next(button for button in at.button if button.label == "← Back to Nour’s World · العودة لعالم نور")
               back.click()
               at.run()
               assert not at.exception, (button_label, "back", at.exception)

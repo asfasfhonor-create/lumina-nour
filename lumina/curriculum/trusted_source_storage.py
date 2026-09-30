@@ -76,6 +76,21 @@ class NeonTrustedSourceStorage:
             ) from exc
         return key
 
+    def object_size(self, storage_key: str) -> int:
+        key = (storage_key or "").strip()
+        if not key:
+            raise TrustedSourceStorageError("storage_key is required.")
+        try:
+            response = self.client.head_object(
+                Bucket=self.config.bucket,
+                Key=key,
+            )
+            return int(response.get("ContentLength", 0))
+        except Exception as exc:
+            raise TrustedSourceStorageError(
+                "تعذر التحقق من الملف الدائم الآن."
+            ) from exc
+
     def get_bytes(self, storage_key: str) -> bytes:
         key = (storage_key or "").strip()
         if not key:

@@ -50,6 +50,8 @@ def render_home_foundation() -> None:
         )
 
     _render_first_run_welcome()
+    if not st.session_state.get("first_run_complete", False):
+        return
 
     level_number = current_level()
     c1, c2, c3 = st.columns(3)
@@ -126,17 +128,18 @@ def _render_first_run_welcome() -> None:
     left, right = st.columns(2)
     with left:
         if st.button(
-            "🤖 ورّيني AI بيعمل إيه",
+            "🤖 ورّيني إزاي أعمل فكرة برنامج بالـAI",
             key="first_run_ai",
             use_container_width=True,
         ):
             st.session_state.first_run_complete = True
+            st.session_state.ai_lab_mode = "✨ اصنعي فكرة برنامج مع AI"
             persist_profile_state()
             st.session_state.active_world = "ai"
             st.rerun()
     with right:
         if st.button(
-            "🌍 أختار عالمي بنفسي",
+            "🌍 أختار حاجة أجربها بنفسي",
             key="first_run_choose",
             use_container_width=True,
         ):

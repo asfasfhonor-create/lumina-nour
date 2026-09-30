@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from lumina.learning.progress import attempt_is_mastery_eligible
+
 
 GENTLE_START = "gentle_start"
 BUILDING = "building"

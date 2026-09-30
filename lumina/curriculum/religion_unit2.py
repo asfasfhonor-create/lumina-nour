@@ -24,7 +24,7 @@ RELIGION_U2_LESSONS = (
         objectives=("تعريف المد العارض للسكون.", "تمييز أوجهه وتطبيقه."),
         key_terms=("المد العارض للسكون","الوقف","القصر","التوسط","الطول"),
         evidence_summary=("يكون المد عارضًا للسكون عند الوقف على حرف متحرك فيسكن بسبب الوقف.", "يعرض الدرس أوجه القصر والتوسط والطول."),
-        checks=(LessonCheck(id="arid",prompt="متى يظهر المد العارض للسكون؟",expected_points=("عند الوقف فيسكن الحرف بعد المد",),hint="سبب السكون هنا هو الوقف.",options=("عند الوصل فقط","عند الوقف فيسكن الحرف بعد المد","عند عدم وجود حرف مد"),correct_index=1),),
+        checks=(LessonCheck(id="arid",prompt="متى يظهر المد العارض للسكون؟",expected_points=("عند الوقف فيسكن الحرف بعد المد",),hint="سبب السكون هنا هو الوقف.",options=("عند الوصل فقط","عند الوقف فيسكن الحرف بعد المد","عند عدم وجود حرف مد"),correct_index=1,activity_kind="recall",mastery_eligible=False),),
     ),
     LessonData(
         id="religion_u2_l4", source_id="religion_prep3_t1", unit_id="u2",
@@ -48,7 +48,7 @@ RELIGION_U2_LESSONS = (
         objectives=("التعرف على سيرة الإمام مالك العلمية والعملية.", "معرفة بعض مصادر مذهبه ومؤلفاته."),
         key_terms=("مالك بن أنس","الموطأ","الحديث","الفقه","أهل المدينة"),
         evidence_summary=("يتناول الدرس شخصية الإمام مالك واهتمامه بالسنة والفقه.", "تذكر التدريبات كتاب الموطأ واعتماده على عمل أهل المدينة ضمن مصادره."),
-        checks=(LessonCheck(id="muwatta",prompt="ما الكتاب الذي تربطه تدريبات الدرس بالإمام مالك؟",expected_points=("الموطأ",),hint="الكتاب يجمع بين الحديث والفقه.",options=("الموطأ","الأغاني","كليلة ودمنة"),correct_index=0),),
+        checks=(LessonCheck(id="muwatta",prompt="ما الكتاب الذي تربطه تدريبات الدرس بالإمام مالك؟",expected_points=("الموطأ",),hint="الكتاب يجمع بين الحديث والفقه.",options=("الموطأ","الأغاني","كليلة ودمنة"),correct_index=0,activity_kind="recall",mastery_eligible=False),),
     ),
     LessonData(
         id="religion_u2_l7", source_id="religion_prep3_t1", unit_id="u2",

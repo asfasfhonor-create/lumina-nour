@@ -195,7 +195,10 @@ def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
                     evidence_id=check.id,
                     activity_type="creative_mission",
                 )
-                st.success("ممتاز 👏 فهمتي الفكرة، مش مجرد حفظتي الإجابة.")
+                if getattr(check, "mastery_eligible", True) is False:
+                    st.success("تمام 👏 المعلومة ثبتت. هنحتاج سؤال فهم أو تطبيق كمان قبل ما نقول إن الدرس اتقن.")
+                else:
+                    st.success("ممتاز 👏 فهمتي الفكرة، مش مجرد حفظتي الإجابة.")
                 if earned_xp:
                     st.caption(f"+{earned_xp} XP لأنك أثبتّي فهم جديد.")
                 st.rerun()

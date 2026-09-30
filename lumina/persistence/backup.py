@@ -12,9 +12,12 @@ PROFILE_KEYS = (
     "xp",
     "streak",
     "english_profile",
+    "ai_profile",
     "rewarded_evidence",
     "learning_days",
     "badges",
+    "daily_mission_lesson_id",
+    "daily_mission_date",
 )
 
 

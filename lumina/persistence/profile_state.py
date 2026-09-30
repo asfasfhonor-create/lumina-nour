@@ -16,6 +16,7 @@ PROFILE_KEYS = (
     "ai_profile",
     "daily_mission_lesson_id",
     "daily_mission_date",
+    "first_run_complete",
 )
 
 

@@ -8,7 +8,7 @@ ARABIC_U3_LESSONS = (
         objectives=("فهم نص الاستماع «بناء المستقبل في عصر الآلة».", "ربط الاستماع بفكرة المستقبل والتقنية."),
         key_terms=("بناء المستقبل","عصر الآلة","الاستماع"),
         evidence_summary=("يفتتح الكتاب الوحدة الثالثة بنص استماع بعنوان «بناء المستقبل في عصر الآلة».",),
-        checks=(LessonCheck(id="future_listening",prompt="ما عنوان نص الاستماع في بداية الوحدة الثالثة؟",expected_points=("بناء المستقبل في عصر الآلة",),hint="هو أول درس في الوحدة.",options=("ثمرة القراءة","بناء المستقبل في عصر الآلة","تحية للشباب"),correct_index=1),),
+        checks=(LessonCheck(id="future_listening",prompt="ما عنوان نص الاستماع في بداية الوحدة الثالثة؟",expected_points=("بناء المستقبل في عصر الآلة",),hint="هو أول درس في الوحدة.",options=("ثمرة القراءة","بناء المستقبل في عصر الآلة","تحية للشباب"),correct_index=1,activity_kind="recall",mastery_eligible=False),),
     ),
     LessonData(
         id="arabic_u3_l2", source_id="arabic_prep3_t1", unit_id="u3",
@@ -16,7 +16,7 @@ ARABIC_U3_LESSONS = (
         objectives=("قراءة «حرفتك بين يديك».", "تعلم اسم الزمان.", "تعلم كتابة الهمزة المتطرفة.", "التدرب على كتابة نص إقناعي."),
         key_terms=("حرفتك بين يديك","اسم الزمان","الهمزة المتطرفة","نص إقناعي"),
         evidence_summary=("يجمع الدرس قراءة «حرفتك بين يديك» مع اسم الزمان في النحو.", "الموضوع الإملائي هو الهمزة المتطرفة، والتعبير الكتابي تطبيق على النص الإقناعي."),
-        checks=(LessonCheck(id="time_noun",prompt="ما القاعدة النحوية في هذا الدرس؟",expected_points=("اسم الزمان",),hint="العنوان النحوي ظاهر في الفهرس.",options=("اسم الزمان","اسم الفاعل","اسم المفعول"),correct_index=0),),
+        checks=(LessonCheck(id="time_noun",prompt="ما القاعدة النحوية في هذا الدرس؟",expected_points=("اسم الزمان",),hint="العنوان النحوي ظاهر في الفهرس.",options=("اسم الزمان","اسم الفاعل","اسم المفعول"),correct_index=0,activity_kind="recall",mastery_eligible=False),),
     ),
     LessonData(
         id="arabic_u3_l3", source_id="arabic_prep3_t1", unit_id="u3",
@@ -24,7 +24,7 @@ ARABIC_U3_LESSONS = (
         objectives=("قراءة «مستقبل مصر في الزراعة».", "تعلم اسم الآلة.", "تطبيق الهمزة المتطرفة.", "التدرب على كتابة تقرير صحفي."),
         key_terms=("مستقبل مصر في الزراعة","اسم الآلة","الهمزة المتطرفة","تقرير صحفي"),
         evidence_summary=("النص القرائي هو «مستقبل مصر في الزراعة».", "الموضوع النحوي اسم الآلة، مع تطبيقات على الهمزة المتطرفة وتطبيق كتابي على التقرير الصحفي."),
-        checks=(LessonCheck(id="instrument_noun",prompt="ما الموضوع النحوي المصاحب لنص «مستقبل مصر في الزراعة»؟",expected_points=("اسم الآلة",),hint="راجعي الفهرس.",options=("اسم الآلة","اسم المكان","صيغة المبالغة"),correct_index=0),),
+        checks=(LessonCheck(id="instrument_noun",prompt="ما الموضوع النحوي المصاحب لنص «مستقبل مصر في الزراعة»؟",expected_points=("اسم الآلة",),hint="راجعي الفهرس.",options=("اسم الآلة","اسم المكان","صيغة المبالغة"),correct_index=0,activity_kind="recall",mastery_eligible=False),),
     ),
     LessonData(
         id="arabic_u3_l4", source_id="arabic_prep3_t1", unit_id="u3",
@@ -32,6 +32,6 @@ ARABIC_U3_LESSONS = (
         objectives=("دراسة النص الشعري «اصنع بيدك مجدك».", "مراجعة الوحدة الثالثة وحصادها.", "مراجعة نصوص الاستماع."),
         key_terms=("اصنع بيدك مجدك","معروف الرصافي","شعر","مراجعة"),
         evidence_summary=("الدرس الرابع نص شعري بعنوان «اصنع بيدك مجدك» لمعروف الرصافي.", "يعقبه تقويم الوحدة الثالثة وحصادها ونصوص الاستماع."),
-        checks=(LessonCheck(id="poet_rusafi",prompt="من شاعر «اصنع بيدك مجدك» كما يذكر الكتاب؟",expected_points=("معروف الرصافي",),hint="الاسم مكتوب بجوار عنوان النص.",options=("معروف الرصافي","أحمد شوقي","شوقي ضيف"),correct_index=0),),
+        checks=(LessonCheck(id="poet_rusafi",prompt="من شاعر «اصنع بيدك مجدك» كما يذكر الكتاب؟",expected_points=("معروف الرصافي",),hint="الاسم مكتوب بجوار عنوان النص.",options=("معروف الرصافي","أحمد شوقي","شوقي ضيف"),correct_index=0,activity_kind="recall",mastery_eligible=False),),
     ),
 )

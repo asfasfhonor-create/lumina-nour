@@ -1,7 +1,7 @@
 import streamlit as st
 
 from lumina.ai_service import GeminiService
-from lumina.curriculum.retrieval import context_for_hit, grounded_prompt
+from lumina.curriculum.retrieval import context_for_hit, grounded_prompt, page_scope_prompt
 from lumina.curriculum.search import lesson_by_id, search_curriculum
 
 
@@ -74,6 +74,13 @@ def render_curriculum_search(ai: GeminiService) -> None:
         if context is None:
             st.warning("المصدر المرتبط بالدرس غير مكتمل في سجل المنهج، لذلك لن نخمن الإجابة.")
             return
+
+        if context.extraction_mode != "parsed_text":
+            st.info(
+                "الجزء ده يعتمد على صور/تنسيق صفحات الكتاب. النسخة الحالية لن تدّعي قراءة "
+                "الرسم أو المعادلة من الملخص النصي وحده؛ وسيتم استخدام نطاق الصفحات عند توفر "
+                "الملف الرسمي داخل مخزن المصادر."
+            )
 
         response = ai.generate(grounded_prompt(context, question))
         st.markdown(response)

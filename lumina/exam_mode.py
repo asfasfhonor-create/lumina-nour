@@ -12,34 +12,15 @@ from lumina.learning.evidence_cache import group_by_lesson
 
 
 def _pick_checks(lessons, store, limit: int = 5, max_difficulty: int = 1):
-    """Build a source-grounded adaptive exam set without inventing questions.
+    """Build a source-grounded practice set in curriculum order.
 
-    Priority is weak/in-progress learning first, then unseen material, then
-    mastered material for spaced reinforcement. We prefer one check per lesson
-    before taking a second check from the same lesson.
+    Review/mistake priority belongs in Review Center. Inside an explicitly chosen
+    unit, questions stay in source order so the learner never sees lesson 3 before
+    lesson 1 merely because of adaptive ranking.
     """
-    attempts_by_lesson = group_by_lesson(store.get_attempts())
-    mistakes_by_lesson = group_by_lesson(store.get_mistakes())
-
-    priority = {
-        NEEDS_REVIEW: 0,
-        LEARNING: 1,
-        NOT_STARTED: 2,
-        MASTERED: 3,
-    }
-
-    ranked = []
-    for curriculum_index, lesson in enumerate(lessons):
-        state = derive_mastery(
-            attempts_by_lesson.get(lesson.id, []),
-            mistakes_by_lesson.get(lesson.id, []),
-        ).state
-        ranked.append((priority.get(state, 9), curriculum_index, lesson))
-
-    ranked.sort(key=lambda item: (item[0], item[1]))
-
     picked = []
-    for _, _, lesson in ranked:
+
+    for lesson in lessons:
         eligible = [
             check for check in lesson.checks
             if int(getattr(check, "difficulty", 1)) <= max_difficulty
@@ -49,7 +30,7 @@ def _pick_checks(lessons, store, limit: int = 5, max_difficulty: int = 1):
             if len(picked) >= limit:
                 return picked
 
-    for _, _, lesson in ranked:
+    for lesson in lessons:
         eligible = [
             check for check in lesson.checks
             if int(getattr(check, "difficulty", 1)) <= max_difficulty
@@ -60,7 +41,6 @@ def _pick_checks(lessons, store, limit: int = 5, max_difficulty: int = 1):
                 return picked
 
     return picked
-
 
 def render_exam_mode() -> None:
     st.markdown('<div class="section-title">🧪 وضع الاختبار</div>', unsafe_allow_html=True)
@@ -117,7 +97,7 @@ def render_exam_mode() -> None:
 
     st.caption(
         f"{len(checks)} سؤال · من {unit_title} · "
-        "الأسئلة الأهم للمراجعة تظهر أولًا"
+        "الأسئلة ماشية حسب ترتيب الدروس في المنهج"
     )
 
     answers: dict[str, int] = {}

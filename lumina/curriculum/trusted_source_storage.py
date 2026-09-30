@@ -91,6 +91,22 @@ class NeonTrustedSourceStorage:
                 "تعذر التحقق من الملف الدائم الآن."
             ) from exc
 
+    def download_to_path(self, storage_key: str, path: str) -> None:
+        key = (storage_key or "").strip()
+        if not key:
+            raise TrustedSourceStorageError("storage_key is required.")
+        try:
+            with open(path, "wb") as handle:
+                self.client.download_fileobj(
+                    self.config.bucket,
+                    key,
+                    handle,
+                )
+        except Exception as exc:
+            raise TrustedSourceStorageError(
+                "تعذر تجهيز المصدر الدائم للاستخدام الآن."
+            ) from exc
+
     def get_bytes(self, storage_key: str) -> bytes:
         key = (storage_key or "").strip()
         if not key:

@@ -1708,7 +1708,7 @@ jobs:
           assert not at.exception, at.exception
           assert any("نحتاجين نفك الفكرة" in w.value or "عادي جدًا" in w.value for w in at.warning), [w.value for w in at.warning]
 
-          next(b for b in at.button if b.label == "← العودة إلى عالم نور").click()
+          next(b for b in at.button if b.label == "← Back to Nour’s World · العودة لعالم نور").click()
           at.run()
           next(b for b in at.button if b.label == "📝 My Reviews · مراجعاتي").click()
           at.run()
@@ -1751,7 +1751,7 @@ jobs:
           if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
               next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
               at.run()
-          next(b for b in at.button if b.label == "ادخلي عالم الذكاء الاصطناعي").click()
+          next(b for b in at.button if b.label == "Enter AI Lab · ادخلي عالم الذكاء الاصطناعي").click()
           at.run()
           assert not at.exception, at.exception
 

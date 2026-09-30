@@ -6,7 +6,11 @@ GLOBAL_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
 * { font-family:'Cairo',sans-serif; }
 .stApp { background:linear-gradient(155deg,#100d2d 0%,#231a54 45%,#151a3d 100%); color:#f7f4ff; }
-.block-container { max-width:860px; padding-top:1rem; padding-bottom:5rem; }
+.block-container { max-width:900px; padding-top:1rem; padding-bottom:5rem; }
+.stApp p, .stApp label, .stApp [data-testid="stCaptionContainer"] { color:#eee9fb; }
+.stApp [data-testid="stCaptionContainer"] { opacity:.9; }
+.stApp hr { border-color:rgba(255,255,255,.10); }
+div[data-testid="stVerticalBlockBorderWrapper"] { border-color:rgba(255,255,255,.12) !important; }
 /* Remove Streamlit chrome from the learner-facing experience. The owner can
    still manage the app from Streamlit Community Cloud. */
 [data-testid="stHeader"],
@@ -67,12 +71,21 @@ header[data-testid="stHeader"],
 .stat { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:12px; text-align:center; min-height:86px; }
 .stat b { display:block; font-size:1.15rem; }
 .section-title { font-size:1.18rem; font-weight:900; margin:1.15rem 0 .5rem; }
-.subject { background:rgba(255,255,255,.065); border:1px solid rgba(255,255,255,.11); border-radius:20px; padding:14px; margin-bottom:8px; min-height:118px; }
+.subject { background:linear-gradient(145deg,rgba(255,255,255,.085),rgba(255,255,255,.045)); border:1px solid rgba(255,255,255,.13); border-radius:22px; padding:16px; margin-bottom:9px; min-height:118px; box-shadow:0 10px 30px rgba(0,0,0,.10); transition:transform .18s ease,border-color .18s ease,background .18s ease; }
+.subject:hover { transform:translateY(-2px); border-color:rgba(185,167,255,.34); background:linear-gradient(145deg,rgba(255,143,193,.10),rgba(126,214,255,.07)); }
 .subject h4 { margin:0 0 4px; }
 .mission { background:linear-gradient(135deg,rgba(255,118,172,.13),rgba(120,115,245,.14)); border:1px solid rgba(255,160,205,.24); border-radius:22px; padding:16px; }
 .feature-card { background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.1); border-radius:20px; padding:14px; margin-bottom:14px; }
 .track-card { background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:14px; margin-bottom:10px; }
-.stButton>button { width:100%; border-radius:14px; min-height:46px; font-weight:800; border:0; background:linear-gradient(135deg,#ff758c,#ff7eb3 50%,#7873f5); color:white; }
+.stButton>button { width:100%; border-radius:15px; min-height:48px; font-weight:800; border:1px solid rgba(255,255,255,.10); background:linear-gradient(135deg,#ff758c,#ff7eb3 50%,#7873f5); color:white !important; box-shadow:0 8px 22px rgba(74,56,190,.18); transition:transform .15s ease,filter .15s ease,box-shadow .15s ease; }
+.stButton>button:hover { transform:translateY(-1px); filter:brightness(1.06); box-shadow:0 11px 28px rgba(74,56,190,.25); }
+.stButton>button:focus { color:white !important; border-color:rgba(255,255,255,.45); }
+.stButton>button:disabled { opacity:.52; transform:none; box-shadow:none; }
+.stDownloadButton>button { border-radius:15px; min-height:46px; font-weight:800; }
+.stTextInput input,.stTextArea textarea { border-radius:14px !important; background:rgba(255,255,255,.08) !important; color:#fff !important; border:1px solid rgba(255,255,255,.15) !important; }
+.stTextInput input::placeholder,.stTextArea textarea::placeholder { color:#c9c1df !important; }
+div[data-baseweb="select"] > div { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.15); }
+div[data-testid="stExpander"] { background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.10); border-radius:18px; }
 .stTextInput input,.stTextArea textarea { border-radius:14px !important; }
 div[data-testid="stTabs"] button { font-weight:800; }
 @media (max-width:640px){

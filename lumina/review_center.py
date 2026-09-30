@@ -111,7 +111,13 @@ def render_review_center() -> None:
                             "answer": answer,
                             "correct": correct,
                             "source_pages": lesson.source_pages,
-                            "activity_type": "review",
+                            "activity_type": (
+                                "review_recall"
+                                if getattr(check, "mastery_eligible", True) is False
+                                else "review"
+                            ),
+                            "cognitive_kind": getattr(check, "activity_kind", "concept"),
+                            "mastery_eligible": bool(getattr(check, "mastery_eligible", True)),
                             "cognitive_kind": getattr(check, "activity_kind", "concept"),
                             "mastery_eligible": bool(getattr(check, "mastery_eligible", True)),
                         }

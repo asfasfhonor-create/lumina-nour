@@ -495,6 +495,32 @@ def _render_trusted_sources() -> None:
 
     if sources:
         st.success(f"المصادر المحفوظة والمعتمدة حاليًا: {len(sources)}")
+        if st.button(
+            "اختبر سلامة الملفات المحفوظة",
+            key="verify_trusted_source_objects",
+            use_container_width=True,
+        ):
+            ok_count = 0
+            broken = []
+            for source in sources:
+                try:
+                    size = storage.object_size(source["storage_key"])
+                    if size > 0:
+                        ok_count += 1
+                    else:
+                        broken.append(source["display_name"])
+                except Exception:
+                    broken.append(source["display_name"])
+            if broken:
+                st.error(
+                    f"سليم {ok_count}/{len(sources)} · محتاج مراجعة: "
+                    + " · ".join(broken)
+                )
+            else:
+                st.success(
+                    f"سلامة التخزين مؤكدة ✅ كل الملفات {ok_count}/{len(sources)} موجودة وبحجم فعلي."
+                )
+
         st.markdown("#### المصادر المعتمدة حاليًا")
         for source in sources:
             with st.container(border=True):

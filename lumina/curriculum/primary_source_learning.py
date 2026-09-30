@@ -32,7 +32,9 @@ def _runtime_source(lesson):
         return context, None, None
     try:
         catalog = NeonTrustedSourceCatalog(database_url, learner_key)
-        record = catalog.find_active_by_filename(context.filename)
+        record = catalog.find_active_by_canonical_source(context.source_id)
+        if record is None:
+            record = catalog.find_active_by_filename(context.filename)
     except PersistenceError:
         return context, None, None
     return context, record, storage_config

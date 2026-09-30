@@ -1092,24 +1092,24 @@ jobs:
 
           at = AppTest.from_file("app.py", default_timeout=20)
           at.run()
-          if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
-              next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+          if any(b.label == "🌍 Let me choose something to explore" for b in at.button):
+              next(b for b in at.button if b.label == "🌍 Let me choose something to explore").click()
               at.run()
           assert not at.exception, at.exception
           labels = [button.label for button in at.button]
           for expected in [
-              "🔎 Curriculum Search · البحث في المنهج",
-              "📅 My Plan · خطتي",
-              "🧪 Quick Practice · تدريب سريع",
-              "📝 My Reviews · مراجعاتي",
-              "فتح لوحة وليّ الأمر",
-              "Start English Adventure · ابدئي مغامرة الإنجليزي",
-              "Enter Science Lab · ادخلي معمل العلوم",
-              "Start Math Quest · ابدئي تحدّي الرياضيات",
+              "🔎 Curriculum Search",
+              "📅 My Plan",
+              "🧪 Quick Practice",
+              "📝 My Reviews",
+              "Open Parent Dashboard",
+              "Start English Adventure",
+              "Enter Science Lab",
+              "Start Math Quest",
           ]:
               assert expected in labels, (expected, labels)
 
-          next(button for button in at.button if button.label == "🔎 Curriculum Search · البحث في المنهج").click()
+          next(button for button in at.button if button.label == "🔎 Curriculum Search").click()
           at.run()
           assert not at.exception, at.exception
           assert any("Curriculum" in markdown.value or "المنهج" in markdown.value for markdown in at.markdown)
@@ -1131,20 +1131,20 @@ jobs:
           from streamlit.testing.v1 import AppTest
 
           worlds = [
-              ("Start English Adventure · ابدئي مغامرة الإنجليزي", "مغامرة الإنجليزي"),
-              ("Enter Science Lab · ادخلي معمل العلوم", "معمل العلوم"),
-              ("Start Math Quest · ابدئي تحدّي الرياضيات", "تحدّي الرياضيات"),
-              ("ادخلي عالم العربي", "عالم العربي"),
-              ("ابدئي مغامرة الدراسات", "مغامرة الدراسات"),
-              ("ابدئي رحلة الدين", "رحلة الدين"),
-              ("Enter ICT Lab · ادخلي معمل الكمبيوتر", "معمل الكمبيوتر"),
+              ("Start English Adventure", "مغامرة الإنجليزي"),
+              ("Enter Science Lab", "معمل العلوم"),
+              ("Start Math Quest", "تحدّي الرياضيات"),
+              ("Enter Arabic World", "عالم العربي"),
+              ("Start Social Studies", "مغامرة الدراسات"),
+              ("Start Religion Journey", "رحلة الدين"),
+              ("Enter ICT Lab", "معمل الكمبيوتر"),
           ]
 
           for button_label, expected_title in worlds:
               at = AppTest.from_file("app.py", default_timeout=20)
               at.run()
-              if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
-                  next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+              if any(b.label == "🌍 Let me choose something to explore" for b in at.button):
+                  next(b for b in at.button if b.label == "🌍 Let me choose something to explore").click()
                   at.run()
               assert not at.exception, (button_label, at.exception)
 
@@ -1183,17 +1183,17 @@ jobs:
           from streamlit.testing.v1 import AppTest
 
           flows = [
-              ("📅 My Plan · خطتي", "الخطة الأسبوعية"),
-              ("🧪 Quick Practice · تدريب سريع", "تدريب سريع"),
-              ("📝 My Reviews · مراجعاتي", "مراجعاتي"),
-              ("فتح لوحة وليّ الأمر", "لوحة وليّ الأمر"),
+              ("📅 My Plan", "الخطة الأسبوعية"),
+              ("🧪 Quick Practice", "تدريب سريع"),
+              ("📝 My Reviews", "مراجعاتي"),
+              ("Open Parent Dashboard", "لوحة وليّ الأمر"),
           ]
 
           for button_label, expected_text in flows:
               at = AppTest.from_file("app.py", default_timeout=20)
               at.run()
-              if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
-                  next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+              if any(b.label == "🌍 Let me choose something to explore" for b in at.button):
+                  next(b for b in at.button if b.label == "🌍 Let me choose something to explore").click()
                   at.run()
               assert not at.exception, (button_label, at.exception)
 
@@ -1209,7 +1209,7 @@ jobs:
                   + [w.value for w in at.warning]
               )
               assert expected_text in rendered, (button_label, expected_text, rendered[:700])
-              if button_label == "فتح لوحة وليّ الأمر":
+              if button_label == "Open Parent Dashboard":
                   assert "المصادر الدائمة" in rendered, rendered[:1200]
 
               back = next(button for button in at.button if button.label == "← Back to Nour’s World · العودة لعالم نور")
@@ -1689,12 +1689,12 @@ jobs:
 
           at = AppTest.from_file("app.py", default_timeout=30)
           at.run()
-          if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
-              next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+          if any(b.label == "🌍 Let me choose something to explore" for b in at.button):
+              next(b for b in at.button if b.label == "🌍 Let me choose something to explore").click()
               at.run()
           assert not at.exception, at.exception
 
-          next(b for b in at.button if b.label == "Enter Science Lab · ادخلي معمل العلوم").click()
+          next(b for b in at.button if b.label == "Enter Science Lab").click()
           at.run()
           assert not at.exception, at.exception
 
@@ -1710,7 +1710,7 @@ jobs:
 
           next(b for b in at.button if b.label == "← Back to Nour’s World · العودة لعالم نور").click()
           at.run()
-          next(b for b in at.button if b.label == "📝 My Reviews · مراجعاتي").click()
+          next(b for b in at.button if b.label == "📝 My Reviews").click()
           at.run()
           assert not at.exception, at.exception
 
@@ -1748,8 +1748,8 @@ jobs:
 
           at = AppTest.from_file("app.py", default_timeout=30)
           at.run()
-          if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
-              next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+          if any(b.label == "🌍 Let me choose something to explore" for b in at.button):
+              next(b for b in at.button if b.label == "🌍 Let me choose something to explore").click()
               at.run()
           next(b for b in at.button if b.label == "Enter AI Lab · ادخلي عالم الذكاء الاصطناعي").click()
           at.run()
@@ -1793,10 +1793,10 @@ jobs:
 
           at = AppTest.from_file("app.py", default_timeout=30)
           at.run()
-          if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
-              next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+          if any(b.label == "🌍 Let me choose something to explore" for b in at.button):
+              next(b for b in at.button if b.label == "🌍 Let me choose something to explore").click()
               at.run()
-          next(b for b in at.button if b.label == "Start English Adventure · ابدئي مغامرة الإنجليزي").click()
+          next(b for b in at.button if b.label == "Start English Adventure").click()
           at.run()
           assert not at.exception, at.exception
 

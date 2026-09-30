@@ -68,7 +68,7 @@ def learning_stage(attempts: list[dict], mistakes: list[dict]) -> LearningStage:
         if item.get("evidence_id") or item.get("check_id")
     }
 
-    if not attempts or unresolved:
+    if not attempts or unresolved or not correct:
         return STAGES[GENTLE_START]
     if len(distinct_correct) >= 2 and len(correct) >= 2:
         return STAGES[READY_CHALLENGE]

@@ -40,14 +40,16 @@ MAPPED_CURRICULUM = OrderedDict(
         (
             "english",
             OrderedDict(
-                list(
-                    (f"Term 1 · {title}", lessons)
-                    for title, lessons in ENGLISH_UNIT_LESSONS.items()
-                )
-                + [
+                (
+                    ("Term 1 · Personal Identity", ENGLISH_UNIT_LESSONS["Personal Identity"]),
+                    ("Term 1 · Communication with Family and Friends", ENGLISH_UNIT_LESSONS["Communication with Family and Friends"]),
+                    ("Term 1 · Artificial Intelligence", ENGLISH_UNIT_LESSONS["Artificial Intelligence"]),
                     ("Term 1 · Review 1", (REVIEW1,)),
+                    ("Term 1 · Screen Time", ENGLISH_UNIT_LESSONS["Screen Time"]),
+                    ("Term 1 · Design Thinking", ENGLISH_UNIT_LESSONS["Design Thinking"]),
+                    ("Term 1 · Why Do We Like Stories?", ENGLISH_UNIT_LESSONS["Why Do We Like Stories?"]),
                     ("Term 1 · Review 2", (REVIEW2,)),
-                ]
+                )
             ),
         ),
         (

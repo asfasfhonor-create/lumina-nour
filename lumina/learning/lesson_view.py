@@ -4,6 +4,7 @@ from lumina.learning.progress import derive_mastery, mastery_label
 from lumina.learning.progress_view import render_learning_brain_summary
 from lumina.persistence.session_store import get_learning_store
 from lumina.learning.rewards import apply_success_reward
+from lumina.learning.question_presentation import presented_options, is_correct_answer
 from lumina.learning.scaffolding import (
     eligible_checks,
     learning_stage,
@@ -151,7 +152,7 @@ def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
 
     answer = st.radio(
         check.prompt,
-        list(check.options),
+        list(presented_options(check)),
         index=None,
         key=f"lesson_check_{module_id}_{lesson.id}_{check.id}",
     )
@@ -164,7 +165,7 @@ def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
         if answer is None:
             st.warning("اختاري إجابة الأول — مفيش أي خصم لو كانت غلط.")
         else:
-            selected_index = list(check.options).index(answer)
+            selected_index = list(presented_options(check)).index(answer)
             correct = selected_index == check.correct_index
             store.record_attempt(
                 {

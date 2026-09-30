@@ -187,13 +187,17 @@ def _level_snapshot() -> None:
             return
 
         result = score_baseline(answers)
-        st.session_state.english_profile = {
-            "baseline_correct": result.correct,
-            "baseline_total": result.total,
-            "broad_band": result.broad_band,
-            "support_note": result.note,
-            "skill_scores": result.skill_scores,
-        }
+        profile = dict(st.session_state.get("english_profile") or {})
+        profile.update(
+            {
+                "baseline_correct": result.correct,
+                "baseline_total": result.total,
+                "broad_band": result.broad_band,
+                "support_note": result.note,
+                "skill_scores": result.skill_scores,
+            }
+        )
+        st.session_state.english_profile = profile
         persist_profile_state()
         st.success(f"نقطة البداية: {result.broad_band} · {result.correct}/{result.total}")
         st.write(result.note)
@@ -262,7 +266,7 @@ def _need_ai(ai: GeminiService) -> bool:
 
 
 def _writing_snapshot(ai: GeminiService) -> None:
-    st.caption("ده تدريب لتحديد المستوى، مش شهادة CEFR رسمية.")
+    st.caption("تدريب كتابة حقيقي. هنصلّح أهم نقطة بس ونخلي تعبيرك طبيعي أكتر من غير محاضرة قواعد.")
     writing = st.text_area(
         "اكتبي 4–6 جمل بالإنجليزي عن نفسك أو يومك أو حاجة بتحبيها.",
         key="english_world_writing",
@@ -329,12 +333,15 @@ Rules:
 - Keep most of the response in English; use one brief Arabic hint only if needed."""
         response = ai.generate(prompt)
         st.markdown(response)
-        _record_real_english_evidence(
-            skill="Speaking/Use",
-            activity_type="real_english_conversation_practice",
-            answer=answer if answer else "[started conversation]",
-            correct=None,
-        )
+        if answer.strip():
+            _record_real_english_evidence(
+                skill="Speaking/Use",
+                activity_type="real_english_conversation_practice",
+                answer=answer,
+                correct=None,
+            )
+        else:
+            st.caption("لما تردّي بنفسك بالإنجليزي، المحاولة هتتحسب ضمن تقدمك.")
 
 
 def _vocabulary_mission(ai: GeminiService) -> None:
@@ -357,12 +364,41 @@ Include exactly:
 - brief Arabic support only for difficult meaning.
 Keep it concise and practical."""
         response = ai.generate(prompt)
+        st.session_state.real_english_vocab_mission = response
         st.markdown(response)
-        _record_real_english_evidence(
-            skill="Vocabulary",
-            activity_type="real_english_vocabulary_practice",
-            answer=topic,
-            correct=None,
-        )
 
+    mission = st.session_state.get("real_english_vocab_mission")
+    if mission:
+        st.caption("دلوقتي دورك إنتِ: استخدمي تعبيرين على الأقل من التحدّي في جملة أو جملتين.")
+        learner_use = st.text_area(
+            "Your turn",
+            key="english_world_vocab_use",
+            placeholder="Write one or two sentences using the new expressions...",
+        )
+        if st.button("راجعي استخدامي", key="english_world_vocab_use_check") and learner_use.strip() and _need_ai(ai):
+            profile = st.session_state.get("english_profile", {})
+            support = support_instruction(profile)
+            feedback = ai.generate(
+                f"""You are Nour's practical English coach.
+Adaptive support rule: {support}
+Vocabulary mission shown to Nour:
+{mission}
+
+Nour's own use:
+{learner_use}
+
+Respond briefly:
+1. Say whether she genuinely used at least one expression from the mission in a meaningful way.
+2. Correct only one important issue.
+3. Show one natural improved version.
+4. Give one short encouragement.
+Use English first and one brief Arabic hint only if needed."""
+            )
+            st.markdown(feedback)
+            _record_real_english_evidence(
+                skill="Vocabulary",
+                activity_type="real_english_vocabulary_practice",
+                answer=learner_use,
+                correct=None,
+            )
 

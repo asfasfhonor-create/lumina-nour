@@ -10,6 +10,37 @@ NEEDS_REVIEW = "needs_review"
 MASTERED = "mastered"
 
 
+def attempt_is_mastery_eligible(attempt: dict) -> bool:
+    """Resolve evidence quality from the live curriculum definition.
+
+    Old durable attempts may not carry the newer mastery_eligible field, so
+    known school checks are resolved by lesson/check metadata at read time.
+    Non-curriculum activities (for example AI literacy) keep the legacy
+    default unless they explicitly opt out.
+    """
+    if attempt.get("mastery_eligible") is False:
+        return False
+
+    lesson_id = attempt.get("lesson_id")
+    check_id = attempt.get("check_id")
+    if not lesson_id or not check_id:
+        return True
+
+    try:
+        from lumina.curriculum.search import lesson_by_id
+        lesson = lesson_by_id(str(lesson_id))
+    except Exception:
+        lesson = None
+
+    if lesson is None:
+        return True
+
+    check = next((item for item in lesson.checks if item.id == check_id), None)
+    if check is None:
+        return True
+    return bool(getattr(check, "mastery_eligible", True))
+
+
 @dataclass(frozen=True)
 class MasterySnapshot:
     state: str

@@ -1,7 +1,8 @@
-"""Adaptive language policy for Nour's learner-facing UI.
+"""Language policy for Nour's learner-facing UI.
 
-English-first is the default. Arabic is a scaffold, not a second permanent
-translation layer. Parent/admin surfaces remain Arabic-first.
+Navigation is English-first by design. Arabic is used inside Arabic-medium
+subject content and in parent/admin surfaces, not as a permanent translation
+layer beside learner navigation.
 """
 
 import streamlit as st
@@ -19,33 +20,32 @@ LEARNER_LABELS = {
     "learning_worlds": ("Choose Your World", "اختاري عالمك"),
 }
 
-# Parent/admin surfaces deliberately stay Arabic-first.
-PARENT_AREA_LABEL = "للأسرة"
+PARENT_AREA_LABEL = "Parent Area"
 
 WORLD_LABELS = {
-    "english": (("English Adventure", ""), ("Start English Adventure", "ابدئي مغامرة الإنجليزي")),
-    "science": (("Science Lab", ""), ("Enter Science Lab", "ادخلي معمل العلوم")),
-    "math": (("Math Quest", ""), ("Start Math Quest", "ابدئي تحدّي الرياضيات")),
-    "ict": (("ICT Lab", ""), ("Enter ICT Lab", "ادخلي معمل الكمبيوتر")),
-    # Subject-language rule overrides English-profile adaptation here.
-    "arabic": (("عالم العربي", ""), ("ادخلي عالم العربي", "")),
-    "social": (("مغامرة الدراسات", ""), ("ابدئي مغامرة الدراسات", "")),
-    "religion": (("رحلة الدين", ""), ("ابدئي رحلة الدين", "")),
-    "ai": (("AI Lab", ""), ("Enter AI Lab", "ادخلي عالم الذكاء الاصطناعي")),
+    "english": (("English Adventure", ""), ("Start English Adventure", "")),
+    "science": (("Science Lab", ""), ("Enter Science Lab", "")),
+    "math": (("Math Quest", ""), ("Start Math Quest", "")),
+    "ict": (("ICT Lab", ""), ("Enter ICT Lab", "")),
+    "arabic": (("Arabic World", ""), ("Enter Arabic World", "")),
+    "social": (("Social Studies", ""), ("Start Social Studies", "")),
+    "religion": (("Religion Journey", ""), ("Start Religion Journey", "")),
+    "ai": (("AI Lab", ""), ("Enter AI Lab", "")),
 }
 
 
 def learner_support_level() -> str:
-    """Derive UI scaffolding from Nour's demonstrated Real English baseline."""
+    """Derive content scaffolding from Nour's demonstrated Real English baseline."""
     return support_level(st.session_state.get("english_profile") or {})
 
 
 def learner_label(english: str, arabic: str = "") -> str:
-    """Render English-first UI; Arabic scaffold fades only at independent level."""
-    level = learner_support_level()
-    if level == "light" or not arabic:
-        return english
-    return f"{english} · {arabic}"
+    """Keep learner navigation English-first.
+
+    Arabic support belongs in learning content/context when it genuinely helps;
+    it should not turn the main navigation into an Arabic or duplicated UI.
+    """
+    return english
 
 
 def ui_label(key: str) -> str:

@@ -43,7 +43,7 @@ def _pick_checks(lessons, store, limit: int = 5, max_difficulty: int = 1):
     return picked
 
 def render_exam_mode() -> None:
-    st.markdown('<div class="section-title">🧪 وضع الاختبار</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🧪 تدريب سريع</div>', unsafe_allow_html=True)
     render_context_help("exam_mode")
     st.markdown(
         '<div class="mission"><b>تدريب من المحتوى الموثق فقط.</b><br>'

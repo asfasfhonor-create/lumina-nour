@@ -32,7 +32,7 @@ RELIGION_U3_LESSONS = (
         objectives=("معرفة فضائل الصيام وفوائده.", "إدراك فضل العشر الأواخر من رمضان."),
         key_terms=("الصيام","الفضائل","الفوائد","العشر الأواخر","رمضان"),
         evidence_summary=("تعلن الوحدة دراسة فوائد الصيام وفضائله المتنوعة.", "تتضمن الأهداف معرفة فضل العشر الأواخر من رمضان."),
-        checks=(LessonCheck(id="fasting",prompt="أي موضوع تربطه الوحدة مباشرة بهذا الدرس؟",expected_points=("فضائل الصيام وفوائده وفضل العشر الأواخر",),hint="انظر إلى هدف الوحدة.",options=("أحكام الزكاة فقط","فضائل الصيام وفوائده وفضل العشر الأواخر","أحكام الحج فقط"),correct_index=1),),
+        checks=(LessonCheck(id="fasting_last_ten",prompt="ليه يقدّم الدرس العشر الأواخر من رمضان كفرصة مميزة للمسلم؟",expected_points=("لاغتنام الوقت والاجتهاد في العبادة وطلب رضا الله",),hint="ركزي على فكرة اغتنام كل لحظة وزيادة العمل في الأيام المميزة.",options=("لاغتنام الوقت والاجتهاد في العبادة وطلب رضا الله","لأن الصيام ينتهي قبل العشر الأواخر","لأن المطلوب فيها ترك العمل الصالح والراحة"),correct_index=0,activity_kind="concept"),),
     ),
     LessonData(
         id="religion_u3_l5", source_id="religion_prep3_t1", unit_id="u3",
@@ -48,7 +48,7 @@ RELIGION_U3_LESSONS = (
         objectives=("التعرف على سيرة الإمام الشافعي.", "إدراك دوره في تأسيس علم أصول الفقه."),
         key_terms=("الإمام الشافعي","أصول الفقه","العلم","الفقه"),
         evidence_summary=("تخصص الوحدة درسًا لسيرة الإمام الشافعي.", "يذكر الهدف المعلن دوره في تأسيس علم أصول الفقه."),
-        checks=(LessonCheck(id="shafii",prompt="بأي علم تربط الوحدة الإمام الشافعي على نحو بارز؟",expected_points=("أصول الفقه",),hint="انظر إلى هدف الوحدة.",options=("أصول الفقه","الهندسة","الطب"),correct_index=0),),
+        checks=(LessonCheck(id="shafii",prompt="بأي علم تربط الوحدة الإمام الشافعي على نحو بارز؟",expected_points=("أصول الفقه",),hint="انظر إلى هدف الوحدة.",options=("أصول الفقه","الهندسة","الطب"),correct_index=0,activity_kind="recall",mastery_eligible=False),),
     ),
     LessonData(
         id="religion_u3_l7", source_id="religion_prep3_t1", unit_id="u3",

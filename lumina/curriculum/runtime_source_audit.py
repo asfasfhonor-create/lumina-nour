@@ -18,7 +18,7 @@ class RuntimeSourceStatus:
     resolution: str
 
 
-def audit_primary_runtime_sources(database_url: str, learner_key: str) -> tuple[RuntimeSourceStatus, ...]:
+def audit_primary_runtime_sources(database_url: str, learner_key: str, storage=None) -> tuple[RuntimeSourceStatus, ...]:
     """Check whether every registered curriculum book also exists in durable runtime storage."""
     catalog = NeonTrustedSourceCatalog(database_url, learner_key)
     statuses = []
@@ -35,8 +35,17 @@ def audit_primary_runtime_sources(database_url: str, learner_key: str) -> tuple[
         except PersistenceError:
             record = None
         ready = record is not None
+        if ready and storage is not None:
+            try:
+                ready = storage.object_size(record.get("storage_key", "")) > 0
+            except Exception:
+                ready = False
+            if not ready:
+                resolution = "missing_object"
         if ready:
             reason = "ready"
+        elif resolution == "missing_object":
+            reason = "storage_object_missing_or_unreadable"
         elif not source.trusted:
             reason = "source_needs_current_year_verification"
         else:

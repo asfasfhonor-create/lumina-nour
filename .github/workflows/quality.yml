@@ -826,7 +826,7 @@ jobs:
           print("Persistence status helper OK")
           PY
 
-      - name: Validate adaptive exam selection
+      - name: Validate exam follows curriculum order
         run: |
           python - <<'PY'
           from lumina.exam_mode import _pick_checks
@@ -834,14 +834,14 @@ jobs:
 
           lessons = [lesson for lesson in all_mapped_lessons("english") if lesson.checks][:3]
           assert len(lessons) >= 2
-          weak = lessons[1]
+          later = lessons[1]
 
           class Store:
               def get_attempts(self, lesson_id=None):
                   rows = [{
-                      "lesson_id": weak.id,
-                      "check_id": weak.checks[0].id,
-                      "evidence_id": weak.checks[0].id,
+                      "lesson_id": later.id,
+                      "check_id": later.checks[0].id,
+                      "evidence_id": later.checks[0].id,
                       "correct": False,
                   }]
                   if lesson_id is None:
@@ -850,8 +850,8 @@ jobs:
 
               def get_mistakes(self, lesson_id=None, unresolved_only=False):
                   rows = [{
-                      "lesson_id": weak.id,
-                      "check_id": weak.checks[0].id,
+                      "lesson_id": later.id,
+                      "check_id": later.checks[0].id,
                       "resolved": False,
                   }]
                   if lesson_id is not None:
@@ -862,9 +862,9 @@ jobs:
 
           picked = _pick_checks(lessons, Store(), limit=2)
           assert picked
-          assert picked[0][0].id == weak.id, picked[0][0].id
-          assert len({lesson.id for lesson, _ in picked}) == len(picked)
-          print("Adaptive exam selection OK")
+          assert picked[0][0].id == lessons[0].id, [lesson.id for lesson, _ in picked]
+          assert picked[1][0].id == lessons[1].id, [lesson.id for lesson, _ in picked]
+          print("Exam curriculum order OK")
           PY
 
       - name: Validate persistence health checks
@@ -1890,4 +1890,87 @@ jobs:
           assert APP_TITLE == "LUMINA NOUR"
           assert BUILD_LABEL == "RC-2026.09.30-C"
           print("Installed app title OK")
+          PY
+
+      - name: Validate mapped unit sequence against source inventory
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM
+
+          expected = {
+              "english": [
+                  "Term 1 · Personal Identity",
+                  "Term 1 · Communication with Family and Friends",
+                  "Term 1 · Artificial Intelligence",
+                  "Term 1 · Review 1",
+                  "Term 1 · Screen Time",
+                  "Term 1 · Design Thinking",
+                  "Term 1 · Why Do We Like Stories?",
+                  "Term 1 · Review 2",
+              ],
+              "science": [
+                  "Term 1 · Force and Motion",
+                  "Term 1 · Light Energy",
+                  "Term 1 · Universe and Solar System",
+                  "Term 1 · Reproduction and Species Continuity",
+              ],
+              "math": [
+                  "Term 1 · Relations and Functions",
+                  "Term 1 · Ratio and Variation",
+                  "Term 1 · Statistics",
+                  "Term 1 · Trigonometry",
+                  "Term 1 · Coordinate Geometry",
+              ],
+              "arabic": [
+                  "Term 1 · قيم تحمي شبابنا",
+                  "Term 1 · نحو تفكير سليم",
+                  "Term 1 · أنا والمستقبل",
+              ],
+              "social": [
+                  "Term 1 · الملامح الطبيعية والحضارية لقارات العالم الجديد",
+                  "Term 1 · مصر في عصر محمد علي وخلفائه",
+                  "Term 1 · النظم البيئية في قارات العالم الجديد",
+                  "Term 1 · الحركة الوطنية في مواجهة الاحتلال البريطاني",
+              ],
+              "religion": [
+                  "Term 1 · قيم الإسلام في بناء الفرد والمجتمع",
+                  "Term 1 · الإسلام دين وحياة",
+                  "Term 1 · تحمل المسئولية في الإسلام",
+              ],
+          }
+
+          for subject, sequence in expected.items():
+              actual = [name for name in MAPPED_CURRICULUM[subject] if name.startswith("Term 1")]
+              assert actual[:len(sequence)] == sequence, (subject, actual, sequence)
+
+          print("Mapped unit sequence matches source inventory")
+          PY
+
+      - name: Validate daily mission does not jump ahead in new learning
+        run: |
+          python - <<'PY'
+          from lumina.curriculum.mapped_curriculum import MAPPED_CURRICULUM
+          from lumina.learning.missions import choose_mission
+
+          class EmptyStore:
+              def get_reviews(self, status=None):
+                  return []
+              def get_attempts(self, lesson_id=None):
+                  return []
+              def get_mistakes(self, lesson_id=None, unresolved_only=False):
+                  return []
+
+          mission = choose_mission(EmptyStore())
+          assert mission is not None
+
+          subject_lessons = [
+              lesson
+              for lessons in MAPPED_CURRICULUM[mission.module_id].values()
+              for lesson in lessons
+          ]
+          assert mission.lesson_id == subject_lessons[0].id, (
+              mission.module_id, mission.lesson_id, subject_lessons[0].id
+          )
+          assert "ترتيب المنهج" in mission.reason
+          print("Daily mission respects first unfinished lesson in selected subject")
           PY

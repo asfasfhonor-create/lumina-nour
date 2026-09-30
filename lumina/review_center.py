@@ -132,7 +132,10 @@ def render_review_center() -> None:
                             evidence_id=f"review:{check.id}",
                             activity_type="review",
                         )
-                        st.success("تمام — المراجعة اتقفلت لأنك أظهرتِ فهم جديد.")
+                        if getattr(check, "mastery_eligible", True) is False:
+                            st.success("تمام — معلومة التذكّر اتصححت واتقفلت. الإتقان الكامل لسه محتاج فهم أو تطبيق.")
+                        else:
+                            st.success("تمام — المراجعة اتقفلت لأنك أظهرتِ فهم جديد.")
                         if earned_xp:
                             st.caption(f"+{earned_xp} XP لإجابة مراجعة صحيحة.")
                         st.rerun()

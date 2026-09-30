@@ -1681,3 +1681,141 @@ jobs:
           assert "تم منع التكرار تلقائيًا" in source
           print("Trusted source save confirmation rerun contract OK")
           PY
+
+      - name: Streamlit AppTest full learning transaction
+        run: |
+          mkdir -p .streamlit
+          cat > .streamlit/secrets.toml <<'EOF'
+          GEMINI_API_KEY = ""
+          NOUR_APP_PIN = ""
+          PARENT_PIN = ""
+          NEON_DATABASE_URL = ""
+          NOUR_LEARNER_KEY = ""
+          EOF
+          python - <<'PY'
+          from streamlit.testing.v1 import AppTest
+
+          at = AppTest.from_file("app.py", default_timeout=30)
+          at.run()
+          assert not at.exception, at.exception
+
+          next(b for b in at.button if b.label == "ادخلي معمل العلوم").click()
+          at.run()
+          assert not at.exception, at.exception
+
+          science_q = next(
+              r for r in at.radio
+              if "Which rule best matches average speed" in r.label
+          )
+          science_q.set_value("Average speed = total time ÷ total distance")
+          next(b for b in at.button if b.label == "أجرب إجابتي").click()
+          at.run()
+          assert not at.exception, at.exception
+          assert any("نحتاجين نفك الفكرة" in w.value or "عادي جدًا" in w.value for w in at.warning), [w.value for w in at.warning]
+
+          next(b for b in at.button if b.label == "← العودة إلى عالم نور").click()
+          at.run()
+          next(b for b in at.button if b.label == "📝 مراجعاتي").click()
+          at.run()
+          assert not at.exception, at.exception
+
+          retry = next(
+              r for r in at.radio
+              if "Which rule best matches average speed" in r.label
+          )
+          retry.set_value("Average speed = total distance ÷ total time")
+          next(b for b in at.button if b.label == "راجعت وجربت تاني").click()
+          at.run()
+          assert not at.exception, at.exception
+          rendered = " ".join(
+              [m.value for m in at.markdown]
+              + [s.value for s in at.success]
+              + [c.value for c in at.caption]
+          )
+          assert "مفيش مراجعات مستحقة" in rendered or "المراجعة اتقفلت" in rendered, rendered[:1500]
+          assert int(at.session_state["xp"]) >= 10
+          print("Full learning transaction OK")
+          PY
+          rm -f .streamlit/secrets.toml
+
+      - name: Streamlit AppTest AI literacy transaction
+        run: |
+          mkdir -p .streamlit
+          cat > .streamlit/secrets.toml <<'EOF'
+          GEMINI_API_KEY = ""
+          NOUR_APP_PIN = ""
+          PARENT_PIN = ""
+          NEON_DATABASE_URL = ""
+          NOUR_LEARNER_KEY = ""
+          EOF
+          python - <<'PY'
+          from streamlit.testing.v1 import AppTest
+
+          at = AppTest.from_file("app.py", default_timeout=30)
+          at.run()
+          next(b for b in at.button if b.label == "ادخلي عالم الذكاء الاصطناعي").click()
+          at.run()
+          assert not at.exception, at.exception
+
+          mode = next(r for r in at.radio if r.label == "اختاري تحدّي")
+          mode.set_value("⚖️ قارني إجابتين من AI")
+          at.run()
+          assert not at.exception, at.exception
+
+          next(r for r in at.radio if r.label == "مين الإجابة الأفضل؟").set_value("B")
+          next(r for r in at.radio if r.label == "إيه أهم سبب؟").set_value(
+              "لأنها بتعترف بعدم اليقين وبتطلب دليل قبل الاعتماد."
+          )
+          next(b for b in at.button if b.label == "أكشف النتيجة").click()
+          at.run()
+          assert not at.exception, at.exception
+
+          profile = at.session_state["ai_profile"]
+          assert profile["skills"]["comparison"]["attempts"] == 1
+          assert profile["skills"]["comparison"]["correct"] == 1
+          assert profile["completed_skills"] >= 1
+          assert int(at.session_state["xp"]) >= 10
+          print("AI literacy transaction OK")
+          PY
+          rm -f .streamlit/secrets.toml
+
+      - name: Streamlit AppTest Real English baseline transaction
+        run: |
+          mkdir -p .streamlit
+          cat > .streamlit/secrets.toml <<'EOF'
+          GEMINI_API_KEY = ""
+          NOUR_APP_PIN = ""
+          PARENT_PIN = ""
+          NEON_DATABASE_URL = ""
+          NOUR_LEARNER_KEY = ""
+          EOF
+          python - <<'PY'
+          from streamlit.testing.v1 import AppTest
+          from lumina.learning.english_profile import BASELINE_ITEMS
+
+          at = AppTest.from_file("app.py", default_timeout=30)
+          at.run()
+          next(b for b in at.button if b.label == "ابدئي مغامرة الإنجليزي").click()
+          at.run()
+          assert not at.exception, at.exception
+
+          mode = next(r for r in at.radio if r.label == "اختاري تدريب")
+          mode.set_value("تحديد نقطة البداية")
+          at.run()
+
+          for item in BASELINE_ITEMS:
+              label = f"{item['skill']} · {item['prompt']}"
+              radio = next(r for r in at.radio if r.label == label)
+              radio.set_value(item["options"][item["correct_index"]])
+
+          next(b for b in at.button if b.label == "اعرضي نقطة البداية").click()
+          at.run()
+          assert not at.exception, at.exception
+
+          profile = at.session_state["english_profile"]
+          assert profile["baseline_correct"] == len(BASELINE_ITEMS)
+          assert profile["broad_band"] == "Independent-start"
+          assert profile["skill_scores"]["Vocabulary"]["correct"] == 1
+          print("Real English baseline transaction OK")
+          PY
+          rm -f .streamlit/secrets.toml

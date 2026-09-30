@@ -135,7 +135,11 @@ def render_exam_mode() -> None:
                     "answer": answer_text,
                     "correct": correct,
                     "source_pages": lesson.source_pages,
-                    "activity_type": "exam",
+                    "activity_type": (
+                        "exam_recall"
+                        if getattr(check, "mastery_eligible", True) is False
+                        else "exam"
+                    ),
                     "cognitive_kind": getattr(check, "activity_kind", "concept"),
                     "mastery_eligible": bool(getattr(check, "mastery_eligible", True)),
                 }

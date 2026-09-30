@@ -44,16 +44,20 @@ def derive_mastery(
         )
 
     correct = [a for a in attempts_list if a.get("correct") is True]
+    mastery_correct = [
+        a for a in correct
+        if a.get("mastery_eligible", True) is not False
+    ]
     distinct = {
         a.get("check_id") or a.get("evidence_id")
-        for a in correct
+        for a in mastery_correct
         if a.get("check_id") or a.get("evidence_id")
     }
     last_correct = attempts_list[-1].get("correct") is True
 
     if mistakes_list:
         state = NEEDS_REVIEW
-    elif len(correct) >= 3 and len(distinct) >= 2:
+    elif len(mastery_correct) >= 3 and len(distinct) >= 2:
         state = MASTERED
     elif last_correct:
         state = LEARNING

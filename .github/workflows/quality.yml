@@ -2253,3 +2253,35 @@ jobs:
           assert largest / total < 0.55, (positions, total)
           print("Presented answer positions balanced:", dict(positions))
           PY
+
+      - name: Validate learner-driven Real English evidence
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path("lumina/worlds/english.py").read_text(encoding="utf-8")
+          assert 'profile = dict(st.session_state.get("english_profile") or {})' in source
+          assert 'if answer.strip():' in source
+          assert 'لما تردّي بنفسك بالإنجليزي' in source
+          assert 'english_world_vocab_use' in source
+          assert 'راجعي استخدامي' in source
+          assert source.index('english_world_vocab_use') < source.index(
+              'activity_type="real_english_vocabulary_practice"'
+          )
+          print("Learner-driven Real English evidence OK")
+          PY
+
+      - name: Validate AI creation is completion not correctness
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import lumina.worlds.ai_lab as ai_lab
+
+          assert ai_lab.ACTIVITY_SKILL["ai_app_idea"] == ("creation",)
+          source = Path("lumina/worlds/ai_lab.py").read_text(encoding="utf-8")
+          assert '"correct": None' in source
+          assert 'activity_type="ai_creation"' in source
+          parent = Path("lumina/parent_dashboard.py").read_text(encoding="utf-8")
+          assert "نشاط إنشاء مكتمل" in parent
+          print("AI creation completion semantics OK")
+          PY

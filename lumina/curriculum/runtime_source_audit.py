@@ -15,6 +15,7 @@ class RuntimeSourceStatus:
     ready: bool
     trusted: bool
     reason: str
+    resolution: str
 
 
 def audit_primary_runtime_sources(database_url: str, learner_key: str) -> tuple[RuntimeSourceStatus, ...]:
@@ -22,10 +23,15 @@ def audit_primary_runtime_sources(database_url: str, learner_key: str) -> tuple[
     catalog = NeonTrustedSourceCatalog(database_url, learner_key)
     statuses = []
     for source in CURRICULUM_SOURCES:
+        resolution = "missing"
         try:
             record = catalog.find_active_by_canonical_source(source.id)
-            if record is None:
+            if record is not None:
+                resolution = "canonical"
+            else:
                 record = catalog.find_active_by_filename(source.filename)
+                if record is not None:
+                    resolution = "filename_fallback"
         except PersistenceError:
             record = None
         ready = record is not None
@@ -43,6 +49,7 @@ def audit_primary_runtime_sources(database_url: str, learner_key: str) -> tuple[
                 ready=ready,
                 trusted=source.trusted,
                 reason=reason,
+                resolution=resolution,
             )
         )
     return tuple(statuses)

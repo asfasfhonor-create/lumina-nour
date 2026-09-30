@@ -5,6 +5,7 @@ from lumina.context_help import render_context_help
 from lumina.curriculum.mapped_curriculum import SUBJECT_LABELS
 from lumina.curriculum.search import lesson_by_id
 from lumina.learning.rewards import apply_success_reward
+from lumina.learning.question_presentation import presented_options, is_correct_answer
 from lumina.learning.scaffolding import support_depth
 from lumina.persistence.session_store import get_learning_store
 
@@ -85,7 +86,7 @@ def render_review_center() -> None:
 
                 answer = st.radio(
                     check.prompt,
-                    list(check.options),
+                    list(presented_options(check)),
                     index=None,
                     key=f"review_retry_{lesson.id}_{check.id}",
                 )
@@ -98,7 +99,7 @@ def render_review_center() -> None:
                         st.warning("اختاري إجابة الأول.")
                         continue
 
-                    selected_index = list(check.options).index(answer)
+                    selected_index = list(presented_options(check)).index(answer)
                     correct = selected_index == check.correct_index
 
                     store.record_attempt(

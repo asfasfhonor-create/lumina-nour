@@ -87,17 +87,17 @@ def render_home_foundation() -> None:
             st.session_state.active_world = "weekly"
             st.rerun()
     with top_right:
-        if st.button("🧪 وضع الاختبار", key="open_exam_mode", use_container_width=True, help=help_text("exam_mode")):
+        if st.button("🧪 تدريب سريع", key="open_exam_mode", use_container_width=True, help=help_text("exam_mode")):
             st.session_state.active_world = "exam"
             st.rerun()
 
-    bottom_left, bottom_right = st.columns(2)
-    with bottom_left:
-        if st.button("📝 مراجعاتي", key="open_review_center", use_container_width=True, help=help_text("review_center")):
-            st.session_state.active_world = "review"
-            st.rerun()
-    with bottom_right:
-        if st.button("👨‍👧 لوحة وليّ الأمر", key="open_parent_dashboard", use_container_width=True):
+    if st.button("📝 مراجعاتي", key="open_review_center", use_container_width=True, help=help_text("review_center")):
+        st.session_state.active_world = "review"
+        st.rerun()
+
+    with st.expander("👨‍👧 للأسرة", expanded=False):
+        st.caption("ده جزء منفصل لمتابعة التقدّم والمصادر، ومش محتاجاه أثناء مذاكرتك.")
+        if st.button("فتح لوحة وليّ الأمر", key="open_parent_dashboard", use_container_width=True):
             st.session_state.active_world = "parent"
             st.rerun()
 

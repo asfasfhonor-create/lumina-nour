@@ -124,7 +124,8 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
     else:
         st.warning("الحفظ الدائم غير مفعّل حاليًا؛ التقدّم محفوظ داخل الجلسة فقط.")
 
-    st.markdown("### جاهزية النسخة")
+    st.markdown("### الجاهزية التقنية")
+    st.caption("هذا القسم يفحص تشغيل البرنامج نفسه. جاهزية ملفات الكتب الأساسية تظهر بشكل منفصل في قسم المصادر الدائمة.")
     readiness = build_release_readiness(
         ai_available=ai_available,
         app_pin_configured=app_pin_configured,

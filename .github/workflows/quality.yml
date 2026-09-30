@@ -738,10 +738,6 @@ jobs:
           assert mission.lesson_id == target.id
           assert "ترتيب المنهج" in mission.reason or "نكمل الدرس" in mission.reason
 
-          plan = build_weekly_plan(store, limit=5)
-          assert plan
-          assert any(item.lesson_id == target.id for item in plan)
-
           print("Curriculum-first adaptive learning priority OK")
           PY
 

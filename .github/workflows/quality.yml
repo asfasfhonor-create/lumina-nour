@@ -1889,7 +1889,7 @@ jobs:
           from lumina.config import APP_TITLE, BUILD_LABEL
 
           assert APP_TITLE == "LUMINA NOUR"
-          assert BUILD_LABEL == "RC-2026.09.30-C"
+          assert BUILD_LABEL == "RC-2026.09.30-D"
           print("Installed app title OK")
           PY
 

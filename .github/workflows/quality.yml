@@ -1143,6 +1143,9 @@ jobs:
           for button_label, expected_title in worlds:
               at = AppTest.from_file("app.py", default_timeout=20)
               at.run()
+              if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
+                  next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+                  at.run()
               assert not at.exception, (button_label, at.exception)
 
               target = next(button for button in at.button if button.label == button_label)
@@ -1189,6 +1192,9 @@ jobs:
           for button_label, expected_text in flows:
               at = AppTest.from_file("app.py", default_timeout=20)
               at.run()
+              if any(b.label == "🌍 أختار حاجة أجربها بنفسي" for b in at.button):
+                  next(b for b in at.button if b.label == "🌍 أختار حاجة أجربها بنفسي").click()
+                  at.run()
               assert not at.exception, (button_label, at.exception)
 
               target = next(button for button in at.button if button.label == button_label)

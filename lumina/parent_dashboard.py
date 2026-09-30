@@ -227,8 +227,21 @@ def render_parent_dashboard(parent_pin: str | None, *, ai_available: bool = Fals
                 st.write(f"• **{skill}** — {correct_count}/{total_count}")
             focus_label, focus_reason = recommended_focus(profile)
             st.info(f"التركيز المقترح حاليًا: **{focus_label}** — {focus_reason}")
+            activity_evidence = profile.get("activity_evidence") or {}
+            if activity_evidence:
+                st.markdown("**نشاط Real English الفعلي**")
+                for skill, values in activity_evidence.items():
+                    completed_count = int(values.get("completed", 0))
+                    correct_count = int(values.get("correct", 0))
+                    if correct_count:
+                        st.write(
+                            f"• **{skill}** — {completed_count} نشاط · "
+                            f"{correct_count} إجابة موثقة صحيحة"
+                        )
+                    else:
+                        st.write(f"• **{skill}** — {completed_count} نشاط مكتمل")
             st.caption(
-                "دي صورة مبدئية فقط، وهتتطور مع أدلة من القراءة والكتابة والمحادثة والتدريبات الفعلية."
+                "اختبار البداية مجرد صورة أولية، أما النشاط الفعلي فيتراكم من القراءة والكتابة والمحادثة والتدريبات."
             )
     else:
         st.caption("لسه ما اتعملش اختبار تحديد المستوى لـ Real English.")
@@ -467,8 +480,12 @@ def _render_trusted_sources() -> None:
             st.info(
                 f"{duplicate_count} ملف كان محفوظ بالفعل، فتم منع التكرار تلقائيًا."
             )
-        if not created_count and not duplicate_count and failed:
-            st.error("لم يتم حفظ الملفات. راجع رسالة الخطأ وحاول مرة أخرى.")
+        if failed:
+            st.error(
+                f"تعذر حفظ {len(failed)} ملف: " + " · ".join(failed)
+            )
+        elif not created_count and not duplicate_count:
+            st.warning("لم يتم حفظ أي ملف في العملية الأخيرة.")
 
     try:
         sources = catalog.list_active()

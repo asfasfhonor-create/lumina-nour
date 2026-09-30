@@ -24,6 +24,7 @@ def initialize_session_state() -> None:
         "daily_mission_lesson_id": None,
         "daily_mission_date": None,
         "first_run_complete": False,
+        "onboarding_version": 0,
         "focus_lesson_id": None,
         "profile_hydrated": False,
         "persistence_disabled_for_session": False,

@@ -194,7 +194,7 @@ def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
     )
 
     if st.button(
-        "أجرب إجابتي",
+        "Try my answer",
         key=f"lesson_check_button_{module_id}_{lesson.id}_{check.id}",
         use_container_width=True,
     ):

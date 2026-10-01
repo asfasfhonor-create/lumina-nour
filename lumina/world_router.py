@@ -36,7 +36,7 @@ def render_active_world(ai: GeminiService, parent_pin: str | None = None, *, app
     if not module_id:
         return False
 
-    if st.button("← Back to Nour’s World · العودة لعالم نور", key="back_to_nour_world"):
+    if st.button("← Back to Nour’s World", key="back_to_nour_world"):
         st.session_state.active_world = None
         st.rerun()
 

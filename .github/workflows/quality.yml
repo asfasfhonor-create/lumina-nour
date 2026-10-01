@@ -1208,7 +1208,7 @@ jobs:
           flows = [
               ("📅 My Plan", "الخطة الأسبوعية"),
               ("🧪 Quick Practice", "تدريب سريع"),
-              ("📝 My Reviews", "مراجعاتي"),
+              ("📝 My Reviews", "My Reviews"),
               ("Open Parent Dashboard", "لوحة وليّ الأمر"),
           ]
 

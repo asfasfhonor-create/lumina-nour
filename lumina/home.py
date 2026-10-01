@@ -119,9 +119,9 @@ def _render_first_run_welcome() -> None:
         <div class="mission">
           <b>✨ A little surprise before you start</b><br>
           <span class="muted">
-          العالم ده اتبنى بمساعدة الذكاء الاصطناعي مخصوص ليكي.
-          ومش لازم تكوني بتعرفي كود علشان تبدأي تعملي فكرتك بنفسك —
-          أهم حاجة تعرفي تطلبي صح، تجربي، وتعدّلي.
+          This world was built with AI to help you learn, explore, and create.
+          You do not need to know coding to start building an idea —
+          Ask well, try, test, and improve.
           </span>
         </div>
         """,
@@ -138,7 +138,7 @@ def _render_first_run_welcome() -> None:
         ):
             st.session_state.first_run_complete = True
             st.session_state.onboarding_version = ONBOARDING_VERSION
-            st.session_state.ai_lab_mode = "✨ اصنعي فكرة برنامج مع AI"
+            st.session_state.ai_lab_mode = "✨ Build an idea with AI"
             persist_profile_state()
             st.session_state.active_world = "ai"
             st.rerun()

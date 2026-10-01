@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from datetime import datetime, timezone
+from time import sleep
 
 import psycopg
 from psycopg.rows import dict_row
@@ -27,13 +28,19 @@ class NeonLearningStore(LearningStore):
 
     @contextmanager
     def _connect(self):
-        try:
-            with psycopg.connect(self.database_url, row_factory=dict_row) as conn:
-                yield conn
-        except psycopg.Error as exc:
-            raise PersistenceError(
-                "تعذر الوصول إلى قاعدة بيانات تقدم نور الآن. لم يتم تسجيل هذه العملية."
-            ) from exc
+        last_error: Exception | None = None
+        for attempt, delay in enumerate((0.0, 0.75, 1.5), start=1):
+            try:
+                with psycopg.connect(self.database_url, row_factory=dict_row) as conn:
+                    yield conn
+                return
+            except psycopg.Error as exc:
+                last_error = exc
+                if attempt < 3:
+                    sleep(delay)
+        raise PersistenceError(
+            "تعذر الوصول إلى قاعدة بيانات تقدم نور الآن. لم يتم تسجيل هذه العملية."
+        ) from last_error
 
     def record_attempt(self, attempt: dict) -> None:
         payload = dict(attempt)

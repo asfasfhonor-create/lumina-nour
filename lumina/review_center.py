@@ -19,26 +19,26 @@ def render_review_center() -> None:
     mistakes = store.get_mistakes(unresolved_only=True)
     reviews = store.get_reviews("due")
 
-    st.markdown('<div class="section-title">📝 مراجعاتي</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">📝 My Reviews</div>', unsafe_allow_html=True)
     render_context_help("review_center")
     st.markdown(
-        '<div class="mission"><b>الغلط هنا معلومة مفيدة، مش عقوبة.</b><br>'
-        '<span class="muted">بنرجع للحاجات اللي محتاجة مراجعة ونقفلها لما يظهر فهم جديد.</span></div>',
+        '<div class="mission"><b>Mistakes are useful information, not punishment.</b><br>'
+        '<span class="muted">We revisit what needs review and close it when new understanding appears.</span></div>',
         unsafe_allow_html=True,
     )
 
     c1, c2 = st.columns(2)
     with c1:
-        st.metric("أخطاء نراجعها", len(mistakes))
+        st.metric("Mistakes to review", len(mistakes))
     with c2:
-        st.metric("مراجعات مستحقة", len(reviews))
+        st.metric("Reviews due", len(reviews))
 
     if not mistakes and not reviews:
-        st.success("مفيش مراجعات مستحقة حاليًا. كمّلي تعلمك 🌱")
+        st.success("مفيش Reviews due حاليًا. كمّلي تعلمك 🌱")
         return
 
     if mistakes:
-        st.markdown("### دفتر الأخطاء")
+        st.markdown("### Mistake Notebook")
         for mistake in mistakes:
             subject = SUBJECT_LABELS.get(mistake.get("module_id"), mistake.get("module_id", ""))
             title = mistake.get("lesson_title", mistake.get("lesson_id", "Lesson"))
@@ -51,8 +51,8 @@ def render_review_center() -> None:
                     st.caption(f"المصدر: {mistake['source_pages']}")
 
     if reviews:
-        st.markdown("### أسئلة جاهزة للمراجعة")
-        st.caption("راجعي السؤال هنا مباشرة بدل ما تدوري على الدرس من جديد.")
+        st.markdown("### Ready-to-review questions")
+        st.caption("Review the question here without reopening the lesson.")
 
         seen = set()
         for review in reviews:
@@ -92,7 +92,7 @@ def render_review_center() -> None:
                 )
 
                 if st.button(
-                    "راجعت وجربت تاني",
+                    "Review and try again",
                     key=f"review_retry_button_{lesson.id}_{check.id}",
                 ):
                     if answer is None:

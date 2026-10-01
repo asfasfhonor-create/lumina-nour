@@ -12,8 +12,8 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_arabic_world(ai: GeminiService) -> None:
-    st.markdown('<div class="section-title">📖 عالم العربي</div>', unsafe_allow_html=True)
-    render_context_help("arabic", label="💬 قوليلي العالم ده بيعمل إيه")
+    st.markdown('<div class="section-title">📖 Arabic World</div>', unsafe_allow_html=True)
+    render_context_help("arabic", label="💬 What can I do here?")
     st.markdown(
         '<div class="mission"><b>نفهم اللغة ونستخدمها، مش نحفظها بس.</b><br>'
         '<span class="muted">الشرح يحافظ على ترتيب ومصطلحات كتاب نور، مع تدريب على الفهم والتعبير.</span></div>',

@@ -19,8 +19,8 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_math_world(ai: GeminiService) -> None:
-    st.markdown('<div class="section-title">➗ تحدّي الرياضيات · Math Quest</div>', unsafe_allow_html=True)
-    render_context_help("math", label="💬 قوليلي العالم ده بيعمل إيه")
+    st.markdown('<div class="section-title">➗ Math Quest</div>', unsafe_allow_html=True)
+    render_context_help("math", label="💬 What can I do here?")
     st.markdown(
         '<div class="mission"><b>افهمي الفكرة الأول، وبعدها استخدمي القاعدة.</b><br>'
         '<span class="muted">بنمشي مع منهج نور، ونوضح خطوات التفكير والرموز الرياضية من غير قفزات.</span></div>',

@@ -13,8 +13,8 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_ict_world(ai: GeminiService) -> None:
-    st.markdown('<div class="section-title">💻 معمل الكمبيوتر · ICT Lab</div>', unsafe_allow_html=True)
-    render_context_help("ict", label="💬 قوليلي العالم ده بيعمل إيه")
+    st.markdown('<div class="section-title">💻 ICT Lab</div>', unsafe_allow_html=True)
+    render_context_help("ict", label="💬 What can I do here?")
     st.markdown(
         '<div class="mission"><b>منهج المدرسة أولًا، والتجربة تساعدنا نفهمه.</b><br>'
         '<span class="muted">بنحافظ على منهج Visual Basic .NET كما هو، وPython يفضل مسارًا إضافيًا منفصلًا.</span></div>',

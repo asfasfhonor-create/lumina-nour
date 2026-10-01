@@ -55,8 +55,8 @@ def _record_real_english_evidence(
 
 
 def render_english_world(ai: GeminiService) -> None:
-    st.markdown('<div class="section-title">🇬🇧 مغامرة الإنجليزي · English Adventure</div>', unsafe_allow_html=True)
-    render_context_help("english", label="💬 قوليلي العالم ده بيعمل إيه")
+    st.markdown('<div class="section-title">🇬🇧 English Adventure</div>', unsafe_allow_html=True)
+    render_context_help("english", label="💬 What can I do here?")
     st.markdown(
         '<div class="mission"><b>مساران، وهدف واحد: English أقوى.</b><br>'
         '<span class="muted">منهج المدرسة يمشي مع كتاب نور، وReal English يطوّر استخدامها الحقيقي للغة أبعد من حدود المنهج.</span></div>',

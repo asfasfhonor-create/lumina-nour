@@ -422,6 +422,25 @@ def _render_trusted_sources() -> None:
         "ارفع هنا فقط نسخة الكتاب المطابقة للمصدر المسجل. "
         "LUMINA يحفظ الهوية الأصلية للكتاب منفصلة عن الكتب الخارجية."
     )
+
+    primary_save_result = st.session_state.pop("primary_save_result", None)
+    if primary_save_result:
+        if primary_save_result.get("status") == "saved":
+            st.success(
+                "تم الحفظ بنجاح ✅ تم اعتماد الكتاب الأساسي وربطه بالمنهج، "
+                "وتم التحقق من وجود الملف في التخزين الدائم."
+            )
+        elif primary_save_result.get("status") == "duplicate":
+            st.info(
+                "الكتاب محفوظ بالفعل ✅ تم منع إنشاء نسخة مكررة، "
+                "وتم التحقق من وجود الملف في التخزين الدائم."
+            )
+        elif primary_save_result.get("status") == "failed":
+            st.error(
+                "لم يتم اعتماد الكتاب. "
+                + str(primary_save_result.get("message", "حدث خطأ غير متوقع."))
+            )
+
     primary_options = {
         f"{SUBJECT_LABELS.get(source.subject_id, source.subject_id)} · {source.term} · {source.title}": source
         for source in CURRICULUM_SOURCES
@@ -432,11 +451,12 @@ def _render_trusted_sources() -> None:
         key="parent_primary_source_choice",
     )
     primary_source = primary_options[primary_label]
+    upload_nonce = int(st.session_state.get("primary_upload_nonce", 0))
     primary_file = st.file_uploader(
         f"ملف الكتاب الأساسي · المتوقع: {primary_source.filename}",
         type=["pdf"],
         accept_multiple_files=False,
-        key=f"parent_primary_source_upload_{primary_source.id}",
+        key=f"parent_primary_source_upload_{primary_source.id}_{upload_nonce}",
     )
     st.caption(
         "رفع الكتب الكبيرة مدعوم حتى 500 MB في إعدادات LUMINA؛ "
@@ -462,6 +482,10 @@ def _render_trusted_sources() -> None:
                     data=primary_file.getvalue(),
                 )
                 storage_key = storage.put(upload, learner_key=learner_key)
+                stored_size = storage.object_size(storage_key)
+                if stored_size <= 0:
+                    raise PersistenceError("تم رفع الملف لكن تعذر التحقق من حجمه في التخزين الدائم.")
+
                 record = build_trusted_record(
                     upload,
                     learner_key=learner_key,
@@ -482,15 +506,25 @@ def _render_trusted_sources() -> None:
                     edition_label=primary_source.edition_label,
                 )
                 created = catalog.register(record)
-                if created:
-                    st.success("تم حفظ الكتاب الأساسي وربطه بالمنهج بهوية ثابتة.")
-                else:
-                    st.info("هذا الملف محفوظ بالفعل، وتم منع إنشاء نسخة مكررة.")
+                st.session_state["primary_save_result"] = {
+                    "status": "saved" if created else "duplicate",
+                    "filename": primary_file.name,
+                    "size_bytes": stored_size,
+                }
+                st.session_state["primary_upload_nonce"] = upload_nonce + 1
                 st.rerun()
             except (ValueError, PersistenceError) as exc:
-                st.error(str(exc))
+                st.session_state["primary_save_result"] = {
+                    "status": "failed",
+                    "message": str(exc),
+                }
+                st.rerun()
             except Exception:
-                st.error("تعذر حفظ الكتاب الأساسي الآن.")
+                st.session_state["primary_save_result"] = {
+                    "status": "failed",
+                    "message": "تعذر حفظ الكتاب الأساسي الآن.",
+                }
+                st.rerun()
 
     st.markdown("#### الكتب والمذكرات الإضافية")
     uploaded_files = st.file_uploader(

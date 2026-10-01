@@ -1732,7 +1732,7 @@ jobs:
 
           next(b for b in at.button if b.label == "← Back to Nour’s World").click()
           at.run()
-          next(b for b in at.button if b.label == "📝 My Reviews").click()
+          next(b for b in at.button if b.label == "📝 My Reviews" or b.label == "📝 مراجعاتي").click()
           at.run()
           assert not at.exception, at.exception
 

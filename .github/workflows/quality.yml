@@ -1725,12 +1725,12 @@ jobs:
               if "Which rule best matches average speed" in r.label
           )
           science_q.set_value("Average speed = total time ÷ total distance")
-          next(b for b in at.button if b.label == "أجرب إجابتي").click()
+          next(b for b in at.button if b.label == "Try my answer").click()
           at.run()
           assert not at.exception, at.exception
           assert any("نحتاجين نفك الفكرة" in w.value or "عادي جدًا" in w.value for w in at.warning), [w.value for w in at.warning]
 
-          next(b for b in at.button if b.label == "← Back to Nour’s World · العودة لعالم نور").click()
+          next(b for b in at.button if b.label == "← Back to Nour’s World").click()
           at.run()
           next(b for b in at.button if b.label == "📝 My Reviews").click()
           at.run()
@@ -1741,7 +1741,7 @@ jobs:
               if "Which rule best matches average speed" in r.label
           )
           retry.set_value("Average speed = total distance ÷ total time")
-          next(b for b in at.button if b.label == "راجعت وجربت تاني").click()
+          next(b for b in at.button if b.label == "Review and try again").click()
           at.run()
           assert not at.exception, at.exception
           rendered = " ".join(

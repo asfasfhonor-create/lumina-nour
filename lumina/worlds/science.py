@@ -16,8 +16,8 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 
 def render_science_world(ai: GeminiService) -> None:
-    st.markdown('<div class="section-title">🔬 معمل العلوم · Science Lab</div>', unsafe_allow_html=True)
-    render_context_help("science", label="💬 قوليلي العالم ده بيعمل إيه")
+    st.markdown('<div class="section-title">🔬 Science Lab</div>', unsafe_allow_html=True)
+    render_context_help("science", label="💬 What can I do here?")
     st.markdown(
         '<div class="mission"><b>لاحظي → افهمي → توقّعي → طبّقي</b><br>'
         '<span class="muted">بنشرح من منهج نور نفسه، ونبدأ بالفهم والاستنتاج قبل الحفظ.</span></div>',

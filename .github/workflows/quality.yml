@@ -1206,8 +1206,8 @@ jobs:
           from streamlit.testing.v1 import AppTest
 
           flows = [
-              ("📅 My Plan", "الخطة الأسبوعية"),
-              ("🧪 Quick Practice", "تدريب سريع"),
+              ("📅 My Plan", "My Plan"),
+              ("🧪 Quick Practice", "Quick Practice"),
               ("📝 My Reviews", "My Reviews"),
               ("Open Parent Dashboard", "لوحة وليّ الأمر"),
           ]

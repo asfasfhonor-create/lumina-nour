@@ -1154,13 +1154,13 @@ jobs:
           from streamlit.testing.v1 import AppTest
 
           worlds = [
-              ("Start English Adventure", "مغامرة الإنجليزي"),
-              ("Enter Science Lab", "معمل العلوم"),
-              ("Start Math Quest", "تحدّي الرياضيات"),
-              ("Enter Arabic World", "عالم العربي"),
-              ("Start Social Studies", "مغامرة الدراسات"),
-              ("Start Religion Journey", "رحلة الدين"),
-              ("Enter ICT Lab", "معمل الكمبيوتر"),
+              ("Start English Adventure", "English Adventure"),
+              ("Enter Science Lab", "Science Lab"),
+              ("Start Math Quest", "Math Quest"),
+              ("Enter Arabic World", "Arabic World"),
+              ("Start Social Studies", "Social Studies"),
+              ("Start Religion Journey", "Religion Journey"),
+              ("Enter ICT Lab", "ICT Lab"),
           ]
 
           for button_label, expected_title in worlds:
@@ -1183,7 +1183,7 @@ jobs:
               )
               assert expected_title in rendered, (button_label, expected_title, rendered[:500])
 
-              back = next(button for button in at.button if button.label == "← Back to Nour’s World · العودة لعالم نور")
+              back = next(button for button in at.button if button.label == "← Back to Nour’s World")
               back.click()
               at.run()
               assert not at.exception, (button_label, "back", at.exception)
@@ -1235,7 +1235,7 @@ jobs:
               if button_label == "Open Parent Dashboard":
                   assert "المصادر الدائمة" in rendered, rendered[:1200]
 
-              back = next(button for button in at.button if button.label == "← Back to Nour’s World · العودة لعالم نور")
+              back = next(button for button in at.button if button.label == "← Back to Nour’s World")
               back.click()
               at.run()
               assert not at.exception, (button_label, "back", at.exception)

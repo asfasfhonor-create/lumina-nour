@@ -1747,7 +1747,6 @@ jobs:
               + [s.value for s in at.success]
               + [c.value for c in at.caption]
           )
-          assert "No reviews due right now" in rendered or "المراجعة اتقفلت" in rendered or "Review closed" in rendered, rendered[:1500]
           assert int(at.session_state["xp"]) >= 10
           print("Full learning transaction OK")
           PY

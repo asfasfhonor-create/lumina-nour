@@ -14,7 +14,7 @@ from lumina.curriculum.source_session import render_temporary_source_session
 
 def render_social_world(ai: GeminiService) -> None:
     st.markdown('<div class="section-title">🌍 مغامرة الدراسات</div>', unsafe_allow_html=True)
-    render_context_help("social", label="💬 قوليلي العالم ده بيعمل إيه")
+    render_context_help("social", label="💬 What can I do here?")
     st.markdown(
         '<div class="mission"><b>خريطة + دليل + استنتاج.</b><br>'
         '<span class="muted">الدراسات هنا تحقيق: نقرأ الخريطة ونربط السبب بالنتيجة بدل الحفظ المنفصل.</span></div>',

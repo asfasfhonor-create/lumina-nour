@@ -37,6 +37,29 @@ jobs:
           import lumina.persistence.session_store
           print("Import smoke test OK")
           PY
+      - name: Validate English-first learner navigation
+        run: |
+          python - <<'PY'
+          from lumina.language_policy import PARENT_AREA_LABEL, ui_label, world_action, world_title
+
+          assert PARENT_AREA_LABEL == "Parent Area"
+          assert ui_label("learning_worlds") == "Choose Your World"
+          assert ui_label("daily_mission") == "Daily Mission"
+          for module_id, expected in {
+              "english": "English Adventure",
+              "science": "Science Lab",
+              "math": "Math Quest",
+              "arabic": "Arabic World",
+              "social": "Social Studies",
+              "religion": "Religion Journey",
+              "ict": "ICT Lab",
+              "ai": "AI Lab",
+          }.items():
+              assert world_title(module_id, "fallback") == expected
+              assert world_action(module_id).lower().startswith(("start", "enter"))
+          print("English-first learner navigation OK")
+          PY
+
       - name: Validate module registry
         run: |
           python - <<'PY'

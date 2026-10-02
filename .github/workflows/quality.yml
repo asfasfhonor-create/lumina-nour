@@ -1240,11 +1240,10 @@ jobs:
                   target.click()
               else:
                   if button_label == "Open Parent Dashboard":
-                      with st.expander("👨‍👧 Parent Area"):
-                          pass
+                      next(e for e in at.expander if "Parent Area" in e.label).click()
                   else:
-                      next(b for b in at.button if b.label == "✨ More ways to learn").click()
-                      at.run()
+                      next(e for e in at.expander if "More ways to learn" in e.label).click()
+                  at.run()
                   target = next(button for button in at.button if button.label == button_label)
                   target.click()
               at.run()

@@ -80,7 +80,6 @@ def render_home_foundation() -> None:
         st.caption("🏅 Your badges: " + " · ".join(badges))
 
     _render_start_studying()
-    _render_daily_mission()
     _render_learning_worlds()
 
     st.markdown("---")
@@ -156,25 +155,49 @@ def _render_first_run_welcome() -> None:
 
 
 def _render_start_studying() -> None:
-    """Put the learner's primary action above dashboard/utility content."""
-    st.markdown('<div class="section-title">🎓 Start Studying</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="mission"><b>Not sure what to do?</b><br>'
-        '<span class="muted">LUMINA can choose a lesson for you, or you can pick a subject yourself.</span></div>',
-        unsafe_allow_html=True,
-    )
+    """Make the first screen answer one question: what should Nour do now?"""
+    store = get_learning_store()
+    today = date.today().isoformat()
+    target_id = st.session_state.get("daily_mission_lesson_id")
 
-    if st.button("▶ Start today's lesson", key="start_studying_now", use_container_width=True):
-        store = get_learning_store()
+    mission = None
+    if st.session_state.get("daily_mission_date") == today and target_id:
+        lesson = get_lesson_by_id(target_id)
+        module_id = get_module_for_lesson_id(target_id)
+        if lesson is not None and module_id is not None:
+            from lumina.curriculum.mapped_curriculum import SUBJECT_LABELS
+            from lumina.learning.missions import MissionRecommendation
+            mission = MissionRecommendation(
+                module_id=module_id,
+                subject_label=SUBJECT_LABELS.get(module_id, module_id),
+                lesson_id=lesson.id,
+                lesson_title=lesson.title,
+                source_pages=lesson.source_pages,
+                reason="Today's recommended lesson",
+            )
+
+    if mission is None:
         mission = choose_mission(store)
         if mission is not None:
             st.session_state.daily_mission_lesson_id = mission.lesson_id
-            st.session_state.daily_mission_date = date.today().isoformat()
-            st.session_state.active_world = "mission"
+            st.session_state.daily_mission_date = today
             persist_profile_state()
+
+    st.markdown('<div class="start-card"><div class="section-title">🎓 What should I do today?</div>',
+                unsafe_allow_html=True)
+
+    if mission is not None:
+        st.markdown(
+            f'<div class="start-lesson"><div class="start-kicker">RECOMMENDED FOR YOU</div>'
+            f'<div class="start-title">{mission.subject_label} · {mission.lesson_title}</div>'
+            f'<div class="start-meta">{mission.source_pages}</div></div>',
+            unsafe_allow_html=True,
+        )
+        if st.button("▶ Start this lesson", key="start_studying_now", use_container_width=True):
+            st.session_state.active_world = "mission"
             st.rerun()
-        else:
-            st.info("No lesson is available right now. Choose a subject below.")
+    else:
+        st.info("No lesson is ready yet. Choose a subject below.")
 
     left, right = st.columns(2)
     with left:
@@ -203,7 +226,7 @@ def _render_start_studying() -> None:
             st.session_state.show_subject_picker = False
             st.rerun()
 
-
+    st.markdown("</div>", unsafe_allow_html=True)
 def _render_daily_mission() -> None:
     store = get_learning_store()
     today = date.today().isoformat()

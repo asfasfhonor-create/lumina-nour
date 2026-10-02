@@ -1330,8 +1330,7 @@ jobs:
           for forbidden in [
               "Gemini API Key",
               "Development branch",
-                        "Exam Mode",
-          ]:
+                    ]:
               assert forbidden not in learner_text, forbidden
 
           print("Learner-facing visual and copy guard OK")

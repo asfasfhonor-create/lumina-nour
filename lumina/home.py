@@ -116,43 +116,33 @@ def _render_first_run_welcome() -> None:
 
     st.markdown(
         """
-        <div class="mission">
-          <b>✨ A little surprise before you start</b><br>
-          <span class="muted">
-          This world was built with AI to help you learn, explore, and create.
-          You do not need to know coding to start building an idea —
-          Ask well, try, test, and improve.
-          </span>
+        <div class="start-card">
+          <div class="section-title">👋 Welcome, Nour!</div>
+          <div class="start-title">Ready to study?</div>
+          <div class="muted">You don't need to learn the app. Just choose where you want to start.</div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    st.caption("Your first tour takes only a few minutes. No test. No grades.")
 
-    left, right = st.columns(2)
-    with left:
-        if st.button(
-            "🤖 Show me how to build an idea with AI",
-            key="first_run_ai",
-            use_container_width=True,
-        ):
-            st.session_state.first_run_complete = True
-            st.session_state.onboarding_version = ONBOARDING_VERSION
-            st.session_state.ai_lab_mode = "✨ Build an idea with AI"
-            persist_profile_state()
-            st.session_state.active_world = "ai"
-            st.rerun()
-    with right:
-        if st.button(
-            "🌍 Let me choose something to explore",
-            key="first_run_choose",
-            use_container_width=True,
-        ):
-            st.session_state.first_run_complete = True
-            st.session_state.onboarding_version = ONBOARDING_VERSION
-            persist_profile_state()
-            st.rerun()
+    if st.button("▶ Start my first lesson", key="first_run_start", use_container_width=True):
+        store = get_learning_store()
+        mission = choose_mission(store)
+        st.session_state.onboarding_version = ONBOARDING_VERSION
+        st.session_state.first_run_complete = True
+        if mission is not None:
+            st.session_state.daily_mission_lesson_id = mission.lesson_id
+            st.session_state.daily_mission_date = date.today().isoformat()
+            st.session_state.active_world = "mission"
+        persist_profile_state()
+        st.rerun()
 
+    if st.button("📚 I want to choose a subject", key="first_run_choose", use_container_width=True):
+        st.session_state.onboarding_version = ONBOARDING_VERSION
+        st.session_state.first_run_complete = True
+        st.session_state.show_subject_picker = True
+        persist_profile_state()
+        st.rerun()
 
 def _render_start_studying() -> None:
     """Make the first screen answer one question: what should Nour do now?"""

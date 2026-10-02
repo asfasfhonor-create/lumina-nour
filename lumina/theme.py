@@ -75,6 +75,11 @@ header[data-testid="stHeader"],
 .subject:hover { transform:translateY(-2px); border-color:rgba(185,167,255,.34); background:linear-gradient(145deg,rgba(255,143,193,.10),rgba(126,214,255,.07)); }
 .subject h4 { margin:0 0 4px; }
 .mission { background:linear-gradient(135deg,rgba(255,118,172,.13),rgba(120,115,245,.14)); border:1px solid rgba(255,160,205,.24); border-radius:22px; padding:16px; }
+.start-card { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); border-radius:26px; padding:18px; margin:14px 0 18px; box-shadow:0 16px 40px rgba(0,0,0,.16); }
+.start-lesson { background:rgba(255,143,193,.12); border:1px solid rgba(255,255,255,.14); border-radius:20px; padding:16px; margin:8px 0 12px; }
+.start-kicker { font-family:'Plus Jakarta Sans',sans-serif; font-size:.68rem; letter-spacing:.10em; font-weight:800; opacity:.78; }
+.start-title { font-size:1.18rem; font-weight:900; margin:.35rem 0 .2rem; }
+.start-meta { font-size:.82rem; opacity:.78; }
 .feature-card { background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.1); border-radius:20px; padding:14px; margin-bottom:14px; }
 .track-card { background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:14px; margin-bottom:10px; }
 div[data-testid="stButton"] > button, .stButton > button, .stButton > button[kind="secondary"] { width:100%; border-radius:15px; min-height:48px; font-weight:800; border:1px solid rgba(255,255,255,.16) !important; background:linear-gradient(135deg,#ff758c,#ff7eb3 50%,#7873f5) !important; color:#ffffff !important; box-shadow:0 8px 22px rgba(74,56,190,.18); transition:transform .15s ease,filter .15s ease,box-shadow .15s ease; }

@@ -82,24 +82,27 @@ def render_home_foundation() -> None:
     _render_start_studying()
     _render_learning_worlds()
 
-    st.markdown("---")
-    if st.button("🔎 " + ui_label("curriculum_search"), key="open_curriculum_search", use_container_width=True, help=help_text("curriculum_search")):
-        st.session_state.active_world = "curriculum_search"
-        st.rerun()
+    with st.expander("✨ More ways to learn", expanded=False):
+        st.caption("You can ignore this for now. Everything you need to start studying is above.")
+        top_left, top_right = st.columns(2)
+        with top_left:
+            if st.button("🔎 Search the curriculum", key="open_curriculum_search", use_container_width=True):
+                st.session_state.active_world = "curriculum_search"
+                st.rerun()
+        with top_right:
+            if st.button("📅 My Plan", key="open_weekly_plan", use_container_width=True):
+                st.session_state.active_world = "weekly"
+                st.rerun()
 
-    top_left, top_right = st.columns(2)
-    with top_left:
-        if st.button("📅 " + ui_label("weekly_plan"), key="open_weekly_plan", use_container_width=True, help=help_text("weekly_plan")):
-            st.session_state.active_world = "weekly"
-            st.rerun()
-    with top_right:
-        if st.button("🧪 " + ui_label("exam_mode"), key="open_exam_mode", use_container_width=True, help=help_text("exam_mode")):
-            st.session_state.active_world = "exam"
-            st.rerun()
-
-    if st.button("📝 " + ui_label("review_center"), key="open_review_center", use_container_width=True, help=help_text("review_center")):
-        st.session_state.active_world = "review"
-        st.rerun()
+        top_left, top_right = st.columns(2)
+        with top_left:
+            if st.button("🧪 Quick Practice", key="open_exam_mode", use_container_width=True):
+                st.session_state.active_world = "exam"
+                st.rerun()
+        with top_right:
+            if st.button("📝 My Reviews", key="open_review_center", use_container_width=True):
+                st.session_state.active_world = "review"
+                st.rerun()
 
     with st.expander("👨‍👧 " + PARENT_AREA_LABEL, expanded=False):
         st.caption("A separate area for parents to follow progress and learning sources.")

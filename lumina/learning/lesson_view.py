@@ -89,14 +89,16 @@ def render_verified_lesson(lesson, *, module_id: str, ai=None) -> None:
 
     st.markdown(f"### {lesson.title}")
     source_context = context_for_lesson(lesson)
-    if source_context is not None:
-        verification = "" if source_context.trusted else " · يحتاج تحقق من تغطية السنة الحالية"
-        st.caption(
-            f"من المصدر: {source_context.source_title} · {source_context.term} · "
-            f"{lesson.source_pages}{verification}"
-        )
-    else:
-        st.caption(f"من المصدر: {lesson.source_pages}")
+    st.caption("📘 School curriculum lesson")
+    with st.expander("ℹ️ About this lesson", expanded=False):
+        if source_context is not None:
+            verification = "" if source_context.trusted else " · يحتاج تحقق من تغطية السنة الحالية"
+            st.caption(
+                f"Source: {source_context.source_title} · {source_context.term} · "
+                f"{lesson.source_pages}{verification}"
+            )
+        else:
+            st.caption(f"Source pages: {lesson.source_pages}")
 
     st.markdown(
         f'<div class="mission"><b>{icon} {mission_name} · {stage.label}</b><br>'

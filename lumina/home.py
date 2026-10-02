@@ -79,6 +79,7 @@ def render_home_foundation() -> None:
     if badges:
         st.caption("🏅 Your badges: " + " · ".join(badges))
 
+    _render_start_studying()
     _render_daily_mission()
     _render_learning_worlds()
 
@@ -151,6 +152,55 @@ def _render_first_run_welcome() -> None:
             st.session_state.first_run_complete = True
             st.session_state.onboarding_version = ONBOARDING_VERSION
             persist_profile_state()
+            st.rerun()
+
+
+def _render_start_studying() -> None:
+    """Put the learner's primary action above dashboard/utility content."""
+    st.markdown('<div class="section-title">🎓 Start Studying</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="mission"><b>Not sure what to do?</b><br>'
+        '<span class="muted">LUMINA can choose a lesson for you, or you can pick a subject yourself.</span></div>',
+        unsafe_allow_html=True,
+    )
+
+    if st.button("▶ Start today's lesson", key="start_studying_now", use_container_width=True):
+        store = get_learning_store()
+        mission = choose_mission(store)
+        if mission is not None:
+            st.session_state.daily_mission_lesson_id = mission.lesson_id
+            st.session_state.daily_mission_date = date.today().isoformat()
+            st.session_state.active_world = "mission"
+            persist_profile_state()
+            st.rerun()
+        else:
+            st.info("No lesson is available right now. Choose a subject below.")
+
+    left, right = st.columns(2)
+    with left:
+        if st.button("📚 Choose a subject", key="start_choose_subject", use_container_width=True):
+            st.session_state.show_subject_picker = True
+    with right:
+        if st.button("🔁 Review & Practice", key="start_review", use_container_width=True):
+            st.session_state.active_world = "review"
+            st.rerun()
+
+    if st.session_state.get("show_subject_picker", False):
+        subject_options = [
+            ("English Adventure", "english"),
+            ("Science Lab", "science"),
+            ("Math Quest", "math"),
+            ("Arabic World", "arabic"),
+            ("Social Studies", "social"),
+            ("Religion Journey", "religion"),
+            ("ICT Lab", "ict"),
+        ]
+        labels = [label for label, _ in subject_options]
+        selected = st.selectbox("What do you want to study?", labels, key="study_subject_picker")
+        selected_id = dict(subject_options)[selected]
+        if st.button("Open this subject", key="open_selected_subject", use_container_width=True):
+            st.session_state.active_world = selected_id
+            st.session_state.show_subject_picker = False
             st.rerun()
 
 

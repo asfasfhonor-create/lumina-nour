@@ -26,7 +26,8 @@ def render_verified_unit(
 ) -> None:
     st.markdown(f"### {title}")
     st.caption("محتوى موثّق من مصدر المنهج.")
-    render_learning_brain_summary([lesson.id for lesson in lessons])
+    with st.expander("📊 My progress in this subject", expanded=False):
+        render_learning_brain_summary([lesson.id for lesson in lessons])
 
     lesson = st.selectbox(
         "اختاري الدرس",

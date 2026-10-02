@@ -1812,7 +1812,7 @@ jobs:
           if any(b.label == "📚 I want to choose a subject" for b in at.button):
               next(b for b in at.button if b.label == "📚 I want to choose a subject").click()
               at.run()
-          at.session_state["onboarding_version"] = 1
+          at.session_state["onboarding_version"] = 2
           at.session_state["first_run_complete"] = True
           at.session_state["show_subject_picker"] = False
           at.session_state["active_world"] = None

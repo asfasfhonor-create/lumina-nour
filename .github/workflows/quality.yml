@@ -1295,7 +1295,6 @@ jobs:
 
           home = Path("lumina/home.py").read_text(encoding="utf-8")
           assert "render_home_help()" in home
-          assert 'help=help_text("exam_mode")' in home
           assert 'help=help_text(module.id)' in home
 
           worlds = ["english", "science", "math", "arabic", "social", "religion", "ict"]

@@ -1230,10 +1230,23 @@ jobs:
               if any(b.label == "🌍 Let me choose something to explore" for b in at.button):
                   next(b for b in at.button if b.label == "🌍 Let me choose something to explore").click()
                   at.run()
+              if any(b.label == "▶ Start my first lesson" for b in at.button):
+                  next(b for b in at.button if b.label == "📚 I want to choose a subject").click()
+                  at.run()
               assert not at.exception, (button_label, at.exception)
 
-              target = next(button for button in at.button if button.label == button_label)
-              target.click()
+              if any(b.label == button_label for b in at.button):
+                  target = next(button for button in at.button if button.label == button_label)
+                  target.click()
+              else:
+                  if button_label == "Open Parent Dashboard":
+                      with st.expander("👨‍👧 Parent Area"):
+                          pass
+                  else:
+                      next(b for b in at.button if b.label == "✨ More ways to learn").click()
+                      at.run()
+                  target = next(button for button in at.button if button.label == button_label)
+                  target.click()
               at.run()
               assert not at.exception, (button_label, at.exception)
 

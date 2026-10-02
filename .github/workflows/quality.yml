@@ -1804,6 +1804,21 @@ jobs:
           if any(b.label == "🌍 Let me choose something to explore" for b in at.button):
               next(b for b in at.button if b.label == "🌍 Let me choose something to explore").click()
               at.run()
+
+          # Start from the current learner home, not from a legacy onboarding assumption.
+          at.session_state["onboarding_version"] = 0
+          at.session_state["first_run_complete"] = False
+          at.run()
+          if not any(b.label == "Enter AI Lab" for b in at.button):
+              # Finish the first-run screen, then use the learner-facing home.
+              if any(b.label == "▶ Start my first lesson" for b in at.button):
+                  next(b for b in at.button if b.label == "📚 I want to choose a subject").click()
+                  at.run()
+              if any(b.label == "Enter AI Lab" for b in at.button):
+                  pass
+              else:
+                  at.session_state["first_run_complete"] = True
+                  at.run()
           next(b for b in at.button if b.label == "Enter AI Lab").click()
           at.run()
           assert not at.exception, at.exception

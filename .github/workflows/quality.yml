@@ -1735,7 +1735,16 @@ jobs:
               at.run()
           assert not at.exception, at.exception
 
-          next(b for b in at.button if b.label == "Enter Science Lab").click()
+          if any(b.label == "▶ Start my first lesson" for b in at.button):
+              next(b for b in at.button if b.label == "📚 I want to choose a subject").click()
+              at.run()
+          if not any(b.label == "Enter Science Lab" for b in at.button):
+              picker = next(s for s in at.selectbox if s.key == "study_subject_picker")
+              picker.set_value("Science Lab")
+              at.run()
+              next(b for b in at.button if b.label == "Open this subject").click()
+          else:
+              next(b for b in at.button if b.label == "Enter Science Lab").click()
           at.run()
           assert not at.exception, at.exception
 

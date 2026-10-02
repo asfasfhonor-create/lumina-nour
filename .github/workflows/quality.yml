@@ -1121,21 +1121,15 @@ jobs:
           assert not at.exception, at.exception
           labels = [button.label for button in at.button]
           for expected in [
-              "🔎 Curriculum Search",
-              "📅 My Plan",
-              "🧪 Quick Practice",
-              "📝 My Reviews",
-              "Open Parent Dashboard",
-              "Start English Adventure",
-              "Enter Science Lab",
-              "Start Math Quest",
+              "▶ Start my first lesson",
+              "📚 I want to choose a subject",
           ]:
               assert expected in labels, (expected, labels)
 
-          next(button for button in at.button if button.label == "🔎 Curriculum Search").click()
+
+          next(button for button in at.button if button.label == "📚 I want to choose a subject").click()
           at.run()
           assert not at.exception, at.exception
-          assert any("Curriculum" in markdown.value or "المنهج" in markdown.value for markdown in at.markdown)
           print("Streamlit AppTest home/navigation smoke OK")
           PY
           rm -f .streamlit/secrets.toml

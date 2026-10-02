@@ -1806,6 +1806,9 @@ jobs:
               at.run()
 
           # Complete the current first-run screen, then return to the learner home.
+          if any(b.label == "▶ Start my first lesson" for b in at.button):
+              next(b for b in at.button if b.label == "▶ Start my first lesson").click()
+              at.run()
           if any(b.label == "📚 I want to choose a subject" for b in at.button):
               next(b for b in at.button if b.label == "📚 I want to choose a subject").click()
               at.run()
